@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Analysis and Plan — Depression Detection & Analysis (v4.1)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text: #0a0a0a;
+      --text-muted: #737373;
+      --bg: #ffffff;
+      --line: #e5e5e5;
+      --accent: #f7f7f7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0 4vw;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 10vh 0;
+    }
+
+    ::selection {
+      background: rgba(0,0,0,0.1);
+    }
+
+    header {
+      border-bottom: 2px solid var(--text);
+      padding-bottom: 5vh;
+      margin-bottom: 10vh;
+      animation: fade-in 1s ease-out;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      display: inline-block;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin: 0 0 2rem;
+    }
+
+    .lead {
+      font-size: 1.15rem;
+      font-weight: 300;
+      max-width: 55ch;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 3rem;
+      margin-top: 6vh;
+    }
+
+    .meta-item dt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      border-top: 1px solid var(--line);
+      padding-top: 1rem;
+    }
+
+    .meta-item dd {
+      margin: 0;
+      font-weight: 400;
+      font-size: 1rem;
+    }
+
+    .section {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      margin-bottom: 10vh;
+      border-top: 1px solid var(--line);
+      padding-top: 8vh;
+    }
+
+    @media (max-width: 800px) {
+      .section { grid-template-columns: 1fr; padding-top: 4vh; margin-bottom: 8vh; }
+    }
+
+    .section-head h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 400;
+      margin: 0;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      position: sticky;
+      top: 4vh;
+    }
+
+    .section-head .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin: 4rem 0 1.5rem;
+      letter-spacing: -0.01em;
+    }
+    
+    .section-content > h3:first-child {
+      margin-top: 0;
+    }
+
+    h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin: 3rem 0 1rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.5rem;
+    }
+
+    p {
+      margin: 0 0 1.5rem;
+      max-width: 65ch;
+      color: var(--text);
+    }
+    
+    strong {
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 1rem 1rem 1rem 0;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: normal;
+      border-bottom: 1px solid var(--text);
+    }
+
+    tr:hover td {
+      color: var(--text);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      margin: 3rem 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stat-item {
+      padding: 2rem 1rem;
+      text-align: left;
+      border-right: 1px solid var(--line);
+    }
+    
+    .stat-item:last-child {
+      border-right: none;
+    }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-desc {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .note {
+      padding: 2rem;
+      margin: 3rem 0;
+      border: 1px solid var(--line);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--text-muted);
+      background: var(--accent);
+    }
+
+    pre {
+      background: var(--accent);
+      padding: 2.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      margin: 2rem 0;
+      color: var(--text-muted);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85em;
+      background: var(--accent);
+      padding: 0.2em 0.4em;
+    }
+
+    ul, ol {
+      padding-left: 0;
+      margin-bottom: 2rem;
+      list-style-type: none;
+    }
+
+    ul li {
+      margin-bottom: 0.75rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    
+    ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+    }
+
+    .step-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .step-item {
+      display: grid;
+      grid-template-columns: 2rem 1fr auto;
+      align-items: baseline;
+      gap: 2rem;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .step-title {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+    }
+
+    .step-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.4em 1em;
+      border: 1px solid var(--text);
+      border-radius: 100px;
+      color: var(--text);
+    }
+
+    .pill.wait {
+      border-color: var(--line);
+      color: var(--text-muted);
+      border-style: dashed;
+    }
+    
+    .file-tree {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 2;
+      color: var(--text-muted);
+      padding: 2.5rem;
+      border: 1px solid var(--line);
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    
+    .file-tree .dir { color: var(--text); font-weight: 500; }
+    .file-tree .file { color: var(--text-muted); }
+    .file-tree .comment { color: #a1a1aa; font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="tag">Data Analysis and Plan &mdash; v4.1 Final</div>
+    <h1>Depression Detection<br>&amp; Analysis</h1>
+    <p class="lead">A multimodal deep learning system for estimating depression risk through facial expressions and acoustic markers &mdash; built for prototype behavioral inference.</p>
+    
+    <div class="meta-grid">
+      <div class="meta-item"><dt>Datasets</dt><dd>E-DAIC &middot; D-Vlog</dd></div>
+      <div class="meta-item"><dt>Hardware</dt><dd>RTX 5060, 8 GB VRAM</dd></div>
+      <div class="meta-item"><dt>Architecture</dt><dd>Source-Aware Transformer</dd></div>
+      <div class="meta-item"><dt>Status</dt><dd>Planning Complete</dd></div>
+    </div>
+  </header>
+
+  <!-- Section 00: Resolved Decisions -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">00</span>
+      <h2>Resolved Decisions</h2>
+    </div>
+    <div class="section-content">
+      <table>
+        <thead><tr><th>Question</th><th>Decision</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td>PHQ Threshold</td><td><strong>PHQ ≥ 10 (standard)</strong></td><td>Best sensitivity/specificity balance per meta-analyses; matches label column</td></tr>
+          <tr><td>Naming</td><td><strong>E-DAIC</strong> (consistently)</td><td>Avoids confusion with the older DAIC-WOZ release</td></tr>
+          <tr><td>Text Modality</td><td><strong>Deferred until pipeline proven</strong></td><td>No speaker column; raw use re-introduces interviewer bias</td></tr>
+          <tr><td>Body Movement</td><td><strong>Visual overlay only in v1</strong></td><td>Second-phase research track</td></tr>
+          <tr><td>Live Inference</td><td><strong>Prototype risk estimation</strong></td><td>Requires feature-space bridge via Model (MediaPipe vs OpenFace)</td></tr>
+          <tr><td>D-Vlog Raw Videos</td><td><strong>Downloaded via yt-dlp ✅</strong></td><td>Ready for feature-space bridging</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 01: Dataset Analysis -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">01</span>
+      <h2>Dataset Analysis</h2>
+    </div>
+    <div class="section-content">
+      <h3>E-DAIC (Extended DAIC-WOZ)</h3>
+      <div class="note">
+        Fully downloaded &amp; labeled. 275 clinical interview archives (105.37 GB) &mdash; all matched with labels. Zero gaps.
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item"><span class="stat-num">275</span><span class="stat-desc">Participants</span></div>
+        <div class="stat-item"><span class="stat-num">66</span><span class="stat-desc">Depressed (PHQ&thinsp;≥&thinsp;10)</span></div>
+        <div class="stat-item"><span class="stat-num">24%</span><span class="stat-desc">Depression rate</span></div>
+        <div class="stat-item"><span class="stat-num">31</span><span class="stat-desc">Visual Dims</span></div>
+        <div class="stat-item"><span class="stat-num">23</span><span class="stat-desc">Acoustic Dims</span></div>
+      </div>
+
+      <table>
+        <thead><tr><th>Split</th><th>Total</th><th>Depressed</th><th>Non-depressed</th><th>Rate</th></tr></thead>
+        <tbody>
+          <tr><td>Train</td><td>163</td><td>37</td><td>126</td><td>23%</td></tr>
+          <tr><td>Dev</td><td>56</td><td>12</td><td>44</td><td>21%</td></tr>
+          <tr><td>Test</td><td>56</td><td>17</td><td>39</td><td>30%</td></tr>
+          <tr style="border-top: 1px solid var(--text); font-weight: 500;"><td>Total</td><td>275</td><td>66</td><td>209</td><td>24%</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>⚠️ Test Split Domain Shift:</strong> The test set consists entirely of AI-controlled interviews, while train/dev are Wizard-of-Oz. Test performance relies on generalization.</p>
+
+      <h3 style="margin-top: 5rem;">D-Vlog</h3>
+      <div class="stats-grid">
+        <div class="stat-item"><span class="stat-num">961</span><span class="stat-desc">Subjects</span></div>
+        <div class="stat-item"><span class="stat-num">555</span><span class="stat-desc">Depressed (58%)</span></div>
+        <div class="stat-item"><span class="stat-num">25</span><span class="stat-desc">Acoustic dims</span></div>
+        <div class="stat-item"><span class="stat-num">136</span><span class="stat-desc">Visual dims</span></div>
+      </div>
+
+      <table>
+        <thead><tr><th>Feature</th><th>File Pattern</th><th>Shape</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Acoustic</td><td><code>&lt;id&gt;_acoustic.npy</code></td><td>(T, 25)</td><td>25 LLDs per second.</td></tr>
+          <tr><td>Visual</td><td><code>&lt;id&gt;_visual.npy</code></td><td>(T, 136)</td><td>68 facial landmarks.</td></tr>
+        </tbody>
+      </table>
+
+      <p>Pre-extracted features are complete. <strong>Raw YouTube videos have been fully downloaded via <code>yt-dlp</code></strong> and are ready for feature-space bridge building.</p>
+
+      <h3 style="margin-top: 5rem;">Dataset Comparison</h3>
+      <table>
+        <thead><tr><th>Aspect</th><th>E-DAIC</th><th>D-Vlog</th></tr></thead>
+        <tbody>
+          <tr><td>Setting</td><td>Clinical interviews</td><td>YouTube vlogs</td></tr>
+          <tr><td>Participants</td><td>275</td><td>961</td></tr>
+          <tr><td>Visual features</td><td>OpenFace: pose+gaze+AUs (31 dim)</td><td>68 landmarks (136 dim)</td></tr>
+          <tr><td>Acoustic features</td><td>eGeMAPS (23 dim)</td><td>25 LLDs</td></tr>
+          <tr><td>Labels</td><td>PHQ-8 continuous (0–27) + binary</td><td>Binary only</td></tr>
+          <tr><td>Class balance</td><td>24% depressed</td><td>58% depressed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 02: Data Pipeline -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">02</span>
+      <h2>Data Pipeline</h2>
+    </div>
+    <div class="section-content">
+      <h3>Dataset Audit &amp; Manifest Generator</h3>
+      <p>New step before training. Extracts sequences, validates files, catches length mismatches (e.g. 14 mismatched subjects in D-vlog). Compiles all windows into a singular `manifest.jsonl`.</p>
+
+      <h3>E-DAIC Feature Extraction & Processing</h3>
+      <ul>
+        <li>Batch-extract `.tar.gz` and parse files automatically.</li>
+        <li><strong>Visual:</strong> 6 pose + 8 gaze + 17 AU_r = 31 dims</li>
+        <li><strong>Acoustic:</strong> 23 valid features after metadata stripping</li>
+        <li>Drop frames where OpenFace confidence &lt; 50%</li>
+      </ul>
+
+      <h3>Unified Model Input Format</h3>
+<pre>
+{
+    "visual":         (num_windows, 30, visual_dim),
+    "acoustic":       (num_windows, 30, acoustic_dim),
+    "label_binary":   int,           # 0 or 1
+    "label_phq":      float,         # PHQ score or NaN
+    "subject_id":     str,
+    "dataset_source": str,           # "edaic" or "dvlog"
+    "quality_flags":  list[str],
+    "modality_mask":  dict,
+}
+</pre>
+      <h3>Imbalance Handling Strategy</h3>
+      <table>
+        <thead><tr><th>Method</th><th>Layer</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>Focal Loss (γ=2.0, α=0.75)</td><td>Loss function</td><td>Down-weight easy negatives</td></tr>
+          <tr><td>Weighted Random Sampling</td><td>DataLoader</td><td>50/50 class balance per batch</td></tr>
+          <tr><td>Temporal augmentation</td><td>Window level</td><td>Random jitter, speed perturbation</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 03: Model Architecture -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">03</span>
+      <h2>Model Architecture</h2>
+    </div>
+    <div class="section-content">
+      <h3>Source-Aware Multimodal Transformer</h3>
+<pre>
+┌─────────────────┐     ┌──────────────────┐
+│  Visual Stream  │     │ Acoustic Stream  │
+│  (T, V_dim)     │     │ (T, A_dim)       │
+└────────┬────────┘     └────────┬─────────┘
+         │                       │
+    ┌────▼────┐             ┌────▼────┐
+    │ Source- │             │ Source- │
+    │ Spec.   │             │ Spec.   │
+    │ Proj    │             │ Proj    │
+    └────┬────┘             └────┬────┘
+         │                       │
+    ┌────▼────┐             ┌────▼────┐
+    │ Visual  │             │Acoustic │
+    │ Encoder │             │ Encoder │
+    └────┬────┘             └────┬────┘
+         │                       │
+    ┌────▼────┐             ┌────▼────┐
+    │Modality │             │Modality │
+    │ Gate    │             │ Gate    │
+    └────┬────┘             └────┬────┘
+         │                       │
+         └──────────┬────────────┘
+                    │
+           ┌────────▼────────┐
+           │   Cross-Modal   │
+           │  Attention &amp;    │
+           │  Masking Fusion │
+           └────────┬────────┘
+                    │
+      ┌─────────────┼─────────────┐
+      │             │             │
+ ┌────▼────┐   ┌────▼────┐   ┌────▼────┐
+ │ Head A  │   │ Head B  │   │ Head C  │
+ │ E-DAIC  │   │ E-DAIC  │   │ D-Vlog  │
+ │ Binary  │   │ PHQ Reg │   │ Binary  │
+ └─────────┘   └─────────┘   └─────────┘
+</pre>
+
+      <h3>Component Specifications</h3>
+      <table>
+        <thead><tr><th>Decision</th><th>Change from v3</th><th>Justification</th></tr></thead>
+        <tbody>
+          <tr><td>Visual Dims</td><td>27 → 31</td><td>Verified from actual CSV structure</td></tr>
+          <tr><td>Acoustic Dims</td><td>88 → 23</td><td>Verified from actual archive</td></tr>
+          <tr><td>Task Heads</td><td>1 → 3</td><td>Multi-task heads improve regression mapping</td></tr>
+          <tr><td>Modality Gates</td><td>Added</td><td>Quality-aware sigmoid gating</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 04: Training Strategy -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">04</span>
+      <h2>Training Strategy</h2>
+    </div>
+    <div class="section-content">
+      <h3>Benchmark Ladder Strategy</h3>
+<pre>
+  Level 1  ·  Acoustic-only baseline (each dataset separately)
+  Level 2  ·  Visual-only baseline (each dataset separately)
+  Level 3  ·  Acoustic + Visual bimodal
+  Level 4  ·  Cross-dataset pretraining (D-vlog to E-DAIC)
+  Level 5  ·  Full multi-task multimodal
+
+  Rule: Each level must beat the previous. If Level 3 does not 
+  beat Level 1/2, then the fusion model is broken.
+</pre>
+
+      <h3>Hyperparameters</h3>
+      <table>
+        <thead><tr><th>Parameter</th><th>Value</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Batch size</td><td>16 (effective 32)</td><td>Gradient accumulation × 2</td></tr>
+          <tr><td>Learning rate</td><td>1e-4 → 3e-5</td><td>CosineAnnealingWarmRestarts scheduler</td></tr>
+          <tr><td>Early stopping</td><td>patience=7</td><td>Monitor val F1</td></tr>
+          <tr><td>Mixed precision</td><td>torch.amp (fp16)</td><td>Crucial for RTX 5060 8GB</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 05: Real-Time Inference -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">05</span>
+      <h2>Real-Time Inference</h2>
+    </div>
+    <div class="section-content">
+      <div class="note">
+        This is a prototype behavioral screening system, not a clinical diagnosis software. The inference will make this explicitly known.
+      </div>
+      <h3>Feature Space Bridge</h3>
+      <p>Since the offline model uses OpenFace AUs and the live model uses MediaPipe FaceMesh, a <strong>Feature Space Bridge</strong> projection will be trained instead of inventing hand-crafted AU mappings.</p>
+
+      <h3>Decoupled Asynchronous Streaming</h3>
+      <ul>
+        <li>Thread 1: Video Capture + Render + MediaPipe overlay (60fps)</li>
+        <li>Thread 2: FaceMesh & Pose buffer extraction</li>
+        <li>Thread 3: Audio VAD extraction</li>
+        <li>Thread 4: Model inference execution on stable cadence</li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- Section 06: Storage & Processing -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">06</span>
+      <h2>Dataset Downloads</h2>
+    </div>
+    <div class="section-content">
+      <div class="note">
+        D-Vlog Videos: ✅ Completed. All 961 videos have been successfully downloaded using yt-dlp at 720p. The datasets are now fully stored locally and are ready for the Feature-Space Bridge conversion step.
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 07: Project Structure -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">07</span>
+      <h2>Project Structure</h2>
+    </div>
+    <div class="section-content">
+      <div class="file-tree">
+<span class="dir">DLP/</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="dir">data/</span>
+│   │   ├── <span class="file">dataset_audit.py</span>          <span class="comment"># Data quality audit [NEW]</span>
+│   │   ├── <span class="file">manifest_generator.py</span>     <span class="comment"># Manifest creation [NEW]</span>
+│   │   ├── <span class="file">dvlog_dataset.py</span>          <span class="comment"># D-Vlog PyTorch Dataset</span>
+│   │   ├── <span class="file">edaic_extractor.py</span>        
+│   │   ├── <span class="file">edaic_preprocessor.py</span>     
+│   │   ├── <span class="file">dvlog_video_downloader.py</span> 
+│   │   ├── <span class="file">dataset.py</span>                <span class="comment"># Unified Dataset</span>
+│   │   └── <span class="file">augmentations.py</span>          <span class="comment"># Temporal augmentations</span>
+│   ├── <span class="dir">model/</span>
+│   │   ├── <span class="file">encoders.py</span>               <span class="comment"># Visual & Acoustic encoders</span>
+│   │   ├── <span class="file">fusion.py</span>                 <span class="comment"># Cross-attn + modality gates</span>
+│   │   ├── <span class="file">aggregation.py</span>            <span class="comment"># Subject aggregations [NEW]</span>
+│   │   ├── <span class="file">classifier.py</span>             <span class="comment"># Multi-task model (3 heads)</span>
+│   │   └── <span class="file">losses.py</span>                 <span class="comment"># Focal loss + multi-task mask</span>
+│   ├── <span class="dir">training/</span>
+│   │   ├── <span class="file">trainer.py</span>                
+│   │   ├── <span class="file">evaluate.py</span>               <span class="comment"># Slice, calibrate, abstain</span>
+│   │   ├── <span class="file">baselines.py</span>              <span class="comment"># Unimodal runners [NEW]</span>
+│   │   └── <span class="file">config.py</span>                 
+│   ├── <span class="dir">inference/</span>
+│   │   ├── <span class="file">feature_extractor.py</span>      
+│   │   ├── <span class="file">audio_stream.py</span>           <span class="comment"># VAD + buffering [NEW]</span>
+│   │   ├── <span class="file">server.py</span>                 <span class="comment"># Flask async server</span>
+│   │   └── <span class="dir">dashboard/</span>                
+│   └── <span class="dir">utils/</span>
+│       ├── <span class="file">logging_utils.py</span>          
+│       ├── <span class="file">visualization.py</span>          
+│       ├── <span class="file">model_card.py</span>             <span class="comment"># Reporting [NEW]</span>
+│       └── <span class="file">seeds.py</span>                  
+├── <span class="dir">data/</span>                             <span class="comment"># D-Vlog features</span>
+├── <span class="dir">wwwedaic/</span>                         <span class="comment"># E-DAIC archives + labels</span>
+├── <span class="dir">processed/</span>                        <span class="comment"># Pre-normalized arrays</span>
+├── <span class="file">History.md</span>
+└── <span class="file">README.md</span>                         <span class="comment"># Project honesty bounds</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 08: Execution Roadmap -->
+  <div class="section">
+    <div class="section-head">
+      <span class="num">08</span>
+      <h2>Execution Roadmap</h2>
+    </div>
+    <div class="section-content">
+      <ul class="step-list">
+        <li class="step-item"><div class="step-num">01</div><div class="step-content"><div class="step-title">Audit</div><div class="step-desc">`dataset_audit.py` + manifest generator for both datasets</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">02</div><div class="step-content"><div class="step-title">Data</div><div class="step-desc">D-Vlog Dataset + float32 cast, alignment</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">03</div><div class="step-content"><div class="step-title">Data</div><div class="step-desc">E-DAIC extraction + preprocessing</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">04</div><div class="step-content"><div class="step-title">Baselines</div><div class="step-desc">Unimodal baselines: audio/visual</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">05</div><div class="step-content"><div class="step-title">Model</div><div class="step-desc">Multi-task model with 3 heads</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">06</div><div class="step-content"><div class="step-title">Train</div><div class="step-desc">Bimodal D-Vlog training</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">07</div><div class="step-content"><div class="step-title">Train</div><div class="step-desc">Fine-tune on E-DAIC</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">08</div><div class="step-content"><div class="step-title">Eval</div><div class="step-desc">Slice metrics, calibration, abstention</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">09</div><div class="step-content"><div class="step-title">Inference</div><div class="step-desc">Live UI with async pipeline</div></div><div><span class="pill ready">Ready</span></div></li>
+        <li class="step-item"><div class="step-num">10</div><div class="step-content"><div class="step-title">D-Vlog SSD</div><div class="step-desc">Feature-space bridge creation</div></div><div><span class="pill ready">Done</span></div></li>
+        <li class="step-item"><div class="step-num">11</div><div class="step-content"><div class="step-title">Text</div><div class="step-desc">Transcript corpus audit + text modality ablation</div></div><div><span class="pill wait">Future</span></div></li>
+        <li class="step-item"><div class="step-num">12</div><div class="step-content"><div class="step-title">Body</div><div class="step-desc">Body-movement research track</div></div><div><span class="pill wait">Future</span></div></li>
+        <li class="step-item"><div class="step-num">13</div><div class="step-content"><div class="step-title">Docs</div><div class="step-desc">Model cards, privacy policy</div></div><div><span class="pill wait">Future</span></div></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

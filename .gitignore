@@ -1,0 +1,65 @@
+# Datasets and large data directories
+data/
+wwwedaic/
+D-Vlog dataset/
+_reference_repo/
+*.tar.gz
+*.mp4
+*.wav
+*.mat
+*.npy
+*.npz
+
+# Executables and binaries
+*.exe
+Git-*.exe
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Logs and databases
+*.log
+*.sqlite
+
+# IDEs and Tools
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# User specific or temporary docs not for github
+suggestions/
+suggestions
+suggestion_response.md
+History.md
