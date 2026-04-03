@@ -1,0 +1,88 @@
+{
+  "num_examples": 102,
+  "bins": 10,
+  "ece": 0.16472005100840775,
+  "brier_score": 0.22525294814720115,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 10,
+      "mean_confidence": 0.05108585910051881,
+      "mean_accuracy": 0.3
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 8,
+      "mean_confidence": 0.13094594053055605,
+      "mean_accuracy": 0.5
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 14,
+      "mean_confidence": 0.2617295891716699,
+      "mean_accuracy": 0.42857142857142855
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 12,
+      "mean_confidence": 0.3320007393289939,
+      "mean_accuracy": 0.3333333333333333
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 7,
+      "mean_confidence": 0.45681092369148363,
+      "mean_accuracy": 0.14285714285714285
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 8,
+      "mean_confidence": 0.5702336889243078,
+      "mean_accuracy": 0.5
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 9,
+      "mean_confidence": 0.6539738906529521,
+      "mean_accuracy": 0.8888888888888888
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 13,
+      "mean_confidence": 0.7341665173302082,
+      "mean_accuracy": 0.8461538461538461
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 12,
+      "mean_confidence": 0.8456800353978616,
+      "mean_accuracy": 0.75
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 9,
+      "mean_confidence": 0.9478130864020693,
+      "mean_accuracy": 0.7777777777777778
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.6500000779221697,
+    "dev_macro_f1": 0.4822190611664296,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.5542753818558483,
+    "dev_macro_f1": 0.46891464699683877,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.4715047373277385,
+    "dev_macro_f1": 0.475,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.41071985153163354,
+    "dev_macro_f1": 0.49321266968325794,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.3608828263311851,
+    "dev_macro_f1": 0.4875816993464052,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.32822646346034073,
+    "dev_macro_f1": 0.5108045977011495,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.29037665048750433,
+    "dev_macro_f1": 0.49321266968325794,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.25968745623419925,
+    "dev_macro_f1": 0.5227272727272727,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 9,
+    "train_loss": 0.23557044311267575,
+    "dev_macro_f1": 0.5349291646311676,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 10,
+    "train_loss": 0.22120902996237685,
+    "dev_macro_f1": 0.5363834422657952,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 11,
+    "train_loss": 0.2015653090869508,
+    "dev_macro_f1": 0.5636363636363637,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 12,
+    "train_loss": 0.1846034689465674,
+    "dev_macro_f1": 0.5363834422657952,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 13,
+    "train_loss": 0.1674932030642905,
+    "dev_macro_f1": 0.49918699186991866,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 14,
+    "train_loss": 0.16634335087203397,
+    "dev_macro_f1": 0.5108045977011495,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 15,
+    "train_loss": 0.15489793468902752,
+    "dev_macro_f1": 0.5349291646311676,
+    "best_method": "mean"
+  }
+]

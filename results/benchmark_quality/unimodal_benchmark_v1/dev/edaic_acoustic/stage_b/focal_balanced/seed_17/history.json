@@ -1,0 +1,92 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.06522221582366039,
+    "dev_macro_f1": 0.2925170068027211,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.056335477019783746,
+    "dev_macro_f1": 0.3748006379585327,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.05014891741634572,
+    "dev_macro_f1": 0.4013605442176871,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.044749553607698396,
+    "dev_macro_f1": 0.4666666666666667,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.04042421875696352,
+    "dev_macro_f1": 0.4385026737967914,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.03772526969801646,
+    "dev_macro_f1": 0.45264577013818674,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.03530660512763705,
+    "dev_macro_f1": 0.4805194805194805,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.03310397676038511,
+    "dev_macro_f1": 0.4629842731108554,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 9,
+    "train_loss": 0.03104974820751781,
+    "dev_macro_f1": 0.5059455312619869,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 10,
+    "train_loss": 0.029403497395633107,
+    "dev_macro_f1": 0.49321266968325794,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 11,
+    "train_loss": 0.028143237751809137,
+    "dev_macro_f1": 0.5625,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 12,
+    "train_loss": 0.026563564330508216,
+    "dev_macro_f1": 0.5491949910554561,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 13,
+    "train_loss": 0.02512770133472762,
+    "dev_macro_f1": 0.5363834422657952,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 14,
+    "train_loss": 0.02387107830060628,
+    "dev_macro_f1": 0.5114250103863731,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 15,
+    "train_loss": 0.023097702392458338,
+    "dev_macro_f1": 0.5491949910554561,
+    "best_method": "mean"
+  }
+]

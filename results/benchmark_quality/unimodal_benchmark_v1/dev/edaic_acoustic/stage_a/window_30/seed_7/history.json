@@ -1,0 +1,98 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.6534218461048312,
+    "dev_macro_f1": 0.4944444444444444,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.5597628951072693,
+    "dev_macro_f1": 0.408130081300813,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.481029063826654,
+    "dev_macro_f1": 0.475,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.43283583114786844,
+    "dev_macro_f1": 0.5114250103863731,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.3815056663460848,
+    "dev_macro_f1": 0.4991055456171736,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.33986503358294323,
+    "dev_macro_f1": 0.5059455312619869,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.2993610515827086,
+    "dev_macro_f1": 0.49918699186991866,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.26648933658512625,
+    "dev_macro_f1": 0.51875,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 9,
+    "train_loss": 0.24078750156047868,
+    "dev_macro_f1": 0.5018315018315018,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 10,
+    "train_loss": 0.20702341453331272,
+    "dev_macro_f1": 0.46489405899459907,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 11,
+    "train_loss": 0.1996505889223843,
+    "dev_macro_f1": 0.5363834422657952,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 12,
+    "train_loss": 0.17256284041739092,
+    "dev_macro_f1": 0.5491949910554561,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 13,
+    "train_loss": 0.16519534115384266,
+    "dev_macro_f1": 0.5108045977011495,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 14,
+    "train_loss": 0.14414080196037526,
+    "dev_macro_f1": 0.5349291646311676,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 15,
+    "train_loss": 0.14226343137461964,
+    "dev_macro_f1": 0.5114250103863731,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 16,
+    "train_loss": 0.12931905677769243,
+    "dev_macro_f1": 0.5447154471544715,
+    "best_method": "attention"
+  }
+]

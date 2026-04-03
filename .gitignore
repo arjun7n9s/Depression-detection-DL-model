@@ -63,3 +63,12 @@ suggestions/
 suggestions
 suggestion_response.md
 History.md
+
+# Local scratch / non-public artifacts
+_check_report.py
+results/benchmark_quality/benchmark_suite_smoke/
+results/benchmark_quality/unimodal_benchmark_v1/logs/
+results/baselines/dvlog_acoustic_20260402_213734/
+results/baselines/dvlog_visual_20260402_213838/
+results/baselines/edaic_acoustic_20260402_213838/
+results/baselines/edaic_visual_20260402_213838/

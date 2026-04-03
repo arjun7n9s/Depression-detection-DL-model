@@ -1,0 +1,98 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.06402881423005394,
+    "dev_macro_f1": 0.37320115126319153,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.05246825134050113,
+    "dev_macro_f1": 0.424212271973466,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.044108258909922586,
+    "dev_macro_f1": 0.4385026737967914,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.03698261505939235,
+    "dev_macro_f1": 0.4954954954954955,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.03137783816500196,
+    "dev_macro_f1": 0.5114250103863731,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.027031881813092525,
+    "dev_macro_f1": 0.49321266968325794,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.02436298109639231,
+    "dev_macro_f1": 0.51875,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.022547320697854444,
+    "dev_macro_f1": 0.5851851851851853,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 9,
+    "train_loss": 0.019023394178972853,
+    "dev_macro_f1": 0.5604395604395604,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 10,
+    "train_loss": 0.01835282321139254,
+    "dev_macro_f1": 0.5491949910554561,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 11,
+    "train_loss": 0.015406701528440111,
+    "dev_macro_f1": 0.5363834422657952,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 12,
+    "train_loss": 0.015287524431304928,
+    "dev_macro_f1": 0.5992844364937389,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 13,
+    "train_loss": 0.01410711702098015,
+    "dev_macro_f1": 0.5851851851851853,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 14,
+    "train_loss": 0.012577493345021333,
+    "dev_macro_f1": 0.5238095238095237,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 15,
+    "train_loss": 0.011714247111864026,
+    "dev_macro_f1": 0.5604395604395604,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 16,
+    "train_loss": 0.010967891999372675,
+    "dev_macro_f1": 0.5739130434782609,
+    "best_method": "mean"
+  }
+]

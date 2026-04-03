@@ -1,0 +1,7 @@
+{
+  "seed": 17,
+  "best_epoch": 9,
+  "best_method": "attention",
+  "best_dev_score": 0.5474747474747474,
+  "selected_method": "attention"
+}

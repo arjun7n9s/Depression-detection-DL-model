@@ -1,174 +1,157 @@
-<div align="center">
+# MindSense
 
-# 🧠 MindSense
-### **Multimodal Depression Detection AI**
+> Multimodal depression-risk estimation research project using facial and acoustic signals from E-DAIC and D-Vlog.
 
-[![Python Version](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c?style=for-the-badge&logo=pytorch)](https://pytorch.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-00a393?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
+![Status](https://img.shields.io/badge/status-active%20research-0f766e)
+![Public Snapshot](https://img.shields.io/badge/public%20snapshot-curated-1d4ed8)
+![Benchmark](https://img.shields.io/badge/unimodal%20benchmark-dev--stage%20complete-f59e0b)
+![Next Step](https://img.shields.io/badge/next-locked%20final%20runs-7c3aed)
+![License](https://img.shields.io/badge/license-MIT-eab308)
 
-<br>
+This repo is the public research log for the project as it actually exists today. It includes the verified data-foundation layer, unimodal training code, benchmark configs, curated result artifacts, and a session-by-session progress log. It does not yet include the planned multimodal fusion model, bridge model, live dashboard, or deployment stack.
 
-*An advanced multi-task, quality-aware deep learning architecture designed for real-time behavioral screening and depression risk estimation using high-dimensional facial and acoustic modalities.*
+## At A Glance
 
-<br>
+| Area | Exact status |
+|---|---|
+| Dataset audit | Complete and verified for D-Vlog and E-DAIC |
+| Manifest + extraction tracking | Complete, including explicit partial-recovery handling |
+| D-Vlog loader | Complete and verified |
+| E-DAIC loader | Complete and verified |
+| Milestone unimodal baselines | Complete |
+| Benchmark-quality unimodal search | Dev-stage complete for all 4 tracks |
+| Locked final benchmark runs | Not started yet |
+| Bimodal acoustic+visual model | Not started yet |
+| Live inference / dashboard | Not started yet |
 
-**[ System Architecture ](#-system-architecture) • [ Key Features ](#-key-features) • [ Implementation Roadmap ](#-implementation--roadmap) • [ Ethics & Privacy ](#%E2%9A%96%EF%B8%8F-ethics--privacy)**
+## What Is Public In This Repo
 
-</div>
+- Source code for dataset auditing, manifest generation, unimodal loaders, encoders, aggregation, training, and evaluation.
+- Benchmark configs under `configs/`.
+- Curated experiment artifacts under `results/baselines/` and `results/benchmark_quality/unimodal_benchmark_v1/`.
+- The running research log in `team_progress`.
 
----
+Intentionally not published:
+- Raw datasets, extracted heavy arrays, downloaded videos, `_reference_repo/`, installers, and other bulky or scratch-only files.
 
-## 📖 Overview
+## Foundation Snapshot
 
-MindSense is an ongoing implementation of a multimodal deep learning system designed to estimate depression risk via non-invasive behavioral signals. By leveraging high-dimensional facial expressions (landmarks, pose, gaze) and acoustic features, this predictive pipeline delivers real-time inference suitable for clinical screening augmentation.
+The current data layer is not a mockup. It was verified end to end before model work was expanded.
 
-### 📊 Integrated Datasets
-*   **E-DAIC:** Highly controlled clinical interviews *(PHQ-8 Continuous + Binary labels)*.
-*   **D-Vlog:** "In-the-wild" YouTube vlogs highlighting continuous speech and behavior *(Binary labels)*.
+| Checkpoint | Recorded result |
+|---|---|
+| Manifest coverage | `1236` total entries |
+| E-DAIC manifest entries | `275` |
+| E-DAIC extraction state | `274` complete, `1` partial (`383_P`, acoustic-only) |
+| D-Vlog loader verification | train `647` subjects / `25738` windows, valid `102` / `3746`, test `212` / `8139` |
+| E-DAIC loader verification | visual train `162` subjects / `10369` windows, acoustic train `163` / `10499` windows |
 
-> [!WARNING]  
-> **Clinical Disclaimer:** This tool acts strictly as a **behavioral screening support system** and is not a clinical diagnostic instrument.
+## Milestone Baseline Snapshot
 
-<br>
+These were the first verified end-to-end unimodal baselines. They are milestone results, not the final benchmark-quality locked runs.
 
-## 🏗 System Architecture
+| Dataset | Modality | Selected aggregation | Dev macro F1 | Test macro F1 |
+|---|---|---|---:|---:|
+| D-Vlog | Acoustic | `topk` | `0.6161 +/- 0.0299` | `0.6445 +/- 0.0367` |
+| D-Vlog | Visual | `topk` | `0.5816 +/- 0.0488` | `0.5323 +/- 0.0389` |
+| E-DAIC | Acoustic | `mean` | `0.4597 +/- 0.0267` | `0.5523 +/- 0.0519` |
+| E-DAIC | Visual | `mean` | `0.4819 +/- 0.0167` | `0.5395 +/- 0.0202` |
 
-The core of the system relies on a **Source-Aware Multimodal Transformer** that applies quality-aware modality gating before fusing features through cross-modal attention.
+## Benchmark Dev-Stage Snapshot
 
-```mermaid
-graph TD
-    classDef visual fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    classDef acoustic fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
-    classDef core fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-    classDef output fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px;
+The stronger research pack is the dev-stage benchmark suite under `results/benchmark_quality/unimodal_benchmark_v1/`. This stage is complete for all four unimodal tracks, which means the best dev-set settings have already been selected and frozen for the next locked final runs.
 
-    %% Data Ingestion
-    V_Raw["🎬 Visual Stream <br> (T, V_dim)"]:::visual
-    A_Raw["🎙️ Acoustic Stream <br> (T, A_dim)"]:::acoustic
+| Track | Selected window | Selected training policy | Selected capacity | Frozen aggregation | Best dev macro F1 |
+|---|---|---|---|---|---:|
+| `dvlog_acoustic` | `9s` | `bce_balanced` | `hidden128_layers1` | `mean` | `0.6935` |
+| `dvlog_visual` | `9s` | `bce_balanced` | `hidden64_layers1` | `mean` | `0.6101` |
+| `edaic_acoustic` | `9s` | `focal_balanced` | `hidden128_layers2` | `mean` | `0.6059` |
+| `edaic_visual` | `30s` | `bce_balanced` | `hidden128_layers2` | `mean` | `0.5325` |
 
-    %% Projection
-    V_Proj["Source-Specific Projection <br> 128-dim"]:::visual
-    A_Proj["Source-Specific Projection <br> 128-dim"]:::acoustic
-    
-    V_Raw --> V_Proj
-    A_Raw --> A_Proj
+Key readouts:
+- D-Vlog favored shorter `9s` windows on both unimodal tracks.
+- E-DAIC acoustic preferred `focal_balanced`, unlike D-Vlog.
+- E-DAIC visual improved only after moving to a larger `30s` window and a deeper model.
+- The repository is now at the exact point where locked final runs should be launched, not at the point of guessing hyperparameters.
 
-    %% Encoding
-    V_Enc["Visual Encoder <br> 1D CNN + BiGRU"]:::visual
-    A_Enc["Acoustic Encoder <br> TCN + BiGRU"]:::acoustic
+## Public Repro Notes
 
-    V_Proj --> V_Enc
-    A_Proj --> A_Enc
+- Large processed artifacts stay outside Git by design.
+- External storage paths are now environment-configurable through:
+  - `MINDSENSE_EXTERNAL_DATA_ROOT`
+  - `MINDSENSE_PROCESSED_ROOT`
+  - `MINDSENSE_DVLOG_VIDEOS_DIR`
+- Result paths written by the benchmark suite are repo-relative so public artifacts stay portable.
 
-    %% Gating
-    V_Gate["Modality Gate <br> Quality-aware Gating"]:::visual
-    A_Gate["Modality Gate <br> Quality-aware Gating"]:::acoustic
+## Clinical And Privacy Note
 
-    V_Enc --> V_Gate
-    A_Enc --> A_Gate
+This project is a behavioral screening support system for research use. It is not a clinical diagnostic instrument.
 
-    %% Fusion
-    F_Cross["Cross-Modal Attention Fusion <br> 4-heads + Masking Logic"]:::core
+By default, the public repo avoids raw webcam, microphone, archive, and video dumps. The published snapshot focuses on code, configs, summaries, and curated evaluation artifacts rather than sensitive or heavyweight source media.
 
-    V_Gate --> F_Cross
-    A_Gate --> F_Cross
+## Live Progress Of Project
 
-    %% Outputs
-    HeadA(("E-DAIC <br> Binary Risk")):::output
-    HeadB(("E-DAIC <br> PHQ Regression")):::output
-    HeadC(("D-Vlog <br> Binary Risk")):::output
-
-    F_Cross --> HeadA
-    F_Cross --> HeadB
-    F_Cross --> HeadC
-```
-
-<br>
-
-## 🚀 Key Features
-
-### 🧩 Robust Multimodal Architecture
-*   **Missing Modality Masking:** Seamlessly ingests unimodal inputs when either facial tracking or audio streams drop below minimum confidence thresholds in real-time.
-*   **Quality-Aware Gating:** Automatically down-weights unreliable streams via dynamically computed confidence scores (e.g., MediaPipe tracker uncertainty, poor VAD confidence).
-
-### 🎯 Advanced Multi-Task Learning Strategy
-*   **Joint Optimization:** Co-trains both datasets using a unique Multi-Task Loss methodology targeting regression and binary thresholds simultaneously: 
-    *   `L = α(L_binary_edaic) + β(L_phq_regression) + γ(L_binary_dvlog)`
-*   **Focal Loss Tuning:** Custom focal loss down-weights overwhelmingly clear samples, natively adapting to inherent dataset class imbalances.
-
-### ⚡ Sub-Second Real-Time Inference
-*   **Live Overlays:** Smooth, 60 FPS feature tracking overlays mapped to user webcam feeds.
-*   **Async Execution:** Heavy inference operations are fully decoupled from tracking loops to prevent UI blocking.
-*   **Bridge Learning:** Employs feature-bridge models allowing weights trained on heavy offline extractors (OpenFace/eGeMAPS) to accept lightweight, localized tracker outputs in production (MediaPipe/Librosa).
-
-<br>
-
-## 🛠️ Implementation & Roadmap
-
-<details open>
-<summary><b>Phase 1 & 2: Dataset Verification & Ingestion</b></summary>
-<br>
-
-- ✅ Unify E-DAIC and D-Vlog data representations.
-- ✅ Implement quality constraints on OpenFace parameters.
-- ✅ Build dynamic manifest generators with strict sequence validation logic.
-</details>
-
-<details open>
-<summary><b>Phase 3 & 4: Training & Modelling</b></summary>
-<br>
-
-- ✅ Verify baseline ladder metrics (Acoustic vs. Visual unimodality performance bounds).
-- ✅ Construct source-conditioned LayerNorm fusion architectures to bridge dataset domains.
-- ✅ Formulate temporal subject-level prediction aggregators.
-</details>
-
-<details open>
-<summary><b>Phase 5 & 6: Deployment & Feature Matching</b></summary>
-<br>
-
-- ✅ Develop MediaPipe-to-OpenFace Feature Bridge projection prototypes.
-- ⏳ Establish Flask / FastAPI async socket communication pipelines.
-- ⏳ Integrate Text modality transcript parsing + Rule-based NLP sentiment gating.
-- ⏳ Launch dashboard enhancements for real-time visualization.
-</details>
-
-<br>
-
-## 📂 Repository Access
-
-> [!NOTE]  
-> The underlying heavy binaries (`.mp4`, `.npy`, and `.mat` datasets) are intentionally `.gitignored` to comply with data privacy policies and LFS storage constraints. Only core logic, models, architectures, and implementation plans are exposed.
+This section is the repo's public heartbeat. It is meant to show what has been finished, why those steps mattered, what evidence we have recorded, and what comes next.
 
 ```mermaid
-graph LR
-    Root[📂 Depression-detection-DL-model]
-    Html[📄 Data analysis and plan.html]
-    Plan[📄 implementation_plan.md]
-    Src[📁 src/]
-    D[📁 data/]
-    M[📁 model/]
-    I[📁 inference/]
-
-    Root --> Html
-    Root --> Plan
-    Root --> Src
-    Src --> D
-    Src --> M
-    Src --> I
-    
-    style Root fill:#f1f8ff,stroke:#0366d6
-    style Src fill:#fff5f5,stroke:#cb2431
+flowchart LR
+    A[Dataset audit] --> B[Manifest + recovery-aware extraction]
+    B --> C[Verified dataset loaders]
+    C --> D[Milestone unimodal baselines]
+    D --> E[Benchmark dev-stage selection complete]
+    E --> F[Locked final unimodal runs]
+    F --> G[First bimodal acoustic+visual baseline]
+    G --> H[Bridge / deployment / dashboard]
 ```
 
-<br>
+### Progress Dashboard
 
-## ⚖️ Ethics & Privacy 
+| Workstream | Status | Evidence already recorded | Why this step existed |
+|---|---|---|---|
+| Data audit | Complete | Dataset statistics, label distributions, corruption checks, normalization-file checks | We needed to prove the datasets were structurally usable before trusting any training result |
+| Manifest generation | Complete | `1236` subject-level records with explicit source, labels, paths, and quality flags | This creates one clean interface for training code instead of hand-written split logic scattered across scripts |
+| E-DAIC extraction recovery | Complete for milestone use | `274` complete subjects and `1` partial subject | Recovery logic mattered because silent corruption would have produced misleading availability counts and unreliable loader behavior |
+| D-Vlog loader | Complete | Verified subject counts and window counts across train/valid/test | This step converts raw feature files into repeatable model-ready windows |
+| E-DAIC loader | Complete | Verified 1 Hz resampling, quality filtering, and modality-aware window creation | E-DAIC is messy enough that loader correctness directly affects every downstream metric |
+| Initial unimodal baselines | Complete | Four modality-specific milestone runs with dev/test metrics and artifact bundles | These gave us a real lower bound and validated the training/evaluation stack end to end |
+| Benchmark dev-stage search | Complete | Full `selection_ledger.json`, `leaderboard.csv`, and per-stage summaries for all four tracks | This is the step that replaced intuition with measured config selection |
+| Locked final unimodal runs | Pending | Not run yet | This is required to turn selected dev settings into the benchmark numbers we should cite publicly |
+| Bimodal modeling | Pending | No released artifacts yet | We should only start fusion after the unimodal ceiling is properly locked |
 
-**Bias Mitigation Strategy:**
-This model completely avoids text transcription features (unless heavily scrubbed) to bypass severe "Interviewer Prompts Bias" inherent to clinical datasets. Demographic bias tracking isolates variance across *(Male vs. Female)* and *(Age brackets)* ensuring balanced screening integrity. 
+### Recorded Data We Can Stand Behind
 
-**Data Locality:**
-Tracking captures are localized telemetry bounds. The system runs entirely inference-edge using memory buffers; absolutely zero raw video or audio frames are recorded, stored, or forwarded over network limits.
+| Category | Recorded value | Interpretation |
+|---|---|---|
+| E-DAIC recovery | `274` success + `1` partial | The data layer is usable, but still honest about the one remaining damaged archive |
+| Manifest size | `1236` entries | Both datasets are now represented in one consistent subject-level format |
+| D-Vlog acoustic benchmark winner | `9s`, `bce_balanced`, `hidden128_layers1`, dev macro F1 `0.6935` | Acoustic is currently the strongest public D-Vlog branch |
+| D-Vlog visual benchmark winner | `9s`, `bce_balanced`, `hidden64_layers1`, dev macro F1 `0.6101` | Visual works, but trails acoustic on D-Vlog |
+| E-DAIC acoustic benchmark winner | `9s`, `focal_balanced`, `hidden128_layers2`, dev macro F1 `0.6059` | E-DAIC acoustic needed a stronger capacity/loss recipe than D-Vlog |
+| E-DAIC visual benchmark winner | `30s`, `bce_balanced`, `hidden128_layers2`, dev macro F1 `0.5325` | E-DAIC visual appears to benefit from longer temporal context |
+
+### Why The Sequence Of Steps Matters
+
+| Step | Why we did it before the next one | What it unlocked |
+|---|---|---|
+| Audit before training | Training on unknown corruption would make every score suspect | Trustworthy dataset assumptions |
+| Manifest before loaders | We needed one shared subject-level contract across datasets | Cleaner training and benchmarking code |
+| Recovery-aware extraction before E-DAIC modeling | Partial failure had to be explicit, not silently dropped | Honest availability counts and safer modality handling |
+| Milestone baselines before benchmark search | We first needed to verify the stack could train, evaluate, save, and aggregate correctly | A working end-to-end baseline pipeline |
+| Benchmark dev-stage before final runs | Hyperparameters should be chosen by evidence, not by narrative | Frozen configs worth locking and testing |
+| Locked unimodal runs before bimodal fusion | Fusion should beat strong unimodal references, not weak placeholders | A real bar for multimodal progress |
+
+### Exact Status Right Now
+
+- The repo is past the "foundation" phase.
+- The repo is also past the "first toy baseline" phase.
+- The current blocking step is the locked final unimodal benchmark run, not more dev-stage searching.
+- Public claims should currently be framed as: verified data foundation complete, unimodal dev-stage benchmark selection complete, locked final runs pending, multimodal modeling pending.
+
+### What We’re Going To Do Further
+
+1. Run the locked final unimodal stage using the frozen configs from `selection_ledger.json`.
+2. Review the resulting test metrics and promote them to the repo's benchmark source of truth.
+3. Use those locked unimodal numbers as the bar for the first acoustic+visual bimodal baseline.
+4. Start multimodal work only after the unimodal ceiling is recorded cleanly.
+
+For a narrative log of the work as it happened, see `team_progress`.

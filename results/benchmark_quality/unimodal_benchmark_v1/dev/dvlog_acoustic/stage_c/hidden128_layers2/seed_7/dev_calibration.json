@@ -1,0 +1,88 @@
+{
+  "num_examples": 102,
+  "bins": 10,
+  "ece": 0.1420434674044641,
+  "brier_score": 0.2303141740066234,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 5,
+      "mean_confidence": 0.05469287074308996,
+      "mean_accuracy": 0.2
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 7,
+      "mean_confidence": 0.1351368193980915,
+      "mean_accuracy": 0.2857142857142857
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 8,
+      "mean_confidence": 0.24607090133770226,
+      "mean_accuracy": 0.375
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 13,
+      "mean_confidence": 0.3581273280774097,
+      "mean_accuracy": 0.38461538461538464
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 9,
+      "mean_confidence": 0.4539152881305608,
+      "mean_accuracy": 0.3333333333333333
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 10,
+      "mean_confidence": 0.5315418717568016,
+      "mean_accuracy": 0.7
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 7,
+      "mean_confidence": 0.6576793457908551,
+      "mean_accuracy": 0.8571428571428571
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 14,
+      "mean_confidence": 0.7537041754873598,
+      "mean_accuracy": 0.5714285714285714
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 11,
+      "mean_confidence": 0.852493180533138,
+      "mean_accuracy": 0.7272727272727273
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 18,
+      "mean_confidence": 0.9575961857059317,
+      "mean_accuracy": 0.7777777777777778
+    }
+  ]
+}

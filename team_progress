@@ -1,0 +1,928 @@
+# Team Progress Log
+
+## 2026-04-03 - Public Repo Curation + GitHub Push Snapshot
+
+### Session goal
+- Turn the repo into a clean public progress snapshot.
+- Push the meaningful code and experiment evidence without uploading bulky or scratch-only noise.
+- Upgrade the README so visitors can understand the exact project state from the landing page.
+
+### Implemented
+- Added `src/paths.py` so shared project paths resolve from the repo and optional environment variables instead of one-machine-only hardcoded paths.
+- Updated the data and training stack to use shared path helpers:
+  - `src/data/dataset_audit.py`
+  - `src/data/manifest_generator.py`
+  - `src/data/dvlog_dataset.py`
+  - `src/data/edaic_dataset.py`
+  - `src/training/baselines.py`
+  - `src/training/benchmark_suite.py`
+- Reworked the public `README.md` into a status page with:
+  - verified foundation counts
+  - milestone baseline metrics
+  - benchmark dev-stage selections
+  - a detailed `Live Progress Of Project` section
+  - explicit next steps
+- Curated the publish set around source, configs, benchmark artifacts, and the progress log itself.
+
+### Verified
+- The publishable results bundle is compact enough for Git:
+  - `1431` files
+  - about `7.54 MB`
+- The benchmark dev-stage suite remains the exact current research state:
+  - all 4 unimodal tracks have selected configs
+  - locked final runs are still pending
+- Public-facing benchmark artifact references are now emitted repo-relatively rather than with machine-specific absolute repo paths.
+
+### Discrepancies found
+- Several training/data scripts still assumed fixed local Windows paths before this cleanup.
+- Some generated leaderboard files recorded absolute local repo paths, which looked rough for public publication.
+- `_check_report.py` and the smoke benchmark outputs are useful locally, but not strong enough to include in the curated public push.
+
+### Artifacts produced
+- `src/paths.py`
+- Updated `README.md`
+- Updated path handling in the training and dataset stack
+- Updated `team_progress`
+
+### Next recommended step
+- Run the locked final unimodal stage:
+  - `python -m src.training.benchmark_suite --suite configs/unimodal_benchmark_v1.json --stage finalize`
+- After that finishes:
+  - review final test metrics
+  - promote the locked benchmark report as the repo's primary reference
+  - then begin the first bimodal acoustic+visual baseline
+
+## 2026-04-02 - Verified Data Foundation + Unimodal Baselines
+
+### Session goal
+- Close the verified data-foundation milestone.
+- Resolve E-DAIC extraction state honestly.
+- Implement the missing E-DAIC loader.
+- Build and run the four unimodal baselines.
+- Align public progress docs with actual implementation.
+
+### Implemented
+- Added `src/data/edaic_dataset.py` with:
+  - 1 Hz resampling
+  - quality-aware window generation
+  - train-only normalization stats
+  - support for `visual`, `acoustic`, and `both` modalities
+- Reworked `src/data/edaic_extractor.py` to:
+  - be idempotent
+  - save timestamps and success flags
+  - salvage readable features from partially corrupted archives
+  - produce explicit `success` vs `partial` extraction status
+- Updated `src/data/manifest_generator.py` so E-DAIC manifest entries reflect extracted, partial, and corrupt states explicitly.
+- Added baseline stack:
+  - `src/model/encoders.py`
+  - `src/model/aggregation.py`
+  - `src/training/trainer.py`
+  - `src/training/evaluate.py`
+  - `src/training/baselines.py`
+- Rewrote `README.md` to match real implementation state instead of future architecture claims.
+
+### Verified
+- E-DAIC extraction status:
+  - `274` complete subjects
+  - `1` partial subject (`383_P`, acoustic-only)
+  - `0` fully failed subject directories after salvage pass
+- Manifest regenerated successfully:
+  - `1236` total entries
+  - `275` E-DAIC entries
+  - `274` E-DAIC `success`
+  - `1` E-DAIC `partial`
+- D-Vlog loader verified:
+  - train `647` subjects, `25738` windows
+  - valid `102` subjects, `3746` windows
+  - test `212` subjects, `8139` windows
+- E-DAIC loader verified:
+  - visual train `162` subjects, `10369` windows
+  - acoustic train `163` subjects, `10499` windows
+  - visual missing only for the partial archive
+- Four unimodal baseline suites executed with 3 seeds:
+  - D-Vlog acoustic: dev macro F1 `0.6161 +/- 0.0299`, test macro F1 `0.6445 +/- 0.0367`
+  - D-Vlog visual: dev macro F1 `0.5816 +/- 0.0488`, test macro F1 `0.5323 +/- 0.0389`
+  - E-DAIC acoustic: dev macro F1 `0.4597 +/- 0.0267`, test macro F1 `0.5523 +/- 0.0519`
+  - E-DAIC visual: dev macro F1 `0.4819 +/- 0.0167`, test macro F1 `0.5395 +/- 0.0202`
+
+### Discrepancies found
+- Previous README heavily overclaimed implementation status for:
+  - baseline verification
+  - source-conditioned fusion architecture
+  - aggregation module
+  - bridge prototypes
+  - deployment progress
+- Existing E-DAIC extraction report was stale relative to newer recovered artifacts.
+- Existing manifest was stale and still treated all E-DAIC subjects as not extracted.
+- Archive `383_P.tar.gz` remains partially corrupted; acoustic features were recovered but visual features were not.
+
+### Artifacts produced
+- `${MINDSENSE_PROCESSED_ROOT}/edaic/extraction_report.json`
+- `${MINDSENSE_PROCESSED_ROOT}/manifest.jsonl`
+- `${MINDSENSE_PROCESSED_ROOT}/edaic_stats/norm_stats_visual.npz`
+- `${MINDSENSE_PROCESSED_ROOT}/edaic_stats/norm_stats_acoustic.npz`
+- `results/baselines/dvlog_acoustic_20260402_214049/`
+- `results/baselines/dvlog_visual_20260402_214250/`
+- `results/baselines/edaic_acoustic_20260402_214459/`
+- `results/baselines/edaic_visual_20260402_214734/`
+
+### Next recommended step
+- Promote the baseline stack from milestone verification to full experiment mode:
+  - run longer baseline training with more epochs and patience
+  - ablate window sizes for both datasets
+  - compare `mean`, `topk`, and `attention` aggregation more thoroughly
+- Then move to the first bimodal acoustic+visual baseline before any bridge or live-inference work.
+
+## 2026-04-02 - Documentation Truth Alignment Cleanup
+
+### Session goal
+- Finish milestone documentation cleanup after the data-and-baselines implementation.
+- Remove duplicated history notes.
+- Make the planning documents match the implemented repo state.
+
+### Implemented
+- Cleaned the duplicated verified-milestone section in `History.md` and added a top-level verified-state note.
+- Rewrote the stale Phase 2 / Step 3 narrative in `implementation_plan.md` so it matches the actual completed baseline milestone.
+- Preserved the older planning history while making the current repo truth explicit.
+
+### Verified
+- `History.md` now contains a single `Verified Milestone Refresh` section instead of duplicate copies.
+- `implementation_plan.md` Phase 2 narrative now reflects:
+  - E-DAIC extraction complete for baseline use
+  - E-DAIC loader complete and verified
+  - manifest regenerated with explicit partial-state tracking
+- `README.md`, `implementation_plan.md`, and `team_progress` now agree on the current milestone scope.
+
+### Discrepancies found
+- `implementation_plan.md` still had pre-implementation narrative text saying extraction was running and the E-DAIC loader was still next.
+- `History.md` had repeated planning blocks and a duplicated milestone-refresh insert.
+
+### Artifacts produced
+- Updated `History.md`
+- Updated `implementation_plan.md`
+- Updated `team_progress`
+
+### Next recommended step
+- Move from milestone verification to stronger experimentation:
+  - longer baseline training runs
+  - window-size ablations
+  - first bimodal acoustic+visual baseline
+
+## 2026-04-02 - Benchmark-Quality Unimodal Research Pack Implementation
+
+### Session goal
+- Implement the config-driven benchmark harness for benchmark-quality unimodal research.
+- Enforce dev-only selection and frozen finalization.
+- Launch the full dev-stage benchmark suite.
+
+### Implemented
+- Added `src/training/benchmark_suite.py` with:
+  - staged dev ablations (`stage_a` through `stage_d`)
+  - frozen finalization (`final_locked`)
+  - machine-readable `selection_ledger.json`
+  - suite-wide `leaderboard.csv`
+  - final `benchmark_summary.csv` and `milestone_report.md`
+- Added suite configs:
+  - `configs/unimodal_benchmark_v1.json`
+  - `configs/unimodal_benchmark_legacy_repro.json`
+- Extended `src/training/trainer.py` to support:
+  - BCE vs focal loss
+  - optional positive-class weighting
+  - dev-only runs without test evaluation
+  - richer per-seed artifact writing
+- Extended `src/training/evaluate.py` to write:
+  - metrics JSON
+  - confusion matrix CSV
+  - calibration JSON
+  - richer error review notes
+- Extended `src/data/dvlog_dataset.py` to support:
+  - explicit normalization source selection
+  - cached train-fold-only normalization stats
+
+### Verified
+- Python compilation passed for:
+  - `src/data/dvlog_dataset.py`
+  - `src/training/evaluate.py`
+  - `src/training/trainer.py`
+  - `src/training/benchmark_suite.py`
+- Smoke dev-stage suite completed successfully for `dvlog_acoustic`.
+- Smoke finalization completed successfully and produced:
+  - `results/benchmark_quality/benchmark_suite_smoke/selection_ledger.json`
+  - `results/benchmark_quality/benchmark_suite_smoke/leaderboard.csv`
+  - `results/benchmark_quality/benchmark_suite_smoke/final/benchmark_summary.csv`
+  - `results/benchmark_quality/benchmark_suite_smoke/final/milestone_report.md`
+- Full benchmark dev-stage suite was launched in the background using:
+  - `python -m src.training.benchmark_suite --suite configs/unimodal_benchmark_v1.json --stage dev`
+
+### Discrepancies found
+- The original one-off baseline runner was not sufficient for:
+  - dev-only selection discipline
+  - frozen finalization
+  - normalization protocol comparison
+  - suite-level reporting
+- The full benchmark runner is intentionally quiet, so progress must be monitored from output artifacts rather than console prints.
+
+### Artifacts produced
+- `results/benchmark_quality/benchmark_suite_smoke/`
+- `results/benchmark_quality/unimodal_benchmark_v1/logs/dev_stage_stdout.log`
+- `results/benchmark_quality/unimodal_benchmark_v1/logs/dev_stage_stderr.log`
+- `${MINDSENSE_PROCESSED_ROOT}/dvlog_stats/train_only_norm_stats.npz`
+
+### Next recommended step
+- Let the full dev-stage suite finish.
+- Then run:
+  - `python -m src.training.benchmark_suite --suite configs/unimodal_benchmark_v1.json --stage finalize`
+- Only after the frozen benchmark report is complete should we update `implementation_plan.md` and plan the first bimodal milestone.
+
+## 2026-04-03 - Live Benchmark Checkpoint (01:20 IST)
+
+### Session goal
+- Record the exact live state of the benchmark-quality unimodal suite while it is still running.
+- Capture what is being trained, why it is being trained, what has completed, and observed timing so far.
+
+### Implemented
+- Logged the active benchmark process state for the long-running dev-stage suite.
+- Recorded the first completed Stage A results for `dvlog_acoustic`.
+- Recorded the currently active in-progress candidate in Stage B.
+
+### Verified
+- Benchmark process is still active:
+  - command: `python -m src.training.benchmark_suite --suite configs/unimodal_benchmark_v1.json --stage dev`
+  - process id: `37832`
+  - start time: `2026-04-02 22:32:55 IST`
+  - checked at: `2026-04-03 01:20:47 IST`
+  - elapsed at check: about `2h 48m`
+- Completed benchmark work so far:
+  - track: `dvlog_acoustic`
+  - stage: `A` (window-size search)
+  - candidate `window_09` completed at `2026-04-02 23:37:19 IST`
+    - why this was trained:
+      - to test whether `9s` acoustic windows produce better subject-level dev performance than longer windows
+      - this follows the benchmark plan to choose window size on dev before any later training-policy or capacity decisions
+    - result:
+      - selected aggregation: `mean`
+      - dev macro F1 mean: `0.6879`
+  - candidate `window_15` completed at `2026-04-03 00:17:37 IST`
+    - why this was trained:
+      - second Stage A window-size candidate for the same `dvlog_acoustic` track
+    - result:
+      - selected aggregation: `mean`
+      - dev macro F1 mean: `0.6652`
+  - candidate `window_30` completed at `2026-04-03 00:29:21 IST`
+    - why this was trained:
+      - third Stage A window-size candidate for the same `dvlog_acoustic` track
+    - result:
+      - selected aggregation: `attention`
+      - dev macro F1 mean: `0.6869`
+- Stage A outcome:
+  - winning candidate for `dvlog_acoustic`: `window_09`
+  - reason:
+    - it had the best dev macro F1 among `9s`, `15s`, and `30s`
+- Current in-progress work at checkpoint time:
+  - track: `dvlog_acoustic`
+  - stage: `B` (training-policy comparison)
+  - current candidate: `bce_balanced`
+  - why it is being trained:
+    - to test whether the best Stage A window-size choice (`9s`) should continue using BCE with balanced sampling, before comparing against the other Stage B policies
+  - status:
+    - candidate directory exists
+    - `summary.json` not written yet
+    - therefore the candidate had started but had not finished at checkpoint time
+
+### Discrepancies found
+- The benchmark runner is functioning correctly, but progress reporting is artifact-driven rather than console-driven.
+- Runtime is dominated by candidate execution time, especially early D-Vlog acoustic runs with smaller windows.
+- The pipeline is currently GPU-enabled but still heavily CPU/data-loading limited.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/selection_ledger.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_a/window_09/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_a/window_15/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_a/window_30/summary.json`
+
+### Next recommended step
+- Continue letting the dev-stage suite run uninterrupted.
+- On the next checkpoint, record:
+  - whether `dvlog_acoustic` Stage B finished
+  - which Stage B policy won
+  - whether Stage C has begun
+
+## Plain-Language Progress Summary
+
+We started the full benchmark-quality unimodal run on `2026-04-02 22:32:55 IST`.
+
+What we were trying to do:
+- first, find the best single-modality settings in a disciplined way
+- only after that, move toward the final multimodal model
+- this run was started to answer real questions like:
+  - which window size works best
+  - which training policy works best
+  - which small model size is enough
+  - which normalization setup is better for D-Vlog
+
+What this process is technically called:
+- this is the **validation-based model selection phase**
+- more specifically, it is a **hyperparameter tuning and ablation study for unimodal baseline selection**
+- in simpler research wording:
+  - we are doing a benchmark sweep on the dev set before training the final locked versions
+
+What we expected at the beginning:
+- the first rough expectation was that the dev-stage run might finish by around `2026-04-03 11:00-15:00 IST`
+- after observing the real pace, that estimate became slower, closer to `2026-04-04 early morning`
+
+Checkpoints so far:
+- `2026-04-02 22:55 IST`
+  - the run was alive and still on the first candidate
+  - at that time, nothing had finished yet
+- `2026-04-03 01:18 IST`
+  - Stage A for `dvlog_acoustic` had fully finished
+  - Stage B for `dvlog_acoustic` had already started
+- `2026-04-03 01:20 IST`
+  - we recorded the exact first meaningful benchmark checkpoint in the technical log above
+
+What exactly finished in Stage A:
+- dataset/modality: `D-Vlog acoustic`
+- purpose: compare window sizes before trying different training policies
+- windows tested:
+  - `9s`
+  - `15s`
+  - `30s`
+- result:
+  - best window so far = `9s`
+
+Time taken for Stage A:
+- run started: `2026-04-02 22:32:55 IST`
+- `window_09` finished: `2026-04-02 23:37:19 IST`
+- `window_15` finished: `2026-04-03 00:17:37 IST`
+- `window_30` finished: `2026-04-03 00:29:21 IST`
+- total Stage A time: about `1 hour 56 minutes`
+
+What got generated during that time:
+- one `summary.json` for each completed window-size candidate
+- per-seed artifacts for seeds `7`, `17`, and `27`
+- updated `selection_ledger.json`
+- enough evidence to freeze the Stage A winner for `dvlog_acoustic`
+
+What is happening after Stage A:
+- the run moved into Stage B for `dvlog_acoustic`
+- current candidate at the last check: `bce_balanced`
+- plain meaning:
+  - now that `9s` won, we are testing which training policy is best for that chosen window size
+
+What this means in simple words:
+- the process is not stuck
+- it is not random busy work
+- it is slowly building the evidence needed before we train the proper multimodal model
+- we already got one useful answer:
+  - for D-Vlog acoustic, `9-second windows` are currently the best of the three tested options
+
+## 2026-04-03 - Live Benchmark Checkpoint (02:42 IST)
+
+### Session goal
+- Record the next live state of the running dev-stage benchmark suite.
+- Capture which Stage B candidate finished and what is currently running after that.
+
+### Implemented
+- Checked the active benchmark process again.
+- Recorded the completed Stage B result for `dvlog_acoustic / bce_balanced`.
+- Recorded the next in-progress candidate after that completion.
+
+### Verified
+- Benchmark process is still active:
+  - process id: `37832`
+  - original start time: `2026-04-02 22:32:55 IST`
+  - checked at: `2026-04-03 02:42:19 IST`
+  - elapsed at check: about `4h 10m`
+- Newly completed work since the last checkpoint:
+  - track: `dvlog_acoustic`
+  - stage: `B` (training-policy comparison)
+  - candidate: `bce_balanced`
+  - completed at: `2026-04-03 01:38:33 IST`
+  - why this candidate exists:
+    - after Stage A selected `9s` windows, Stage B began testing which training policy works best with that fixed window size
+    - `bce_balanced` is the baseline policy: BCE loss with balanced sampling
+  - result:
+    - selected aggregation: `mean`
+    - dev macro F1 mean: `0.6879`
+- Current in-progress work at this checkpoint:
+  - track: `dvlog_acoustic`
+  - stage: `B`
+  - likely current candidate: `bce_weighted`
+  - status evidence:
+    - its candidate folder exists
+    - only `config.json` exists there
+    - no `summary.json` exists yet
+    - `focal_balanced` has not started yet
+
+### Discrepancies found
+- `bce_balanced` reproduced the same dev mean as the winning Stage A `window_09` setup because Stage B started from that frozen Stage A winner using the baseline policy first.
+- The selection ledger is only updated after stage-level selection milestones, so artifact folders show more live progress than the ledger while a stage is still running.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_b/bce_balanced/summary.json`
+
+### Next recommended step
+- Continue letting Stage B finish for `dvlog_acoustic`.
+- On the next checkpoint, record:
+  - whether `bce_weighted` finished
+  - whether `focal_balanced` began or finished
+  - whether Stage B winner selection was written into the ledger
+
+## Plain-Language Progress Summary Update (02:42 IST)
+
+What changed since the last simple summary:
+- Stage B has now clearly started giving results
+- one full Stage B candidate has finished
+
+What finished:
+- `dvlog_acoustic` Stage B candidate `bce_balanced`
+- completion time: `2026-04-03 01:38:33 IST`
+- plain meaning:
+  - we tested the normal baseline training policy after freezing the best `9s` window choice
+
+What it means:
+- Stage A answer is still:
+  - best D-Vlog acoustic window so far = `9s`
+- Stage B is now actively comparing training-policy choices on top of that `9s` setup
+
+What is likely happening now:
+- the next training-policy candidate, `bce_weighted`, appears to be running
+- `focal_balanced` does not appear to have started yet
+
+Overall progress in simple words:
+- the run is still healthy
+- we are still only inside the `dvlog_acoustic` track
+- but we are no longer only choosing window sizes
+- now we are choosing the best training policy for that track
+
+## 2026-04-03 - Live Benchmark Checkpoint (05:33 IST)
+
+### Session goal
+- Record the latest live state after Stage B finished and Stage C began.
+- Capture the first completed capacity-comparison result.
+
+### Implemented
+- Checked the active benchmark process again.
+- Recorded the completed Stage B policy comparison for `dvlog_acoustic`.
+- Recorded the first completed Stage C capacity candidate and the next in-progress one.
+
+### Verified
+- Benchmark process is still active:
+  - process id: `37832`
+  - original start time: `2026-04-02 22:32:55 IST`
+  - checked at: `2026-04-03 05:33:42 IST`
+  - elapsed at check: about `7h 01m`
+- Newly completed work since the last checkpoint:
+  - track: `dvlog_acoustic`
+  - stage: `B`
+  - `bce_weighted` completed
+    - dev macro F1 mean: `0.6810`
+    - selected aggregation: `mean`
+  - `focal_balanced` completed
+    - dev macro F1 mean: `0.6711`
+    - selected aggregation: `mean`
+  - Stage B winner written to the ledger:
+    - selected policy: `bce_balanced`
+    - why it won:
+      - it had the strongest dev macro F1 among the three Stage B policy options
+- Stage C progress:
+  - candidate `hidden64_layers1` completed at `2026-04-03 05:16:52 IST`
+  - why this candidate exists:
+    - after freezing the best Stage B policy, Stage C started comparing model capacity choices
+    - `hidden64_layers1` is the smallest Stage C capacity option
+  - result:
+    - dev macro F1 mean: `0.6879`
+    - selected aggregation: `mean`
+- Current in-progress work at this checkpoint:
+  - track: `dvlog_acoustic`
+  - stage: `C`
+  - likely current candidate: `hidden128_layers1`
+  - status evidence:
+    - its candidate folder exists
+    - `config.json` exists
+    - no `summary.json` exists yet
+
+### Discrepancies found
+- The best Stage B policy remained the same as the baseline policy (`bce_balanced`), which means weighting or focal loss did not beat the original BCE + balanced sampling setup for this track.
+- The first Stage C capacity candidate reproduced the same dev mean as the winning earlier setup because it is effectively the baseline capacity option under the frozen Stage B winner.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_b/bce_weighted/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_b/focal_balanced/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_c/hidden64_layers1/summary.json`
+
+### Next recommended step
+- Continue letting Stage C finish for `dvlog_acoustic`.
+- On the next checkpoint, record:
+  - whether `hidden128_layers1` finished
+  - whether `hidden128_layers2` began or finished
+  - whether Stage C winner selection was written into the ledger
+
+## Plain-Language Progress Summary Update (05:33 IST)
+
+What changed since the last simple summary:
+- the training-policy comparison for `dvlog_acoustic` is now fully done
+- the model-capacity comparison has already started
+
+What finished:
+- Stage B for `dvlog_acoustic`
+- policies tested:
+  - `bce_balanced`
+  - `bce_weighted`
+  - `focal_balanced`
+- winner:
+  - `bce_balanced`
+
+What that means in simple words:
+- after choosing the best `9s` window size, we tried three training-style options
+- the normal baseline setup still came out best
+- so for this track, extra weighting and focal loss did not beat the original baseline policy
+
+What happened next:
+- Stage C started
+- this stage is checking how big the model should be
+- first capacity option finished:
+  - `hidden64_layers1`
+- next likely one running now:
+  - `hidden128_layers1`
+
+Overall progress in simple words:
+- the run is still healthy
+- `dvlog_acoustic` has now cleared:
+  - Stage A
+  - Stage B
+- and has entered Stage C
+
+## 2026-04-03 - Live Benchmark Checkpoint (14:13 IST)
+
+### Session goal
+- Record the next major benchmark milestone after long unattended progress.
+- Capture completion of the full `dvlog_acoustic` dev-stage track and the current state of `dvlog_visual`.
+
+### Implemented
+- Checked the active benchmark process again.
+- Recorded the completed Stage C and Stage D results for `dvlog_acoustic`.
+- Recorded the completed Stage A and Stage B results for `dvlog_visual`.
+- Recorded the in-progress Stage C state for `dvlog_visual`.
+
+### Verified
+- Benchmark process is still active:
+  - process id: `37832`
+  - original start time: `2026-04-02 22:32:55 IST`
+  - checked at: `2026-04-03 14:13:17 IST`
+  - elapsed at check: about `15h 40m`
+- `dvlog_acoustic` is now fully completed through Stage D:
+  - Stage C results:
+    - `hidden64_layers1`: dev macro F1 `0.6879`
+    - `hidden128_layers1`: dev macro F1 `0.6935`
+    - `hidden128_layers2`: dev macro F1 `0.6786`
+    - Stage C winner: `hidden128_layers1`
+  - Stage D results:
+    - `norm_train`: dev macro F1 `0.6935`
+    - `norm_provided`: dev macro F1 `0.6785`
+    - Stage D winner: `norm_train`
+  - Frozen config for `dvlog_acoustic` after dev-stage selection:
+    - window size: `9s`
+    - training policy: `bce_balanced`
+    - capacity: `hidden128_layers1`
+    - normalization: `train`
+    - aggregation: `mean`
+- `dvlog_visual` progress:
+  - Stage A completed:
+    - `window_09`: dev macro F1 `0.6101`
+    - `window_15`: dev macro F1 `0.6091`
+    - `window_30`: dev macro F1 `0.5996`
+    - Stage A winner: `window_09`
+  - Stage B completed:
+    - `bce_balanced`: dev macro F1 `0.6101`
+    - `bce_weighted`: dev macro F1 `0.6005`
+    - `focal_balanced`: dev macro F1 `0.5820`
+    - Stage B winner: `bce_balanced`
+  - Stage C status:
+    - `hidden64_layers1` candidate folder exists and is active
+    - `hidden128_layers1` folder has been created
+    - no Stage C summary written yet for `dvlog_visual` at checkpoint time
+
+### Discrepancies found
+- `dvlog_acoustic` improved meaningfully at Stage C, showing that larger hidden size (`128`) helped while the deeper `2-layer` variant did not.
+- For both `dvlog_acoustic` and `dvlog_visual`, the baseline training policy (`bce_balanced`) continues to beat the more complicated Stage B alternatives.
+- Train-only D-Vlog normalization is clearly outperforming the provided normalization stats for `dvlog_acoustic`.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_c/hidden128_layers1/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_c/hidden128_layers2/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_d/norm_train/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_acoustic/stage_d/norm_provided/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_a/window_09/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_a/window_15/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_a/window_30/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_b/bce_balanced/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_b/bce_weighted/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_b/focal_balanced/summary.json`
+
+### Next recommended step
+- Continue letting `dvlog_visual` Stage C finish.
+- On the next checkpoint, record:
+  - whether `dvlog_visual` Stage C finished
+  - whether `dvlog_visual` Stage D began or finished
+  - whether the run has moved on to `edaic_acoustic`
+
+## Plain-Language Progress Summary Update (14:13 IST)
+
+What changed since the last simple summary:
+- one full benchmark track is now basically done on the dev-stage side
+- that full track is `D-Vlog acoustic`
+- the next track, `D-Vlog visual`, is already well underway
+
+What is fully decided now for D-Vlog acoustic:
+- best window size: `9s`
+- best training policy: `bce_balanced`
+- best model size: `hidden128_layers1`
+- best normalization choice: `train`
+- best aggregation choice: `mean`
+
+What that means in simple words:
+- for the D-Vlog acoustic baseline, the benchmark has already chosen the best settings we should carry forward into the final locked run later
+
+What is happening now:
+- D-Vlog visual has already finished:
+  - Stage A
+  - Stage B
+- and is now inside Stage C
+
+Overall progress in simple words:
+- the run is still healthy
+- `dvlog_acoustic` dev-stage selection is done
+- `dvlog_visual` is in progress
+- the project now has its first fully selected benchmark-quality unimodal configuration
+
+GPU / CPU note for this phase:
+- the remaining work in this benchmark phase still uses the GPU for model training
+- but it is not a fully GPU-saturating phase
+- reason:
+  - the training loop runs on GPU
+  - but data loading, `.npy` reading, window creation, normalization, and batch preparation are still heavily CPU-side
+- so during this phase it is normal to see:
+  - CPU and memory usage high
+  - GPU usage present but often low or spiky
+- plain meaning:
+  - the benchmark is still doing real model training
+  - but the runtime bottleneck is partly the data pipeline, not only raw GPU compute
+
+## 2026-04-03 - Live Benchmark Checkpoint (15:05 IST)
+
+### Session goal
+- Record the next live state after the `dvlog_acoustic` milestone.
+- Confirm whether `dvlog_visual` Stage C has finished or is still in progress.
+
+### Implemented
+- Checked the active benchmark process again.
+- Checked the selection ledger and latest generated experiment artifacts.
+
+### Verified
+- Benchmark process is still active:
+  - process id: `37832`
+  - original start time: `2026-04-02 22:32:55 IST`
+  - checked at: `2026-04-03 15:05:30 IST`
+- No change to the already frozen `dvlog_acoustic` dev-stage result:
+  - best config remains:
+    - `window_09`
+    - `bce_balanced`
+    - `hidden128_layers1`
+    - `norm_train`
+    - aggregation `mean`
+- `dvlog_visual` status at this checkpoint:
+  - Stage A complete
+  - Stage B complete
+  - Stage C actively in progress
+  - Stage C candidate folders now exist for:
+    - `hidden64_layers1`
+    - `hidden128_layers1`
+    - `hidden128_layers2`
+  - but no Stage C `summary.json` has been written yet at checkpoint time
+  - therefore no Stage C winner has been selected yet for `dvlog_visual`
+
+### Discrepancies found
+- The selection ledger still only reflects completed stage selections, so it lags behind the existence of active Stage C candidate folders.
+- The run is still healthy, but the current checkpoint shows no new completed summary since the last major milestone; this means the current active candidates are still mid-run.
+
+### Artifacts produced
+- No new completed summary artifact was available at this checkpoint.
+
+### Next recommended step
+- Continue letting `dvlog_visual` Stage C finish.
+- On the next checkpoint, record:
+  - first completed Stage C summary for `dvlog_visual`
+  - whether Stage D begins
+
+## Plain-Language Progress Summary Update (15:05 IST)
+
+What changed since the last simple summary:
+- the benchmark is still moving
+- but at this exact checkpoint there is no new completed stage result yet
+
+What is happening now in simple words:
+- `D-Vlog acoustic` is still fully decided from before
+- `D-Vlog visual` is now in the model-size comparison stage
+- three size options have started, but none of them has fully finished yet
+
+What that means:
+- the run is still active
+- it is currently spending time inside the next set of model-comparison runs rather than producing a fresh finished result right at this checkpoint
+
+## 2026-04-03 - Live Benchmark Checkpoint (17:36 IST)
+
+### Session goal
+- Record the next major benchmark milestone after `dvlog_visual` progressed.
+- Capture the transition from D-Vlog tracks into E-DAIC work.
+
+### Implemented
+- Checked the active benchmark process again.
+- Recorded the completed Stage C and Stage D results for `dvlog_visual`.
+- Recorded the completed Stage A results for `edaic_acoustic`.
+- Recorded the in-progress Stage B state for `edaic_acoustic`.
+
+### Verified
+- Benchmark process is still active:
+  - process id: `37832`
+  - original start time: `2026-04-02 22:32:55 IST`
+  - checked at: `2026-04-03 17:36:02 IST`
+- `dvlog_visual` is now fully completed through Stage D:
+  - Stage C results:
+    - `hidden64_layers1`: dev macro F1 `0.6101`
+    - `hidden128_layers1`: dev macro F1 `0.5967`
+    - `hidden128_layers2`: dev macro F1 `0.5980`
+    - Stage C winner: `hidden64_layers1`
+  - Stage D results:
+    - `norm_train`: dev macro F1 `0.6101`
+    - `norm_provided`: dev macro F1 `0.6019`
+    - Stage D winner: `norm_train`
+  - Frozen config for `dvlog_visual` after dev-stage selection:
+    - window size: `9s`
+    - training policy: `bce_balanced`
+    - capacity: `hidden64_layers1`
+    - normalization: `train`
+    - aggregation: `mean`
+- `edaic_acoustic` progress:
+  - Stage A completed:
+    - `window_06`: dev macro F1 `0.5671`
+    - `window_09`: dev macro F1 `0.5705`
+    - `window_15`: dev macro F1 `0.5505`
+    - `window_30`: dev macro F1 `0.5339`
+    - Stage A winner: `window_09`
+  - Stage B status:
+    - `bce_balanced` candidate folder exists
+    - no `summary.json` yet at checkpoint time
+    - therefore Stage B had started but not finished
+
+### Discrepancies found
+- `dvlog_visual` did not benefit from larger hidden size; the smallest capacity option remained best.
+- Train-only normalization also stayed better than provided normalization for `dvlog_visual`, consistent with the D-Vlog acoustic result.
+- E-DAIC acoustic performs best so far with `9s` windows among the tested Stage A sizes.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_c/hidden64_layers1/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_c/hidden128_layers1/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_c/hidden128_layers2/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_d/norm_train/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/dvlog_visual/stage_d/norm_provided/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_a/window_06/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_a/window_09/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_a/window_15/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_a/window_30/summary.json`
+
+### Next recommended step
+- Continue letting `edaic_acoustic` Stage B finish.
+- On the next checkpoint, record:
+  - whether `edaic_acoustic` Stage B finished
+  - whether Stage C began
+  - whether `edaic_visual` has started
+
+## Plain-Language Progress Summary Update (17:36 IST)
+
+What changed since the last simple summary:
+- the second D-Vlog track is now also fully decided on the dev-stage side
+- the run has moved away from D-Vlog and entered E-DAIC acoustic
+
+What is fully decided now for D-Vlog visual:
+- best window size: `9s`
+- best training policy: `bce_balanced`
+- best model size: `hidden64_layers1`
+- best normalization choice: `train`
+- best aggregation choice: `mean`
+
+What this means in simple words:
+- both D-Vlog unimodal tracks now have their best dev-stage settings selected
+- we now know the best single-modality setup for:
+  - D-Vlog acoustic
+  - D-Vlog visual
+
+What is happening now:
+- E-DAIC acoustic already finished its window-size comparison
+- best window so far there is also `9s`
+- the next training-policy comparison for E-DAIC acoustic has started
+
+Overall progress in simple words:
+- the run is still healthy
+- D-Vlog side is basically done for dev-stage selection
+- E-DAIC side has now started
+
+## 2026-04-03 - Live Benchmark Checkpoint (19:57 IST)
+
+### Session goal
+- Record the completion of the full dev-stage benchmark suite.
+- Capture the final selected configs for the two E-DAIC unimodal tracks.
+
+### Implemented
+- Checked the benchmark process table and confirmed the long-running dev-stage process has ended.
+- Recorded the completed Stage B/C/D results for `edaic_acoustic`.
+- Recorded the completed Stage A/B/C/D results for `edaic_visual`.
+
+### Verified
+- The benchmark Python process `37832` is no longer running.
+- `selection_ledger.json` now shows:
+  - `completed_at`: `2026-04-03 18:45:00`
+- Therefore the full dev-stage suite has completed successfully.
+
+- Final selected dev-stage config for `edaic_acoustic`:
+  - window size: `9s`
+  - training policy: `focal_balanced`
+  - capacity: `hidden128_layers2`
+  - normalization: `train`
+  - aggregation: `mean`
+  - key stage results:
+    - Stage A winner: `window_09` with dev macro F1 `0.5705`
+    - Stage B winner: `focal_balanced` with dev macro F1 `0.5746`
+    - Stage C winner: `hidden128_layers2` with dev macro F1 `0.6059`
+
+- Final selected dev-stage config for `edaic_visual`:
+  - window size: `30s`
+  - training policy: `bce_balanced`
+  - capacity: `hidden128_layers2`
+  - normalization: `train`
+  - aggregation: `mean`
+  - key stage results:
+    - Stage A winner: `window_30` with dev macro F1 `0.5084`
+    - Stage B winner: `bce_balanced` with dev macro F1 `0.5084`
+    - Stage C winner: `hidden128_layers2` with dev macro F1 `0.5325`
+
+- Full set of dev-stage selected unimodal configs is now available for:
+  - `dvlog_acoustic`
+  - `dvlog_visual`
+  - `edaic_acoustic`
+  - `edaic_visual`
+
+### Discrepancies found
+- The E-DAIC tracks behaved differently from D-Vlog:
+  - `edaic_acoustic` preferred `focal_balanced`, unlike D-Vlog which preferred `bce_balanced`
+  - `edaic_visual` preferred a much longer `30s` window, unlike the `9s` winner on the D-Vlog tracks
+- Both E-DAIC tracks benefited from the larger/deeper Stage C capacity option `hidden128_layers2`.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/selection_ledger.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_b/bce_balanced/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_b/bce_weighted/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_b/focal_balanced/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_c/hidden64_layers1/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_c/hidden128_layers1/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_acoustic/stage_c/hidden128_layers2/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_a/window_06/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_a/window_09/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_a/window_15/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_a/window_30/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_b/bce_balanced/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_b/bce_weighted/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_b/focal_balanced/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_c/hidden64_layers1/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_c/hidden128_layers1/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/dev/edaic_visual/stage_c/hidden128_layers2/summary.json`
+
+### Next recommended step
+- Start the finalize stage:
+  - `python -m src.training.benchmark_suite --suite configs/unimodal_benchmark_v1.json --stage finalize`
+- After finalize completes:
+  - review final test metrics
+  - update `implementation_plan.md`
+  - then begin the first bimodal acoustic+visual model milestone
+
+## Plain-Language Progress Summary Update (19:57 IST)
+
+What changed since the last simple summary:
+- the full dev-stage benchmark run is now finished
+- we now have the best settings chosen for all 4 unimodal tracks
+
+What this means in simple words:
+- the “search and compare many options” part is over
+- for each single-modality branch, the system has now decided what settings worked best on the dev set
+- this is exactly what we needed before running the final locked benchmark runs
+
+What is now fully decided:
+- D-Vlog acoustic: selected
+- D-Vlog visual: selected
+- E-DAIC acoustic: selected
+- E-DAIC visual: selected
+
+Why this is important:
+- now we are no longer guessing what settings to use
+- the next step is the final locked run using these chosen settings
+- after that, we can move toward the first real multimodal model phase

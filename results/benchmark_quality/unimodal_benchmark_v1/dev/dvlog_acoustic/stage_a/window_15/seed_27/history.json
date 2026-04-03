@@ -1,0 +1,92 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.5555817948064958,
+    "dev_macro_f1": 0.5901785714285714,
+    "best_method": "topk"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.42194514014429085,
+    "dev_macro_f1": 0.625,
+    "best_method": "topk"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.3515699555705932,
+    "dev_macro_f1": 0.6648411829134722,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.2953698664008883,
+    "dev_macro_f1": 0.6381553015372488,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.24837954146206792,
+    "dev_macro_f1": 0.6528250510551395,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.21761612258593424,
+    "dev_macro_f1": 0.626890756302521,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.18910478824624838,
+    "dev_macro_f1": 0.6726636195662744,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.16458292806189825,
+    "dev_macro_f1": 0.6739319965126417,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 9,
+    "train_loss": 0.1472732950406317,
+    "dev_macro_f1": 0.626890756302521,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 10,
+    "train_loss": 0.13194064661757224,
+    "dev_macro_f1": 0.6672268907563026,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 11,
+    "train_loss": 0.11949504585829122,
+    "dev_macro_f1": 0.6843326885880077,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 12,
+    "train_loss": 0.10841459112874217,
+    "dev_macro_f1": 0.5948852077884336,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 13,
+    "train_loss": 0.10113354313765882,
+    "dev_macro_f1": 0.6448742746615087,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 14,
+    "train_loss": 0.09200322005562227,
+    "dev_macro_f1": 0.6436335403726708,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 15,
+    "train_loss": 0.08398097102244236,
+    "dev_macro_f1": 0.649277925139994,
+    "best_method": "mean"
+  }
+]

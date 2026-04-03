@@ -1,0 +1,92 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.058202380454351776,
+    "dev_macro_f1": 0.5597122302158273,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.04473849576904054,
+    "dev_macro_f1": 0.5808823529411764,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.03545213725579822,
+    "dev_macro_f1": 0.5546777546777547,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.029813153345299805,
+    "dev_macro_f1": 0.584021750496706,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.02571899905476881,
+    "dev_macro_f1": 0.6056166056166056,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.0225090074950488,
+    "dev_macro_f1": 0.5835905605894653,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.020745551974386253,
+    "dev_macro_f1": 0.622532894736842,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.019095997029132603,
+    "dev_macro_f1": 0.5802469135802468,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 9,
+    "train_loss": 0.017531565429178976,
+    "dev_macro_f1": 0.5887096774193548,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 10,
+    "train_loss": 0.016375119846966976,
+    "dev_macro_f1": 0.6085287846481876,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 11,
+    "train_loss": 0.01502263877290511,
+    "dev_macro_f1": 0.6263736263736264,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 12,
+    "train_loss": 0.013757129794916773,
+    "dev_macro_f1": 0.622532894736842,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 13,
+    "train_loss": 0.012769308179857428,
+    "dev_macro_f1": 0.6007226738934056,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 14,
+    "train_loss": 0.012275353904779171,
+    "dev_macro_f1": 0.5626895325734602,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 15,
+    "train_loss": 0.011694186258808328,
+    "dev_macro_f1": 0.6263736263736264,
+    "best_method": "mean"
+  }
+]

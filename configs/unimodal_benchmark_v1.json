@@ -1,0 +1,115 @@
+{
+  "suite_name": "unimodal_benchmark_v1",
+  "output_root": "results/benchmark_quality/unimodal_benchmark_v1",
+  "stride_policy": "half_window",
+  "dev_seeds": [7, 17, 27],
+  "final_seeds": [7, 17, 27, 37, 47],
+  "base_experiment": {
+    "batch_size": 128,
+    "hidden_dim": 64,
+    "num_layers": 1,
+    "dropout": 0.2,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "epochs": 20,
+    "patience": 4,
+    "device": "cuda",
+    "aggregation_methods": ["mean", "topk", "attention"],
+    "loss_name": "bce",
+    "balanced_sampling": true,
+    "use_pos_weight": false,
+    "focal_gamma": 2.0,
+    "focal_alpha": 0.75,
+    "normalization_source": "train",
+    "num_workers": 0,
+    "min_valid_ratio": 0.5
+  },
+  "training_policies": [
+    {
+      "name": "bce_balanced",
+      "overrides": {
+        "loss_name": "bce",
+        "balanced_sampling": true,
+        "use_pos_weight": false
+      }
+    },
+    {
+      "name": "bce_weighted",
+      "overrides": {
+        "loss_name": "bce",
+        "balanced_sampling": false,
+        "use_pos_weight": true
+      }
+    },
+    {
+      "name": "focal_balanced",
+      "overrides": {
+        "loss_name": "focal",
+        "balanced_sampling": true,
+        "use_pos_weight": false,
+        "focal_gamma": 2.0,
+        "focal_alpha": 0.75
+      }
+    }
+  ],
+  "capacity_candidates": [
+    {
+      "name": "hidden64_layers1",
+      "overrides": {
+        "hidden_dim": 64,
+        "num_layers": 1,
+        "dropout": 0.2
+      }
+    },
+    {
+      "name": "hidden128_layers1",
+      "overrides": {
+        "hidden_dim": 128,
+        "num_layers": 1,
+        "dropout": 0.2
+      }
+    },
+    {
+      "name": "hidden128_layers2",
+      "overrides": {
+        "hidden_dim": 128,
+        "num_layers": 2,
+        "dropout": 0.3
+      }
+    }
+  ],
+  "normalization_protocols": {
+    "dvlog": ["train", "provided"],
+    "edaic": ["train"]
+  },
+  "tracks": [
+    {
+      "name": "dvlog_acoustic",
+      "dataset": "dvlog",
+      "modality": "acoustic",
+      "window_sizes": [9, 15, 30],
+      "default_normalization": "train"
+    },
+    {
+      "name": "dvlog_visual",
+      "dataset": "dvlog",
+      "modality": "visual",
+      "window_sizes": [9, 15, 30],
+      "default_normalization": "train"
+    },
+    {
+      "name": "edaic_acoustic",
+      "dataset": "edaic",
+      "modality": "acoustic",
+      "window_sizes": [6, 9, 15, 30],
+      "default_normalization": "train"
+    },
+    {
+      "name": "edaic_visual",
+      "dataset": "edaic",
+      "modality": "visual",
+      "window_sizes": [6, 9, 15, 30],
+      "default_normalization": "train"
+    }
+  ]
+}

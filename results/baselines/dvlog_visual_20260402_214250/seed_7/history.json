@@ -1,0 +1,8 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.640297315310483,
+    "dev_macro_f1": 0.5644409937888198,
+    "best_method": "topk"
+  }
+]

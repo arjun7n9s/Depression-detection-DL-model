@@ -1,0 +1,88 @@
+{
+  "num_examples": 102,
+  "bins": 10,
+  "ece": 0.10055016163037624,
+  "brier_score": 0.24525371603050497,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 2,
+      "mean_confidence": 0.05822553932666778,
+      "mean_accuracy": 0.5
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 7,
+      "mean_confidence": 0.15076560915569273,
+      "mean_accuracy": 0.42857142857142855
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 7,
+      "mean_confidence": 0.24215584683692024,
+      "mean_accuracy": 0.5714285714285714
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 14,
+      "mean_confidence": 0.3452849095577347,
+      "mean_accuracy": 0.42857142857142855
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 11,
+      "mean_confidence": 0.441009117299483,
+      "mean_accuracy": 0.36363636363636365
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 23,
+      "mean_confidence": 0.5505506138715791,
+      "mean_accuracy": 0.5652173913043478
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 15,
+      "mean_confidence": 0.6640641114618553,
+      "mean_accuracy": 0.6666666666666666
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 17,
+      "mean_confidence": 0.7677378831149562,
+      "mean_accuracy": 0.6470588235294118
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 3,
+      "mean_confidence": 0.83964774204814,
+      "mean_accuracy": 0.6666666666666666
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 3,
+      "mean_confidence": 0.9469850825701823,
+      "mean_accuracy": 1.0
+    }
+  ]
+}
