@@ -1,0 +1,84 @@
+{
+  "suite_name": "bimodal_benchmark_smoke",
+  "completed_at": "2026-04-04 05:48:11",
+  "tracks": {
+    "edaic_bimodal": {
+      "dataset": "edaic",
+      "modality": "both",
+      "stages": {
+        "stage_a": {
+          "candidates": [
+            {
+              "candidate_name": "window_09",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_smoke/dev/edaic_bimodal/stage_a/window_09/summary.json",
+              "dev_macro_f1_mean": 0.5492260061919505,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "window_09"
+        },
+        "stage_b": {
+          "candidates": [
+            {
+              "candidate_name": "bce_balanced",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_smoke/dev/edaic_bimodal/stage_b/bce_balanced/summary.json",
+              "dev_macro_f1_mean": 0.5492260061919505,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "bce_balanced"
+        },
+        "stage_c": {
+          "candidates": [
+            {
+              "candidate_name": "hidden64_layers1",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_smoke/dev/edaic_bimodal/stage_c/hidden64_layers1/summary.json",
+              "dev_macro_f1_mean": 0.5492260061919505,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "hidden64_layers1"
+        },
+        "stage_d": {
+          "candidates": [
+            {
+              "candidate_name": "norm_train",
+              "summary_path": null,
+              "dev_macro_f1_mean": 0.5492260061919505,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "norm_train",
+          "note": "E-DAIC keeps train-only normalization fixed for this milestone."
+        }
+      },
+      "final_config": {
+        "batch_size": 48,
+        "hidden_dim": 64,
+        "num_layers": 1,
+        "dropout": 0.3,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 4,
+        "patience": 2,
+        "device": "cuda",
+        "aggregation_methods": [
+          "mean",
+          "topk",
+          "attention"
+        ],
+        "loss_name": "bce",
+        "balanced_sampling": true,
+        "use_pos_weight": false,
+        "focal_gamma": 2.0,
+        "focal_alpha": 0.75,
+        "normalization_source": "train",
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 9,
+        "stride": 4
+      },
+      "frozen_aggregation": "mean"
+    }
+  }
+}

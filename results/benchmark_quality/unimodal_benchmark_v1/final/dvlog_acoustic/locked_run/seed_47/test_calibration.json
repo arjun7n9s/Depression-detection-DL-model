@@ -1,0 +1,88 @@
+{
+  "num_examples": 212,
+  "bins": 10,
+  "ece": 0.14258295883781522,
+  "brier_score": 0.23146113821130518,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 26,
+      "mean_confidence": 0.04275523216288658,
+      "mean_accuracy": 0.2692307692307692
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 18,
+      "mean_confidence": 0.14323783883909622,
+      "mean_accuracy": 0.4444444444444444
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 16,
+      "mean_confidence": 0.2555283226711352,
+      "mean_accuracy": 0.375
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 8,
+      "mean_confidence": 0.3498457549144728,
+      "mean_accuracy": 0.25
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 20,
+      "mean_confidence": 0.4519685017506935,
+      "mean_accuracy": 0.6
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 23,
+      "mean_confidence": 0.5476587655840252,
+      "mean_accuracy": 0.4782608695652174
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 18,
+      "mean_confidence": 0.6618851099740038,
+      "mean_accuracy": 0.6666666666666666
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 27,
+      "mean_confidence": 0.7579470291984977,
+      "mean_accuracy": 0.8518518518518519
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 23,
+      "mean_confidence": 0.8546327947318924,
+      "mean_accuracy": 0.782608695652174
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 33,
+      "mean_confidence": 0.9506774984247656,
+      "mean_accuracy": 0.7272727272727273
+    }
+  ]
+}

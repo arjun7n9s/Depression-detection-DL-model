@@ -3,12 +3,13 @@
 > Multimodal depression-risk estimation research project using facial and acoustic signals from E-DAIC and D-Vlog.
 
 ![Status](https://img.shields.io/badge/status-active%20research-0f766e)
-![Public Snapshot](https://img.shields.io/badge/public%20snapshot-curated-1d4ed8)
-![Benchmark](https://img.shields.io/badge/unimodal%20benchmark-dev--stage%20complete-f59e0b)
-![Next Step](https://img.shields.io/badge/next-locked%20final%20runs-7c3aed)
+![Public Snapshot](https://img.shields.io/badge/public%20snapshot-curated%20stable-1d4ed8)
+![Unimodal](https://img.shields.io/badge/unimodal%20benchmark-finalized-15803d)
+![Bimodal](https://img.shields.io/badge/bimodal%20v1-dev--stage%20complete-f59e0b)
+![Next Step](https://img.shields.io/badge/next-Fusion%20V2-7c3aed)
 ![License](https://img.shields.io/badge/license-MIT-eab308)
 
-This repo is the public research log for the project as it actually exists today. It includes the verified data-foundation layer, unimodal training code, benchmark configs, curated result artifacts, and a session-by-session progress log. It does not yet include the planned multimodal fusion model, bridge model, live dashboard, or deployment stack.
+This repo is the public research log for the project as it actually exists today. It includes the verified data-foundation layer, finalized unimodal benchmark results, implemented bimodal `Fusion V1` code and curated benchmark artifacts, plus the running progress log in `team_progress`.
 
 ## At A Glance
 
@@ -19,20 +20,26 @@ This repo is the public research log for the project as it actually exists today
 | D-Vlog loader | Complete and verified |
 | E-DAIC loader | Complete and verified |
 | Milestone unimodal baselines | Complete |
-| Benchmark-quality unimodal search | Dev-stage complete for all 4 tracks |
-| Locked final benchmark runs | Not started yet |
-| Bimodal acoustic+visual model | Not started yet |
+| Benchmark-quality unimodal search | Complete |
+| Locked final unimodal benchmark runs | Complete |
+| Bimodal acoustic+visual `Fusion V1` | Implemented and dev-stage benchmark complete |
+| Bimodal smoke verification | Complete |
+| Next architecture milestone | `Fusion V2` implementation |
 | Live inference / dashboard | Not started yet |
 
 ## What Is Public In This Repo
 
-- Source code for dataset auditing, manifest generation, unimodal loaders, encoders, aggregation, training, and evaluation.
+- Source code for dataset auditing, manifest generation, unimodal and bimodal loaders, encoders, aggregation, training, and evaluation.
 - Benchmark configs under `configs/`.
-- Curated experiment artifacts under `results/baselines/` and `results/benchmark_quality/unimodal_benchmark_v1/`.
+- Curated experiment artifacts under:
+  - `results/baselines/`
+  - `results/benchmark_quality/unimodal_benchmark_v1/`
+  - `results/benchmark_quality/bimodal_benchmark_smoke/`
+  - `results/benchmark_quality/bimodal_benchmark_v1/`
 - The running research log in `team_progress`.
 
 Intentionally not published:
-- Raw datasets, extracted heavy arrays, downloaded videos, `_reference_repo/`, installers, and other bulky or scratch-only files.
+- Raw datasets, extracted heavy arrays, downloaded videos, `_reference_repo/`, installers, live logs, and other bulky or scratch-only files.
 
 ## Foundation Snapshot
 
@@ -46,42 +53,45 @@ The current data layer is not a mockup. It was verified end to end before model 
 | D-Vlog loader verification | train `647` subjects / `25738` windows, valid `102` / `3746`, test `212` / `8139` |
 | E-DAIC loader verification | visual train `162` subjects / `10369` windows, acoustic train `163` / `10499` windows |
 
-## Milestone Baseline Snapshot
+## Final Unimodal Benchmark Snapshot
 
-These were the first verified end-to-end unimodal baselines. They are milestone results, not the final benchmark-quality locked runs.
+These are the locked 5-seed benchmark results from `results/benchmark_quality/unimodal_benchmark_v1/final/benchmark_summary.csv`. This is the current unimodal source of truth for the repo.
 
-| Dataset | Modality | Selected aggregation | Dev macro F1 | Test macro F1 |
-|---|---|---|---:|---:|
-| D-Vlog | Acoustic | `topk` | `0.6161 +/- 0.0299` | `0.6445 +/- 0.0367` |
-| D-Vlog | Visual | `topk` | `0.5816 +/- 0.0488` | `0.5323 +/- 0.0389` |
-| E-DAIC | Acoustic | `mean` | `0.4597 +/- 0.0267` | `0.5523 +/- 0.0519` |
-| E-DAIC | Visual | `mean` | `0.4819 +/- 0.0167` | `0.5395 +/- 0.0202` |
-
-## Benchmark Dev-Stage Snapshot
-
-The stronger research pack is the dev-stage benchmark suite under `results/benchmark_quality/unimodal_benchmark_v1/`. This stage is complete for all four unimodal tracks, which means the best dev-set settings have already been selected and frozen for the next locked final runs.
-
-| Track | Selected window | Selected training policy | Selected capacity | Frozen aggregation | Best dev macro F1 |
-|---|---|---|---|---|---:|
-| `dvlog_acoustic` | `9s` | `bce_balanced` | `hidden128_layers1` | `mean` | `0.6935` |
-| `dvlog_visual` | `9s` | `bce_balanced` | `hidden64_layers1` | `mean` | `0.6101` |
-| `edaic_acoustic` | `9s` | `focal_balanced` | `hidden128_layers2` | `mean` | `0.6059` |
-| `edaic_visual` | `30s` | `bce_balanced` | `hidden128_layers2` | `mean` | `0.5325` |
+| Track | Window | Loss | Capacity | Dev macro F1 | Test macro F1 |
+|---|---|---|---|---:|---:|
+| `dvlog_acoustic` | `9s` | `bce_balanced` | `hidden128_layers1` | `0.6680 +/- 0.0415` | `0.6630 +/- 0.0100` |
+| `dvlog_visual` | `9s` | `bce_balanced` | `hidden64_layers1` | `0.6028 +/- 0.0189` | `0.5943 +/- 0.0412` |
+| `edaic_acoustic` | `9s` | `focal_balanced` | `hidden128_layers2` | `0.5922 +/- 0.0202` | `0.5134 +/- 0.0257` |
+| `edaic_visual` | `30s` | `bce_balanced` | `hidden128_layers2` | `0.5220 +/- 0.0292` | `0.5355 +/- 0.0686` |
 
 Key readouts:
-- D-Vlog favored shorter `9s` windows on both unimodal tracks.
-- E-DAIC acoustic preferred `focal_balanced`, unlike D-Vlog.
-- E-DAIC visual improved only after moving to a larger `30s` window and a deeper model.
-- The repository is now at the exact point where locked final runs should be launched, not at the point of guessing hyperparameters.
+- D-Vlog acoustic is the strongest finalized unimodal branch so far.
+- E-DAIC acoustic was the strongest unimodal branch on dev, but E-DAIC visual slightly edged it on final test with higher variance.
+- Final locked runs are complete, so the repo has moved beyond dev-stage-only reporting.
+
+## Bimodal Fusion V1 Snapshot
+
+The first multimodal architecture is implemented as `Fusion V1` and its full dev-stage benchmark suite completed on **April 4, 2026 at 19:37 IST**. These are dev-stage selection results only, not finalized test-set benchmark claims.
+
+| Track | Selected window | Selected policy | Selected capacity | Frozen aggregation | Best dev macro F1 |
+|---|---|---|---|---|---:|
+| `edaic_bimodal` | `15s` | `focal_balanced` | `hidden128_layers2` | `attention` | `0.5352` |
+| `dvlog_bimodal` | `9s` | `bce_balanced` | `hidden128_layers1` | `mean` | `0.7024` |
+
+Evidence-backed interpretation:
+- `Fusion V1` is a valid multimodal baseline.
+- On `D-Vlog`, `Fusion V1` already beats both finalized unimodal dev baselines.
+- On `E-DAIC`, `Fusion V1` does not yet beat the stronger acoustic unimodal baseline.
+- That split result is exactly why the next milestone is **`Fusion V2`**, not immediate promotion of `Fusion V1` as the final architecture.
 
 ## Public Repro Notes
 
 - Large processed artifacts stay outside Git by design.
-- External storage paths are now environment-configurable through:
+- External storage paths are environment-configurable through:
   - `MINDSENSE_EXTERNAL_DATA_ROOT`
   - `MINDSENSE_PROCESSED_ROOT`
   - `MINDSENSE_DVLOG_VIDEOS_DIR`
-- Result paths written by the benchmark suite are repo-relative so public artifacts stay portable.
+- Result paths written by the benchmark suite are repo-relative so curated public artifacts stay portable.
 
 ## Clinical And Privacy Note
 
@@ -91,45 +101,46 @@ By default, the public repo avoids raw webcam, microphone, archive, and video du
 
 ## Live Progress Of Project
 
-This section is the repo's public heartbeat. It is meant to show what has been finished, why those steps mattered, what evidence we have recorded, and what comes next.
+This section is the repo's public heartbeat. It shows what has been finished, why those steps mattered, what evidence we have recorded, and what comes next.
 
 ```mermaid
 flowchart LR
     A[Dataset audit] --> B[Manifest + recovery-aware extraction]
     B --> C[Verified dataset loaders]
     C --> D[Milestone unimodal baselines]
-    D --> E[Benchmark dev-stage selection complete]
-    E --> F[Locked final unimodal runs]
-    F --> G[First bimodal acoustic+visual baseline]
-    G --> H[Bridge / deployment / dashboard]
+    D --> E[Locked unimodal benchmark pack]
+    E --> F[First bimodal Fusion V1 benchmark]
+    F --> G[Fusion V2 architecture milestone]
+    G --> H[Inference / bridge / dashboard]
 ```
 
-### Progress Dashboard
+### Current State
 
-| Workstream | Status | Evidence already recorded | Why this step existed |
+| Workstream | Status | Verified artifact(s) | Why this step existed |
 |---|---|---|---|
-| Data audit | Complete | Dataset statistics, label distributions, corruption checks, normalization-file checks | We needed to prove the datasets were structurally usable before trusting any training result |
-| Manifest generation | Complete | `1236` subject-level records with explicit source, labels, paths, and quality flags | This creates one clean interface for training code instead of hand-written split logic scattered across scripts |
+| Data audit | Complete | `data/audit_report.json` | We needed to prove the datasets were structurally usable before trusting any training result |
+| Manifest generation | Complete | `manifest.jsonl` generation + extraction-state tracking | This creates one clean interface for training code instead of hand-written split logic scattered across scripts |
 | E-DAIC extraction recovery | Complete for milestone use | `274` complete subjects and `1` partial subject | Recovery logic mattered because silent corruption would have produced misleading availability counts and unreliable loader behavior |
-| D-Vlog loader | Complete | Verified subject counts and window counts across train/valid/test | This step converts raw feature files into repeatable model-ready windows |
+| D-Vlog loader | Complete | Verified subject and window counts across train/valid/test | This step converts raw feature files into repeatable model-ready windows |
 | E-DAIC loader | Complete | Verified 1 Hz resampling, quality filtering, and modality-aware window creation | E-DAIC is messy enough that loader correctness directly affects every downstream metric |
-| Initial unimodal baselines | Complete | Four modality-specific milestone runs with dev/test metrics and artifact bundles | These gave us a real lower bound and validated the training/evaluation stack end to end |
-| Benchmark dev-stage search | Complete | Full `selection_ledger.json`, `leaderboard.csv`, and per-stage summaries for all four tracks | This is the step that replaced intuition with measured config selection |
-| Locked final unimodal runs | Pending | Not run yet | This is required to turn selected dev settings into the benchmark numbers we should cite publicly |
-| Bimodal modeling | Pending | No released artifacts yet | We should only start fusion after the unimodal ceiling is properly locked |
+| Locked unimodal benchmark | Complete | Final milestone report + benchmark summary CSV | This gives us the benchmark numbers we can cite publicly today |
+| Bimodal `Fusion V1` implementation | Complete | Bimodal model code, runner support, configs, smoke outputs | This proves the repo now supports real multimodal training rather than only unimodal benchmarking |
+| Bimodal `Fusion V1` dev benchmark | Complete | `results/benchmark_quality/bimodal_benchmark_v1/selection_ledger.json` | This gave us evidence for where simple fusion works and where it still falls short |
+| Next architecture milestone | Ready to start | `Fusion V2` plan captured in `implementation_plan.md` | We need a stronger multimodal architecture, not just more repetitions of the same fusion recipe |
 
-### Recorded Data We Can Stand Behind
+### Recorded Results We Can Stand Behind
 
 | Category | Recorded value | Interpretation |
 |---|---|---|
 | E-DAIC recovery | `274` success + `1` partial | The data layer is usable, but still honest about the one remaining damaged archive |
 | Manifest size | `1236` entries | Both datasets are now represented in one consistent subject-level format |
-| D-Vlog acoustic benchmark winner | `9s`, `bce_balanced`, `hidden128_layers1`, dev macro F1 `0.6935` | Acoustic is currently the strongest public D-Vlog branch |
-| D-Vlog visual benchmark winner | `9s`, `bce_balanced`, `hidden64_layers1`, dev macro F1 `0.6101` | Visual works, but trails acoustic on D-Vlog |
-| E-DAIC acoustic benchmark winner | `9s`, `focal_balanced`, `hidden128_layers2`, dev macro F1 `0.6059` | E-DAIC acoustic needed a stronger capacity/loss recipe than D-Vlog |
-| E-DAIC visual benchmark winner | `30s`, `bce_balanced`, `hidden128_layers2`, dev macro F1 `0.5325` | E-DAIC visual appears to benefit from longer temporal context |
+| Final D-Vlog acoustic benchmark | test macro F1 `0.6630 +/- 0.0100` | Current strongest finalized unimodal result in the repo |
+| Final E-DAIC acoustic benchmark | dev macro F1 `0.5922 +/- 0.0202` | Strongest unimodal E-DAIC dev reference that multimodal models must beat |
+| Final E-DAIC visual benchmark | test macro F1 `0.5355 +/- 0.0686` | Shows longer-context visual modeling can stay competitive on final test |
+| `Fusion V1` D-Vlog bimodal | dev macro F1 `0.7024` | First clear sign that fusion is already helping on D-Vlog |
+| `Fusion V1` E-DAIC bimodal | dev macro F1 `0.5352` | First fusion baseline works, but is not yet strong enough to beat the best E-DAIC unimodal reference |
 
-### Why The Sequence Of Steps Matters
+### Why These Steps Matter
 
 | Step | Why we did it before the next one | What it unlocked |
 |---|---|---|
@@ -137,21 +148,24 @@ flowchart LR
 | Manifest before loaders | We needed one shared subject-level contract across datasets | Cleaner training and benchmarking code |
 | Recovery-aware extraction before E-DAIC modeling | Partial failure had to be explicit, not silently dropped | Honest availability counts and safer modality handling |
 | Milestone baselines before benchmark search | We first needed to verify the stack could train, evaluate, save, and aggregate correctly | A working end-to-end baseline pipeline |
-| Benchmark dev-stage before final runs | Hyperparameters should be chosen by evidence, not by narrative | Frozen configs worth locking and testing |
-| Locked unimodal runs before bimodal fusion | Fusion should beat strong unimodal references, not weak placeholders | A real bar for multimodal progress |
+| Locked unimodal runs before multimodal promotion | Fusion should beat strong unimodal references, not weak placeholders | A real bar for multimodal progress |
+| `Fusion V1` before `Fusion V2` | We needed a first multimodal baseline to reveal where simple fusion helps and where it fails | Evidence-driven architecture upgrades instead of guesswork |
 
 ### Exact Status Right Now
 
-- The repo is past the "foundation" phase.
-- The repo is also past the "first toy baseline" phase.
-- The current blocking step is the locked final unimodal benchmark run, not more dev-stage searching.
-- Public claims should currently be framed as: verified data foundation complete, unimodal dev-stage benchmark selection complete, locked final runs pending, multimodal modeling pending.
+- The repo is past the foundation phase.
+- The repo is past the toy-baseline phase.
+- The repo already contains a finalized unimodal benchmark pack.
+- The repo already contains an implemented bimodal baseline with a completed dev-stage benchmark.
+- The current architectural decision is evidence-backed:
+  - freeze `Fusion V1` as the multimodal baseline
+  - build `Fusion V2` as the main upgrade path
 
-### What We’re Going To Do Further
+### What We're Doing Next
 
-1. Run the locked final unimodal stage using the frozen configs from `selection_ledger.json`.
-2. Review the resulting test metrics and promote them to the repo's benchmark source of truth.
-3. Use those locked unimodal numbers as the bar for the first acoustic+visual bimodal baseline.
-4. Start multimodal work only after the unimodal ceiling is recorded cleanly.
+1. Keep `Fusion V1` as the benchmark baseline rather than prematurely promoting it as the final multimodal model.
+2. Implement `Fusion V2` with stronger modality encoders, reliability-aware latent fusion, teacher distillation, masked multitask supervision, and learned subject-level aggregation.
+3. Benchmark `Fusion V2` directly against the strongest unimodal model and `Fusion V1` on both datasets.
+4. Promote winners by evidence, not by narrative.
 
 For a narrative log of the work as it happened, see `team_progress`.

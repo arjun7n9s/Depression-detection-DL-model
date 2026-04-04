@@ -926,3 +926,713 @@ Why this is important:
 - now we are no longer guessing what settings to use
 - the next step is the final locked run using these chosen settings
 - after that, we can move toward the first real multimodal model phase
+
+## 2026-04-03 - Finalize Checkpoint (22:19 IST)
+
+### Session goal
+- Record live progress of the finalize stage after it began.
+- Capture whether the first locked unimodal run has completed.
+
+### Implemented
+- Checked the active finalize process.
+- Checked the `final/` artifact tree.
+
+### Verified
+- Finalize process is still active:
+  - process id: `24652`
+  - start time: `2026-04-03 20:20:38 IST`
+  - checked at: `2026-04-03 22:19:45 IST`
+- `dvlog_acoustic` locked run is now fully completed:
+  - `summary.json` exists
+  - seed folders exist for:
+    - `7`
+    - `17`
+    - `27`
+    - `37`
+    - `47`
+- `dvlog_visual` locked run has already started:
+  - `config.json` exists
+  - no `summary.json` yet at checkpoint time
+
+### Discrepancies found
+- Logs remain quiet even during finalize, so file outputs are still the real progress signal.
+- Finalize is progressing correctly even though console logs stay empty.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/seed_7/`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/seed_17/`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/seed_27/`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/seed_37/`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/seed_47/`
+
+### Next recommended step
+- Let finalize continue uninterrupted.
+- On the next checkpoint, record:
+  - whether `dvlog_visual` locked run completed
+  - whether `edaic_acoustic` locked run began
+
+## Plain-Language Progress Summary Update (22:19 IST)
+
+What changed since the last simple summary:
+- the final locked benchmark phase has made real progress
+- the first finalized unimodal run is now complete
+
+What is finished now:
+- `D-Vlog acoustic` final locked run
+- all 5 final seeds for that run have produced outputs
+
+What is happening now:
+- the next finalized run, `D-Vlog visual`, has already started
+
+What this means in simple words:
+- the “final confirmation” phase is working properly
+- we are no longer just setting things up
+- the benchmark pack is now producing actual final locked outputs
+## 2026-04-04 - Finalize Resume (02:05 IST)
+
+### Session goal
+- Resume the interrupted finalize stage without redoing already completed locked runs.
+
+### Implemented
+- Verified that `benchmark_suite.py` skips an experiment if its `summary.json` already exists.
+- Relaunched the finalize stage after the earlier interruption.
+
+### Verified
+- New finalize process started successfully:
+  - process id: `59052`
+  - start time: `2026-04-04 02:05:41 IST`
+- Resume command:
+  - `python -m src.training.benchmark_suite --suite configs/unimodal_benchmark_v1.json --stage finalize`
+- Existing completed locked run that should be skipped automatically on resume:
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/summary.json`
+- New resume logs:
+  - `results/benchmark_quality/unimodal_benchmark_v1/logs/finalize_resume_stdout.log`
+  - `results/benchmark_quality/unimodal_benchmark_v1/logs/finalize_resume_stderr.log`
+
+### Discrepancies found
+- The earlier finalize attempt was interrupted after only `dvlog_acoustic` completed, so the remaining locked runs still need to finish.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/logs/finalize_resume_stdout.log`
+- `results/benchmark_quality/unimodal_benchmark_v1/logs/finalize_resume_stderr.log`
+
+### Next recommended step
+- Let the resumed finalize stage run uninterrupted.
+- On the next checkpoint, verify whether:
+  - `dvlog_visual` locked run completed
+  - `edaic_acoustic` locked run began
+
+## Plain-Language Progress Summary Update (02:05 IST)
+
+What happened:
+- the earlier final benchmark run had stopped unexpectedly
+- we started it again in a safe way
+
+Why restarting is okay:
+- the code is written to skip any final run that already has its `summary.json`
+- that means `D-Vlog acoustic` should not be retrained again
+- the resumed process should continue with the remaining final models
+
+What should happen next:
+- `D-Vlog visual` should finish first
+- then `E-DAIC acoustic`
+- then `E-DAIC visual`
+
+Estimated time from this restart:
+- roughly `3.5 to 5.5 hours`
+- likely finish window: `April 4, 2026, around 5:30 AM to 7:30 AM IST`
+## 2026-04-04 - Finalize Checkpoint (03:40 IST)
+
+### Session goal
+- Verify the status of the resumed finalize run.
+
+### Implemented
+- Checked the resumed finalize process id.
+- Inspected the `final/` output tree again.
+- Checked the resume logs.
+
+### Verified
+- The resumed finalize process is no longer running:
+  - process id checked: `59052`
+  - checked at: `2026-04-04 03:39:41 IST`
+- Finalized summaries still present:
+  - `dvlog_acoustic/locked_run/summary.json`
+- No new finalized summaries appeared after the restart.
+- `dvlog_visual/locked_run` still contains only:
+  - `config.json`
+- Resume logs did not capture any new diagnostic output.
+
+### Discrepancies found
+- The restarted finalize run stopped again without producing additional finalized artifacts.
+- This means the resume did not advance beyond the already completed `dvlog_acoustic` result.
+
+### Artifacts produced
+- No new benchmark artifacts in this checkpoint window.
+
+### Next recommended step
+- Treat finalize as interrupted again.
+- The next recovery step should be to run finalize in the foreground once so we can capture the exact failure directly instead of relying on quiet background logs.
+
+## Plain-Language Progress Summary Update (03:40 IST)
+
+What changed:
+- the restarted final benchmark process has stopped again
+- it did not finish `D-Vlog visual`
+
+What is still safely done:
+- `D-Vlog acoustic` final locked run
+
+What is still not done:
+- `D-Vlog visual`
+- `E-DAIC acoustic`
+- `E-DAIC visual`
+
+What this means in simple words:
+- the problem is no longer just “waiting for training”
+- finalize is being interrupted before it can continue
+- we need one more debugging-style restart to see the exact error live
+## 2026-04-04 - Finalize Checkpoint (04:14 IST)
+
+### Session goal
+- Verify whether the foreground manual finalize run is still active and whether it has produced new artifacts.
+
+### Implemented
+- Checked active Python processes and command lines.
+- Inspected the `final/` output tree for new summaries or seed folders.
+
+### Verified
+- Manual finalize process is currently running:
+  - process id: `55952`
+  - start time: `2026-04-04 03:42:13 IST`
+  - command: `python -m src.training.benchmark_suite --suite configs/unimodal_benchmark_v1.json --stage finalize`
+- `dvlog_visual/locked_run/config.json` was rewritten at:
+  - `2026-04-04 03:42:19 IST`
+- As of `2026-04-04 04:14:21 IST`, finalized summaries still present:
+  - `dvlog_acoustic/locked_run/summary.json`
+- No new finalized summary exists yet for:
+  - `dvlog_visual`
+  - `edaic_acoustic`
+  - `edaic_visual`
+- `dvlog_visual/locked_run` still contains only:
+  - `config.json`
+
+### Discrepancies found
+- The foreground run is active, but it has not yet emitted visible per-seed artifacts for `dvlog_visual`, so it is likely still in a quiet setup/loading phase or early training.
+
+### Artifacts produced
+- Updated `dvlog_visual/locked_run/config.json`
+
+### Next recommended step
+- Let the foreground run continue for another `15-20` minutes.
+- On the next check, verify whether:
+  - `seed_7/` appears under `dvlog_visual/locked_run`
+  - `summary.json` appears under `dvlog_visual/locked_run`
+
+## Plain-Language Progress Summary Update (04:14 IST)
+
+What changed:
+- your manually started finalize run is alive
+- so this time it is not dead or silently closed yet
+
+What we can clearly see:
+- the job restarted `D-Vlog visual` at about `3:42 AM`
+- by `4:14 AM`, it had not finished that run yet
+- the folder has a fresh `config.json`, but no seed outputs yet
+
+What this means in simple words:
+- it is still working, just very quietly
+- right now there is no evidence of a crash
+- we need a little more time before deciding whether it is truly progressing or stuck
+## 2026-04-04 - Finalize Checkpoint (04:56 IST)
+
+### Session goal
+- Verify whether the manual foreground finalize run has made visible artifact progress after more runtime.
+
+### Implemented
+- Checked the live finalize process again.
+- Re-inspected `dvlog_visual/locked_run`.
+- Confirmed the active Python command line.
+
+### Verified
+- Manual finalize process is still alive:
+  - process id: `55952`
+  - checked at: `2026-04-04 04:56:07 IST`
+- CPU time has increased significantly since the last checkpoint, so the process is actively working.
+- `dvlog_visual/locked_run` still contains only:
+  - `config.json`
+- Finalized summaries still present:
+  - `dvlog_acoustic/locked_run/summary.json`
+- No new finalized summary exists yet for:
+  - `dvlog_visual`
+  - `edaic_acoustic`
+  - `edaic_visual`
+
+### Discrepancies found
+- Even after extended runtime, the process has not emitted visible `dvlog_visual` seed folders or a summary file, so progress remains opaque from artifacts alone.
+
+### Artifacts produced
+- No new artifact files in this checkpoint window.
+
+### Next recommended step
+- Let it continue a bit longer if the terminal is still busy and no exception has appeared.
+- If it remains in this exact state after another `20-30` minutes, treat it as likely stuck inside `dvlog_visual` finalize and stop to inspect the live terminal output/error.
+
+## Plain-Language Progress Summary Update (04:56 IST)
+
+What changed:
+- the manual finalize process is still alive
+- it has been actively using CPU for a long time
+
+What still has not appeared:
+- no `D-Vlog visual` seed folders
+- no `D-Vlog visual` final summary
+
+What this means in simple words:
+- the process is doing something, but from the files alone we still cannot see real output progress
+- if this same state continues much longer, it is safer to suspect it is stuck inside this run rather than just slow
+## 2026-04-04 - Finalize Completion (05:31 IST)
+
+### Session goal
+- Confirm whether the manual rerun returned because finalize failed again or because the benchmark pack had already completed.
+
+### Implemented
+- Checked the `final/` artifact tree and final report files.
+- Verified whether all locked-run summaries exist.
+
+### Verified
+- The manual rerun returned immediately because the finalize stage is effectively complete.
+- Finalized locked-run summaries now exist for all four tracks:
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/summary.json`
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_visual/locked_run/summary.json`
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/edaic_acoustic/locked_run/summary.json`
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/edaic_visual/locked_run/summary.json`
+- Final summary artifacts also exist:
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/benchmark_summary.csv`
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/milestone_report.md`
+
+### Discrepancies found
+- Earlier checks caught an interrupted/background finalize state, but the manual foreground run eventually completed the remaining tracks even though terminal/log output stayed quiet.
+
+### Artifacts produced
+- `results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_visual/locked_run/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/edaic_acoustic/locked_run/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/edaic_visual/locked_run/summary.json`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/benchmark_summary.csv`
+- `results/benchmark_quality/unimodal_benchmark_v1/final/milestone_report.md`
+
+### Next recommended step
+- Treat the unimodal benchmark milestone as complete.
+- Next phase is to review the finalized results and plan the first bimodal acoustic+visual model.
+
+## Plain-Language Progress Summary Update (05:31 IST)
+
+What happened:
+- the final benchmark stage actually finished
+- that is why rerunning the command later just returned immediately
+
+What is finished now:
+- `D-Vlog acoustic` final locked run
+- `D-Vlog visual` final locked run
+- `E-DAIC acoustic` final locked run
+- `E-DAIC visual` final locked run
+- final benchmark summary file
+- final milestone report
+
+What this means in simple words:
+- the unimodal benchmark pack is done
+- we now have the final trusted single-modality results
+- the next major step is the first real bimodal model
+## 2026-04-04 - Bimodal Milestone Kickoff (05:50 IST)
+
+### Session goal
+- Start the first real acoustic + visual benchmark milestone with E-DAIC as the primary target and D-Vlog as the secondary validation target.
+
+### Implemented
+- Extended the model stack with a bimodal encoder:
+  - `src/model/encoders.py`
+    - added `BimodalSequenceClassifier`
+- Extended the trainer to handle multimodal batch inputs:
+  - `src/training/trainer.py`
+- Extended the benchmark runner to support `modality = both`:
+  - `src/training/benchmark_suite.py`
+- Added bimodal suite configs:
+  - `configs/bimodal_benchmark_v1.json`
+  - `configs/bimodal_benchmark_smoke.json`
+
+### Verified
+- Fast forward-pass sanity check succeeded for E-DAIC bimodal batches:
+  - visual batch shape: `(4, 9, 49)`
+  - acoustic batch shape: `(4, 9, 23)`
+  - output shape: `(4,)`
+- Bimodal smoke benchmark dev stage completed successfully:
+  - `results/benchmark_quality/bimodal_benchmark_smoke/selection_ledger.json`
+  - `results/benchmark_quality/bimodal_benchmark_smoke/leaderboard.csv`
+- Bimodal smoke finalize stage completed successfully:
+  - `results/benchmark_quality/bimodal_benchmark_smoke/final/benchmark_summary.csv`
+  - `results/benchmark_quality/bimodal_benchmark_smoke/final/milestone_report.md`
+- Real bimodal dev-stage benchmark started successfully:
+  - process id: `41844`
+  - start time: `2026-04-04 05:50:10 IST`
+  - command: `python -m src.training.benchmark_suite --suite configs/bimodal_benchmark_v1.json --stage dev`
+
+### Discrepancies found
+- D-Vlog bimodal setup remains slower to materialize first-batch checks than E-DAIC, so E-DAIC remains the best lead dataset for the first multimodal iteration.
+- Smoke performance is only a pipeline validation signal, not a target-quality result:
+  - E-DAIC smoke bimodal test macro F1: `0.4490`
+  - This used just `1` seed and short smoke settings (`4` epochs), so it should not be compared directly against finalized unimodal benchmarks.
+
+### Artifacts produced
+- `results/benchmark_quality/bimodal_benchmark_smoke/selection_ledger.json`
+- `results/benchmark_quality/bimodal_benchmark_smoke/leaderboard.csv`
+- `results/benchmark_quality/bimodal_benchmark_smoke/final/benchmark_summary.csv`
+- `results/benchmark_quality/bimodal_benchmark_smoke/final/milestone_report.md`
+- `results/benchmark_quality/bimodal_benchmark_v1/logs/dev_stage_stdout.log`
+- `results/benchmark_quality/bimodal_benchmark_v1/logs/dev_stage_stderr.log`
+
+### Next recommended step
+- Let the full bimodal dev-stage benchmark continue uninterrupted.
+- First checkpoint should verify:
+  - `edaic_bimodal` Stage A candidate completion
+  - which window size is leading on the dev set
+  - whether fusion is already beating the stronger E-DAIC unimodal baseline
+
+## Plain-Language Progress Summary Update (05:50 IST)
+
+What we started:
+- the first true multimodal benchmark phase
+- this means the model now uses both face-related visual features and speech/audio features together
+
+Why E-DAIC is first:
+- it is the cleaner and more controlled dataset
+- if a multimodal design is genuinely good, it should show its value there first
+- D-Vlog is still important, but it is our second priority in this phase
+
+What we built before starting the long run:
+- a new bimodal model
+- support in the trainer for handling visual + acoustic inputs together
+- a new benchmark config for the bimodal phase
+
+What we tested first:
+- a small smoke run just to make sure the pipeline works end to end
+- that smoke run finished correctly and produced the expected reports
+
+What is running now:
+- the real `bimodal_benchmark_v1` dev-stage sweep
+- it starts with `E-DAIC bimodal`, then later moves to `D-Vlog bimodal`
+
+Estimated time:
+- likely around `8 to 11 hours` for the full dev-stage run
+- first useful checkpoint: about `1 to 2 hours` after start
+## 2026-04-04 - Bimodal Checkpoint (06:00 IST)
+
+### Session goal
+- Record the first real progress checkpoint from the E-DAIC-first bimodal dev-stage benchmark.
+
+### Implemented
+- Checked the active bimodal benchmark process.
+- Read the first completed `edaic_bimodal` Stage A summary.
+
+### Verified
+- Bimodal dev-stage process is active:
+  - process id: `41844`
+  - checked at: `2026-04-04 06:00:20 IST`
+- First completed summary exists:
+  - `results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_a/window_09/summary.json`
+- `window_09` completed at:
+  - `2026-04-04 05:55:37 IST`
+- First E-DAIC bimodal Stage A result:
+  - selected aggregation: `topk`
+  - dev macro F1 mean: `0.5163`
+- `window_15` directory now exists as well, so Stage A is continuing.
+
+### Discrepancies found
+- The first E-DAIC bimodal result is not yet stronger than the finalized E-DAIC unimodal baselines:
+  - finalized unimodal E-DAIC visual test macro F1: `0.5355`
+  - finalized unimodal E-DAIC acoustic test macro F1: `0.5134`
+  - finalized unimodal E-DAIC acoustic dev macro F1: `0.5922`
+- This is not yet a failure signal for the milestone:
+  - it is only the first Stage A candidate
+  - the current fusion model/search space may still need better window size, policy, or capacity choices
+
+### Artifacts produced
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_a/window_09/summary.json`
+
+### Next recommended step
+- Let Stage A continue so we can see whether `window_15` or `window_30` is stronger.
+- Do not overreact to the first bimodal number yet; wait for the rest of Stage A and at least Stage B before judging the fusion design.
+
+## Plain-Language Progress Summary Update (06:00 IST)
+
+What happened:
+- the first real multimodal result has arrived
+- this is for `E-DAIC bimodal` with a `9-second` window
+
+What it says:
+- the model is definitely running correctly
+- but the first fusion result is only moderate so far
+
+What that means in simple words:
+- the bimodal model is not instantly beating our best single-modality setup yet
+- that is not shocking, because this is only the very first candidate in the search
+- we still need the rest of the window-size and policy search before judging the multimodal design
+## 2026-04-04 - Bimodal Checkpoint (06:32 IST)
+
+### Session goal
+- Capture the first substantial E-DAIC bimodal selection progress after multiple stages completed.
+
+### Implemented
+- Checked the active bimodal benchmark process.
+- Read the current selection ledger.
+- Opened the strongest completed Stage A and Stage B summaries.
+- Checked Stage C candidate progress.
+
+### Verified
+- Bimodal dev-stage process is still active:
+  - process id: `41844`
+  - checked at: `2026-04-04 06:32:26 IST`
+- `edaic_bimodal` Stage A is complete:
+  - `window_09`: dev macro F1 `0.5163`, aggregation `topk`
+  - `window_15`: dev macro F1 `0.5245`, aggregation `attention`
+  - `window_30`: dev macro F1 `0.5162`, aggregation `mean`
+  - Stage A winner: `window_15`
+- `edaic_bimodal` Stage B is complete:
+  - `bce_balanced`: dev macro F1 `0.5245`
+  - `bce_weighted`: dev macro F1 `0.4820`
+  - `focal_balanced`: dev macro F1 `0.5252`
+  - Stage B winner: `focal_balanced`
+- `edaic_bimodal` Stage C is in progress:
+  - `hidden64_layers1` completed: dev macro F1 `0.5252`
+  - `hidden128_layers1` completed: lower than `hidden64_layers1`
+  - `hidden128_layers2` exists and is being evaluated
+
+### Discrepancies found
+- The current E-DAIC bimodal design is still not outperforming the strongest finalized E-DAIC unimodal baseline:
+  - finalized unimodal E-DAIC acoustic dev macro F1: `0.5922`
+  - current best bimodal dev macro F1 so far: `0.5252`
+- The bimodal model is functioning, but the first fusion design/search space is not yet delivering the expected gain.
+
+### Artifacts produced
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_a/window_15/summary.json`
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_b/focal_balanced/summary.json`
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_c/hidden64_layers1/summary.json`
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_c/hidden128_layers1/summary.json`
+
+### Next recommended step
+- Let Stage C finish before making architecture decisions.
+- If `hidden128_layers2` still does not close the gap to the unimodal acoustic baseline, treat this first fusion design as a valid baseline but plan a stronger second fusion architecture rather than over-tuning this one blindly.
+
+## Plain-Language Progress Summary Update (06:32 IST)
+
+What happened:
+- the E-DAIC multimodal search has moved well ahead now
+- it has already finished:
+  - window-size search
+  - training-policy search
+- and it is now testing model size
+
+What is winning so far:
+- best window so far: `15 seconds`
+- best training policy so far: `focal + balanced sampling`
+
+Important reality check:
+- the multimodal model is working
+- but right now it is still weaker than our strongest E-DAIC single-modality baseline
+
+What this means in simple words:
+- multimodal is not automatically better just because it combines two inputs
+- this first fusion design may simply be too basic
+- that is okay: this run is still useful because it tells us what the first multimodal attempt can and cannot do
+## 2026-04-04 - Bimodal Checkpoint (06:56 IST)
+
+### Session goal
+- Record whether E-DAIC bimodal selection has finished and whether the run has advanced to D-Vlog bimodal.
+
+### Implemented
+- Checked the active bimodal benchmark process.
+- Read the updated selection ledger.
+- Verified D-Vlog bimodal directory creation.
+
+### Verified
+- Bimodal dev-stage process is still active:
+  - process id: `41844`
+  - checked at: `2026-04-04 06:55:56 IST`
+- `edaic_bimodal` dev-stage selection is now fully frozen:
+  - Stage A winner: `window_15`
+  - Stage B winner: `focal_balanced`
+  - Stage C winner: `hidden128_layers2`
+  - Stage D: `norm_train`
+  - frozen aggregation: `attention`
+- Best E-DAIC bimodal dev macro F1 so far:
+  - `0.5352`
+- The run has moved on to `dvlog_bimodal`:
+  - `results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_09/config.json` exists
+
+### Discrepancies found
+- E-DAIC bimodal improved over earlier bimodal candidates but still does not beat the strongest E-DAIC acoustic unimodal dev baseline.
+- It is roughly in the same neighborhood as the E-DAIC visual unimodal baseline, but not yet a clear win for fusion.
+
+### Artifacts produced
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_c/hidden128_layers2/summary.json`
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_09/config.json`
+
+### Next recommended step
+- Let D-Vlog bimodal Stage A produce its first summary before making broader multimodal conclusions.
+- After the full dev-stage run, decide whether this first fusion architecture should be finalized as-is or treated as a baseline for a stronger second multimodal design.
+
+## Plain-Language Progress Summary Update (06:56 IST)
+
+What happened:
+- the E-DAIC multimodal search is now complete on the dev side
+- the benchmark has already started the D-Vlog multimodal search
+
+What E-DAIC finally chose:
+- `15-second` window
+- `focal loss + balanced sampling`
+- `128 hidden size, 2 layers`
+- `attention` as the final window-to-subject aggregation
+
+What this means in simple words:
+- the first multimodal design improved compared to its earlier versions
+- but it still is not clearly beating our strongest E-DAIC acoustic-only setup
+- now the run is testing whether the same fusion idea behaves better or worse on D-Vlog
+## 2026-04-04 - Bimodal Checkpoint (07:38 IST)
+
+### Session goal
+- Verify live D-Vlog bimodal progress after E-DAIC bimodal selection finished.
+
+### Implemented
+- Checked the active bimodal benchmark process.
+- Inspected the selection ledger and D-Vlog bimodal output tree.
+
+### Verified
+- Bimodal dev-stage process is still active:
+  - process id: `41844`
+  - checked at: `2026-04-04 07:37:34 IST`
+- E-DAIC bimodal remains frozen with:
+  - `window_15`
+  - `focal_balanced`
+  - `hidden128_layers2`
+  - `attention`
+- D-Vlog bimodal has started:
+  - `results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_09/config.json` exists
+- No D-Vlog bimodal `summary.json` exists yet at this checkpoint.
+
+### Discrepancies found
+- The selection ledger has not yet recorded the `dvlog_bimodal` track, which means the first D-Vlog bimodal candidate has not finished writing its summary.
+- D-Vlog bimodal is significantly slower to produce visible output than E-DAIC bimodal.
+
+### Artifacts produced
+- No new summary artifact during this checkpoint window.
+
+### Next recommended step
+- Let the D-Vlog bimodal first candidate continue uninterrupted.
+- Next useful check should focus on whether:
+  - `dvlog_bimodal/stage_a/window_09/summary.json` appears
+  - or `window_15` gets created, which would imply Stage A is advancing
+
+## Plain-Language Progress Summary Update (07:38 IST)
+
+What changed:
+- the run is still alive
+- but D-Vlog multimodal has still not finished its first visible candidate yet
+
+What we know for sure:
+- E-DAIC multimodal selection is done on the dev side
+- D-Vlog multimodal has started
+- it is currently still sitting in `window_09` from what the output files show
+
+What this means in simple words:
+- the benchmark has not stalled completely
+- but D-Vlog multimodal is much slower than E-DAIC multimodal
+- the next real progress signal will be the first `summary.json` for `D-Vlog bimodal`
+## 2026-04-04 - Bimodal Checkpoint (08:09 IST)
+
+### Session goal
+- Record the first completed D-Vlog bimodal result and compare its signal to the finalized unimodal benchmarks.
+
+### Implemented
+- Checked the active bimodal benchmark process.
+- Read the first completed `dvlog_bimodal` Stage A summary.
+
+### Verified
+- Bimodal dev-stage process is still active:
+  - process id: `41844`
+  - checked at: `2026-04-04 08:08:49 IST`
+- First completed D-Vlog bimodal summary exists:
+  - `results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_09/summary.json`
+- First D-Vlog bimodal result:
+  - window size: `9`
+  - selected aggregation: `mean`
+  - dev macro F1 mean: `0.6947`
+- `window_15` directory also exists, so D-Vlog Stage A is continuing.
+
+### Discrepancies found
+- D-Vlog behaves differently from E-DAIC:
+  - first D-Vlog bimodal candidate is already stronger than both finalized D-Vlog unimodal dev baselines
+  - E-DAIC bimodal did not show that same early fusion gain
+- This suggests the first fusion design may generalize better to D-Vlog than to E-DAIC, even though E-DAIC remains the primary target.
+
+### Artifacts produced
+- `results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_09/summary.json`
+
+### Next recommended step
+- Let D-Vlog Stage A continue so we can see whether `window_09` remains the winner.
+- After the full dev-stage run, evaluate the split behavior honestly:
+  - E-DAIC multimodal may require a stronger second fusion design
+  - D-Vlog multimodal may already justify moving to finalize
+
+## Plain-Language Progress Summary Update (08:09 IST)
+
+What happened:
+- the first D-Vlog multimodal result has arrived
+
+What it looks like:
+- `9-second` bimodal D-Vlog got about `0.6947` dev macro F1
+
+Why that matters:
+- this is already better than our finalized D-Vlog single-modality dev baselines
+- so on D-Vlog, the multimodal idea is looking promising much earlier than it did on E-DAIC
+
+What this means in simple words:
+- the first fusion design is not a universal win
+- but it is clearly not useless either
+- right now it looks more naturally suited to D-Vlog than to E-DAIC
+
+## 2026-04-04 - Public Snapshot Preparation
+
+### Session goal
+- Prepare and publish a curated stable GitHub snapshot that shows the repo's real implementation depth, benchmark evidence, and next milestone direction.
+
+### Implemented
+- Re-checked the bimodal benchmark state and confirmed the dev-stage sweep completed cleanly.
+- Upgraded `README.md` into a public research-status page with finalized unimodal results, bimodal `Fusion V1` evidence, and the `Fusion V2` next-step narrative.
+- Updated `implementation_plan.md` so its source-of-truth sections now reflect:
+  - data foundation complete
+  - unimodal benchmark pack complete
+  - `Fusion V1` bimodal dev-stage benchmark complete
+  - `Fusion V2` as the next main milestone
+- Curated the publish set to include code, configs, progress docs, locked unimodal artifacts, bimodal smoke outputs, and bimodal dev-stage benchmark artifacts.
+
+### Verified
+- `bimodal_benchmark_v1/selection_ledger.json` now records completion at `2026-04-04 19:37:09`.
+- Finalized unimodal benchmark source of truth is present under:
+  - `results/benchmark_quality/unimodal_benchmark_v1/final/`
+- Bimodal benchmark evidence is present under:
+  - `results/benchmark_quality/bimodal_benchmark_v1/`
+- Public narrative is now aligned with actual repo truth instead of the earlier "bimodal not started" state.
+
+### Discrepancies found
+- Earlier public docs were stale:
+  - they still described locked unimodal runs as pending
+  - they still described bimodal modeling as not started
+- The repo had materially progressed beyond those claims and needed a truth-aligned public snapshot.
+
+### Artifacts produced
+- Updated `README.md`
+- Updated `implementation_plan.md`
+- Curated benchmark artifact set prepared for GitHub publication
+
+### Next recommended step
+- Push the curated public snapshot to GitHub as one clean research-progress commit.
+- After publication, start `Fusion V2` implementation rather than spending more time on `Fusion V1` promotion.

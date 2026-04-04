@@ -1,0 +1,50 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.38891090945453777,
+    "dev_macro_f1": 0.6873949579831933,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.16339537891516093,
+    "dev_macro_f1": 0.6960492165721426,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.10231761240031706,
+    "dev_macro_f1": 0.715001445225937,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.07551913912364844,
+    "dev_macro_f1": 0.7057692307692307,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.06056031994595167,
+    "dev_macro_f1": 0.6843326885880077,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.04924658546591985,
+    "dev_macro_f1": 0.6666666666666666,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.04142497792869424,
+    "dev_macro_f1": 0.6634316770186335,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.037683375086336554,
+    "dev_macro_f1": 0.6619883040935672,
+    "best_method": "mean"
+  }
+]

@@ -64,10 +64,21 @@ def set_seed(seed: int):
     torch.cuda.manual_seed_all(seed)
 
 
-def _extract_inputs(batch: dict, modality: str) -> torch.Tensor:
+def _extract_inputs(batch: dict, modality: str):
+    if modality == "both":
+        return {
+            "visual": batch["visual"],
+            "acoustic": batch["acoustic"],
+        }
     if "inputs" in batch:
         return batch["inputs"]
     return batch[modality]
+
+
+def _move_inputs_to_device(inputs, device: torch.device):
+    if isinstance(inputs, dict):
+        return {key: value.to(device) for key, value in inputs.items()}
+    return inputs.to(device)
 
 
 def _build_criterion(config: TrainConfig, train_loader, device: torch.device) -> nn.Module:
@@ -89,7 +100,7 @@ def collect_window_predictions(model, loader, modality: str, device: torch.devic
     model.eval()
     rows = []
     for batch in loader:
-        inputs = _extract_inputs(batch, modality).to(device)
+        inputs = _move_inputs_to_device(_extract_inputs(batch, modality), device)
         logits = model(inputs)
         probabilities = torch.sigmoid(logits).cpu().numpy()
         labels = batch["label_binary"].cpu().numpy()
@@ -149,7 +160,7 @@ def train_one_seed(
         running_loss = 0.0
         running_items = 0
         for batch in train_loader:
-            inputs = _extract_inputs(batch, modality).to(device)
+            inputs = _move_inputs_to_device(_extract_inputs(batch, modality), device)
             labels = batch["label_binary"].float().to(device)
 
             optimizer.zero_grad(set_to_none=True)

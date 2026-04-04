@@ -1,0 +1,88 @@
+{
+  "num_examples": 102,
+  "bins": 10,
+  "ece": 0.1477442296256348,
+  "brier_score": 0.23336681218401323,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 10,
+      "mean_confidence": 0.05216590832011285,
+      "mean_accuracy": 0.1
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 4,
+      "mean_confidence": 0.14386339651459884,
+      "mean_accuracy": 0.5
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 15,
+      "mean_confidence": 0.25498833692122924,
+      "mean_accuracy": 0.26666666666666666
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 9,
+      "mean_confidence": 0.33966288835806563,
+      "mean_accuracy": 0.7777777777777778
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 10,
+      "mean_confidence": 0.4538168761164053,
+      "mean_accuracy": 0.8
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 12,
+      "mean_confidence": 0.5637727913200098,
+      "mean_accuracy": 0.5833333333333334
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 13,
+      "mean_confidence": 0.6477344389581513,
+      "mean_accuracy": 0.6153846153846154
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 9,
+      "mean_confidence": 0.7490441234542249,
+      "mean_accuracy": 0.5555555555555556
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 7,
+      "mean_confidence": 0.8411657762866783,
+      "mean_accuracy": 0.7142857142857143
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 13,
+      "mean_confidence": 0.9463193958129795,
+      "mean_accuracy": 0.7692307692307693
+    }
+  ]
+}

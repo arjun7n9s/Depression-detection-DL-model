@@ -1,0 +1,88 @@
+{
+  "num_examples": 212,
+  "bins": 10,
+  "ece": 0.15437806897220108,
+  "brier_score": 0.24206955923680346,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 19,
+      "mean_confidence": 0.05459757376565062,
+      "mean_accuracy": 0.47368421052631576
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 20,
+      "mean_confidence": 0.14060149227764984,
+      "mean_accuracy": 0.4
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 32,
+      "mean_confidence": 0.2522624495088913,
+      "mean_accuracy": 0.46875
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 22,
+      "mean_confidence": 0.34734932827756576,
+      "mean_accuracy": 0.4090909090909091
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 14,
+      "mean_confidence": 0.443313914772676,
+      "mean_accuracy": 0.42857142857142855
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 24,
+      "mean_confidence": 0.5491572828699078,
+      "mean_accuracy": 0.625
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 22,
+      "mean_confidence": 0.6593226558117942,
+      "mean_accuracy": 0.45454545454545453
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 32,
+      "mean_confidence": 0.7331351214784919,
+      "mean_accuracy": 0.84375
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 18,
+      "mean_confidence": 0.8454418842318121,
+      "mean_accuracy": 0.8888888888888888
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 9,
+      "mean_confidence": 0.9375752592536857,
+      "mean_accuracy": 0.8888888888888888
+    }
+  ]
+}

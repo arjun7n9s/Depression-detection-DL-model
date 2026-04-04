@@ -1,0 +1,92 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.3528724483711698,
+    "dev_macro_f1": 0.6266861863431977,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.1266646834323872,
+    "dev_macro_f1": 0.6470588235294118,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.07114399907520264,
+    "dev_macro_f1": 0.6528250510551395,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 4,
+    "train_loss": 0.05098549320697159,
+    "dev_macro_f1": 0.5961371318203766,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 5,
+    "train_loss": 0.04107665660449093,
+    "dev_macro_f1": 0.6131479140328697,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 6,
+    "train_loss": 0.033737858695836294,
+    "dev_macro_f1": 0.6039032161704669,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 7,
+    "train_loss": 0.028363349773055255,
+    "dev_macro_f1": 0.6709677419354838,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 8,
+    "train_loss": 0.024944178518745634,
+    "dev_macro_f1": 0.6158377595364558,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 9,
+    "train_loss": 0.022191236460666924,
+    "dev_macro_f1": 0.6357142857142857,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 10,
+    "train_loss": 0.020549650700024038,
+    "dev_macro_f1": 0.6832298136645962,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 11,
+    "train_loss": 0.018823582492616495,
+    "dev_macro_f1": 0.6693191865605659,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 12,
+    "train_loss": 0.017040158254405285,
+    "dev_macro_f1": 0.6007226738934056,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 13,
+    "train_loss": 0.017530498382562324,
+    "dev_macro_f1": 0.5970893970893971,
+    "best_method": "attention"
+  },
+  {
+    "epoch": 14,
+    "train_loss": 0.014961542340426688,
+    "dev_macro_f1": 0.6448742746615087,
+    "best_method": "mean"
+  },
+  {
+    "epoch": 15,
+    "train_loss": 0.014172721598138191,
+    "dev_macro_f1": 0.6158377595364558,
+    "best_method": "mean"
+  }
+]

@@ -1,0 +1,5 @@
+stage,track,dataset,modality,candidate,selected_aggregation,dev_macro_f1_mean,dev_macro_f1_std,test_macro_f1_mean,test_macro_f1_std,summary_path
+final_locked,edaic_bimodal,edaic,both,locked_run,mean,0.5492260061919505,0.0,0.4490161001788909,0.0,results/benchmark_quality/bimodal_benchmark_smoke/final/edaic_bimodal/locked_run/summary.json
+stage_a,edaic_bimodal,edaic,both,window_09,mean,0.5492260061919505,0.0,,,results/benchmark_quality/bimodal_benchmark_smoke/dev/edaic_bimodal/stage_a/window_09/summary.json
+stage_b,edaic_bimodal,edaic,both,bce_balanced,mean,0.5492260061919505,0.0,,,results/benchmark_quality/bimodal_benchmark_smoke/dev/edaic_bimodal/stage_b/bce_balanced/summary.json
+stage_c,edaic_bimodal,edaic,both,hidden64_layers1,mean,0.5492260061919505,0.0,,,results/benchmark_quality/bimodal_benchmark_smoke/dev/edaic_bimodal/stage_c/hidden64_layers1/summary.json

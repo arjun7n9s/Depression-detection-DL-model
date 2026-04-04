@@ -1,0 +1,88 @@
+{
+  "num_examples": 102,
+  "bins": 10,
+  "ece": 0.16767329372923437,
+  "brier_score": 0.24228249557724232,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 18,
+      "mean_confidence": 0.03394438977253271,
+      "mean_accuracy": 0.2222222222222222
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 10,
+      "mean_confidence": 0.1577918346112118,
+      "mean_accuracy": 0.4
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 7,
+      "mean_confidence": 0.25518084144301906,
+      "mean_accuracy": 0.5714285714285714
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 13,
+      "mean_confidence": 0.34116657708138093,
+      "mean_accuracy": 0.5384615384615384
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 7,
+      "mean_confidence": 0.4553115855153063,
+      "mean_accuracy": 0.42857142857142855
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 8,
+      "mean_confidence": 0.5654318307101482,
+      "mean_accuracy": 0.625
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 6,
+      "mean_confidence": 0.6655637240473582,
+      "mean_accuracy": 0.8333333333333334
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 9,
+      "mean_confidence": 0.7662863937605735,
+      "mean_accuracy": 0.6666666666666666
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 9,
+      "mean_confidence": 0.8469212509410908,
+      "mean_accuracy": 0.8888888888888888
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 15,
+      "mean_confidence": 0.971226288036103,
+      "mean_accuracy": 0.7333333333333333
+    }
+  ]
+}

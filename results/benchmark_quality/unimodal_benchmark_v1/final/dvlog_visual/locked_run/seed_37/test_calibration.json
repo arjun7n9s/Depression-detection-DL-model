@@ -1,0 +1,88 @@
+{
+  "num_examples": 212,
+  "bins": 10,
+  "ece": 0.10425610885690322,
+  "brier_score": 0.24102741683641904,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 3,
+      "mean_confidence": 0.07918781993548439,
+      "mean_accuracy": 0.6666666666666666
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 17,
+      "mean_confidence": 0.14837113493048912,
+      "mean_accuracy": 0.23529411764705882
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 26,
+      "mean_confidence": 0.25111035277571025,
+      "mean_accuracy": 0.5384615384615384
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 33,
+      "mean_confidence": 0.3499827775332203,
+      "mean_accuracy": 0.48484848484848486
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 31,
+      "mean_confidence": 0.441175246753529,
+      "mean_accuracy": 0.5161290322580645
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 33,
+      "mean_confidence": 0.5491657614461151,
+      "mean_accuracy": 0.5757575757575758
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 41,
+      "mean_confidence": 0.6648011433285026,
+      "mean_accuracy": 0.6585365853658537
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 15,
+      "mean_confidence": 0.748382276363483,
+      "mean_accuracy": 0.9333333333333333
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 10,
+      "mean_confidence": 0.8451275194000983,
+      "mean_accuracy": 0.8
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 3,
+      "mean_confidence": 0.9143388286277219,
+      "mean_accuracy": 1.0
+    }
+  ]
+}

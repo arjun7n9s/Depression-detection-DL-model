@@ -1,4 +1,4 @@
-# Depression Detection & Analysis — Implementation Plan (v5.1)
+# Depression Detection & Analysis — Implementation Plan (v5.2 Public Snapshot)
 
 ## Background
 
@@ -22,6 +22,40 @@ This project builds a **multimodal AI system** for estimating depression risk fr
 Our target: **match or exceed** these benchmarks via multi-task learning, PHQ regression, and quality-aware gating.
 
 > **Scope clarification**: The system is a **depression risk estimation / behavioral screening support** tool. It is not a clinical diagnostic instrument. Body-movement prediction is a second-phase research track — not part of the initial trained model.
+
+## Current Verified State
+
+This block is the current source of truth for the repo as of **April 4, 2026**. The detailed sections below include historical design context and archived architecture notes, but the active roadmap should be read from this block, the **Execution Order**, and the **Project Progress Tracker**.
+
+### Completed
+
+- Dataset audit and manifest-first data system
+- Recovery-aware E-DAIC extraction (`274` complete + `1` partial)
+- Verified D-Vlog and E-DAIC dataset loaders
+- Initial unimodal baselines
+- Unimodal dev-stage benchmark sweep
+- Locked final unimodal 5-seed benchmark pack
+- `Fusion V1` bimodal implementation
+- `Fusion V1` bimodal smoke verification
+- `Fusion V1` bimodal dev-stage benchmark sweep
+
+### Current milestone interpretation
+
+- `Fusion V1` is now a **real multimodal benchmark baseline**, not just a concept.
+- `Fusion V1` is promising on `D-Vlog`, where it beats the finalized unimodal dev references.
+- `Fusion V1` is **not yet strong enough on `E-DAIC`** to be promoted as the main architecture.
+- The correct next milestone is therefore **`Fusion V2`**, not immediate `Fusion V1` promotion.
+
+### Next official milestone
+
+`Fusion V2` will be the main architecture milestone, built around:
+
+- heterogeneous modality bundles by dataset
+- reliability-aware latent fusion
+- teacher distillation from unimodal checkpoints
+- masked multitask supervision where labels exist
+- learned subject-level aggregation
+- direct showdown against finalized unimodal baselines and `Fusion V1`
 
 ---
 
@@ -149,7 +183,7 @@ The transcript CSV contains only `Start_Time, End_Time, Text, Confidence` — **
 
 ---
 
-## Phase 2: Data Pipeline ✅ IN PROGRESS
+## Phase 2: Data Pipeline ✅ COMPLETE
 
 ### 2.1 Dataset Audit ✅ DONE
 
@@ -166,45 +200,34 @@ The transcript CSV contains only `Start_Time, End_Time, Text, Confidence` — **
 
 #### `src/data/manifest_generator.py`
 
-**Completed.** Manifest written to `D:\DL-Datasets\processed\manifest.jsonl` — 1236 entries (961 D-Vlog + 275 E-DAIC). Windowing is deferred to DataLoader time (manifest is subject-level, not window-level).
+**Completed.** Manifest written to `D:\DL-Datasets\processed\manifest.jsonl` — 1236 entries (961 D-Vlog + 275 E-DAIC). Regenerated with E-DAIC extraction state: 274 `success` + 1 `partial` (`383_P`, acoustic-only).
 
-Each manifest line contains:
+### 2.3 E-DAIC Pipeline ✅ DONE
 
-```json
-{
-  "subject_id": "300_P",
-  "dataset_source": "edaic",
-  "label_binary": 0,
-  "label_phq": 4,
-  "fold": "train",
-  "visual_path": "...",
-  "acoustic_path": "...",
-  "aligned_len": 1200,
-  "quality_flags": [],
-  "session_type": "woz"
-}
-```
-
-### 2.3 E-DAIC Pipeline 🔄 IN PROGRESS
-
-#### `src/data/edaic_extractor.py` ✅ DONE (extraction running)
+#### `src/data/edaic_extractor.py` ✅ DONE
 
 - Extracts from `.tar.gz` → `D:\DL-Datasets\processed\edaic\<pid>_P\`
-- **Visual**: 6 pose + 8 gaze + 17 AU_r + 18 AU_c = **49 dims** (upgraded from 31)
+- **Visual**: 6 pose + 8 gaze + 17 AU_r + 18 AU_c = **49 dims**
 - **Acoustic**: eGeMAPS → strip 2 metadata columns → **23 dims**
 - Also extracts frame-level OpenFace confidence for quality gating
-- Incremental: re-running skips already-extracted archives
-- Extraction running at ~0.2 archives/sec, ETD ~20 min for 275 archives
+- Idempotent: re-running skips already-extracted archives
+- Final state: 274 complete + 1 partial (383_P acoustic-only) + 0 failed
 
-#### `src/data/edaic_dataset.py` ⬜ NEXT
+#### `src/data/edaic_dataset.py` ✅ DONE
 
-- Similar to `dvlog_dataset.py` but adapted for E-DAIC:
-- Resample to 1 FPS (OpenFace ~30fps, eGeMAPS ~100fps)
-- Quality filter: drop frames with OpenFace confidence < 0.5
-- 30-second windows, 15-second stride (baseline; **ablate 6s, 9s, 15s, 30s** — reference repo uses 6-9s)
-- Trim leading/trailing invalid tracking segments per session
-- Drop windows below minimum valid-frame ratio (>=50% valid frames)
-- Compute and cache normalization stats from **train split only**
+**Completed and verified.** E-DAIC PyTorch Dataset with:
+
+- 1 Hz temporal resampling using timestamps
+- Confidence-aware visual filtering (drop frames < 0.5 confidence)
+- Leading/trailing invalid tracking region trimming
+- Window generation with valid-frame ratio checks
+- Train-only normalization stats saved to `D:\DL-Datasets\processed\edaic_stats\`
+- Modality-specific loading: `visual`, `acoustic`, or `both`
+
+Verified counts:
+
+- Visual: train 162 subjects / 10,369 windows, dev 56 / 3,444, test 56 / 3,555
+- Acoustic: train 163 subjects / 10,499 windows, dev 56 / 3,608, test 56 / 3,601
 
 ### 2.4 D-Vlog Pipeline ✅ DONE
 
@@ -770,16 +793,18 @@ D:\DL-Datasets\                        (external SSD — large data processing)
 |------|-------|------|------------|--------|
 | 1 | Audit | `dataset_audit.py` + manifest generator for both datasets | — | ✅ DONE |
 | 2 | Data | D-Vlog Dataset + DataLoader (float32 cast, length alignment, normalization) | Step 1 | ✅ DONE |
-| 3 | Data | E-DAIC extraction to `D:\DL-Datasets\processed\edaic\` (**49** visual, 23 acoustic dims) | Step 1 | 🔄 Extraction running |
-| 3b | Data | E-DAIC DataLoader (resample, quality filter, windowing) | Step 3 | ⬜ Next |
-| 4 | Baselines | Unimodal baselines: acoustic-only + visual-only, multi-seed | Steps 2+3b | ⬜ Queued |
-| 5 | Model | Multi-task model: encoders + source norms + gates + fusion + 3 heads + aggregation | Step 4 | ⬜ Queued |
-| 6 | Train | Bimodal D-Vlog training (must beat unimodal baselines) | Step 5 | ⬜ Queued |
-| 7 | Train | Fine-tune on E-DAIC (E-DAIC heads only) + ablate pretraining + window sizes | Steps 5+6 | ⬜ Queued |
-| 8 | Eval | Full evaluation: subject-level primary, slice metrics, calibration, abstention, error taxonomy | Step 7 | ⬜ Queued |
-| 9 | Inference | Live UI with async pipeline, streaming audio, honest boundaries, failure-case testing | Step 7 | ⬜ Queued |
-| 10 | Bridge | Feature-space bridge: OpenFace + MediaPipe on 773 D-Vlog videos → projection model | Step 7 | ✅ Videos Ready |
-| 11 | Text | Transcript corpus audit → speaker ID → text modality ablation (gated fusion) | Step 7 | Future |
+| 3 | Data | E-DAIC extraction to `D:\DL-Datasets\processed\edaic\` (**49** visual, 23 acoustic dims) | Step 1 | ✅ DONE (274 complete + 1 partial) |
+| 3b | Data | E-DAIC DataLoader (resample, quality filter, windowing) | Step 3 | ✅ DONE |
+| 4 | Baselines | Unimodal baselines: acoustic-only + visual-only, multi-seed | Steps 2+3b | ✅ DONE |
+| 4b | Benchmark | Unimodal dev-stage sweep (window/policy/capacity/norm ablations) | Step 4 | ✅ DONE |
+| 4c | Benchmark | Unimodal finalize: locked 5-seed test-set evaluation | Step 4b | ✅ DONE |
+| 5 | Bimodal | `Fusion V1` bimodal dev-stage sweep via `BimodalSequenceClassifier` | Step 4c | ✅ DONE |
+| 6 | Model | `Fusion V2`: reliability-aware latent multimodal model | Step 5 | 🎯 NEXT |
+| 7 | Benchmark | `Fusion V2` focused dev-stage benchmark + showdown vs unimodal + `Fusion V1` | Step 6 | ⬜ Queued |
+| 8 | Eval | Final locked multimodal comparison, subject-level reporting, calibration, error taxonomy | Step 7 | ⬜ Queued |
+| 9 | Inference | Live UI with async pipeline, streaming audio, honest boundaries, failure-case testing | Step 8 | ⬜ Queued |
+| 10 | Bridge | Feature-space bridge: OpenFace + MediaPipe on 773 D-Vlog videos → projection model | Step 8 | ✅ Videos Ready |
+| 11 | Text | Transcript corpus audit → speaker ID → text modality ablation (gated fusion) | Step 8 | Future |
 | 12 | Body | Body-movement research: MediaPipe Pose on 773 D-Vlog videos → ablation | Step 10 | Future |
 | 13 | Docs | Model cards, project honesty section, privacy policy | Step 8 | Future |
 
@@ -788,8 +813,8 @@ D:\DL-Datasets\                        (external SSD — large data processing)
 ## Project Progress Tracker
 
 ### Step 1: Dataset Audit + Manifest Generator — ✅ DONE
-- [x] Built `src/data/dataset_audit.py` — D-Vlog audit
-- [x] Built `src/data/dataset_audit.py` — E-DAIC audit
+
+- [x] Built `src/data/dataset_audit.py` — D-Vlog + E-DAIC audits
 - [x] Ran audit, generated `data/audit_report.json`
   - D-Vlog: 961/961 features, 0 NaN/Inf, 0 corrupt, 14 length mismatches
   - E-DAIC: 275/275 archives matched labels, 14 files each, 33 columns verified
@@ -797,6 +822,7 @@ D:\DL-Datasets\                        (external SSD — large data processing)
 - [x] Generated `D:\DL-Datasets\processed\manifest.jsonl` (1236 entries: 961 D-Vlog + 275 E-DAIC)
 
 ### Step 2: D-Vlog DataLoader — ✅ DONE
+
 - [x] Built `src/data/dvlog_dataset.py`
 - [x] Validated float32 cast, min-truncation alignment, windowing
   - Train: 647 subjects, 25,738 windows (dep=375, norm=272)
@@ -805,27 +831,124 @@ D:\DL-Datasets\                        (external SSD — large data processing)
   - Shapes: visual (30,136), acoustic (30,25), dtype float32
 - [x] Verified train/valid/test split integrity — 0 subject overlap
 
-### Step 3: E-DAIC Extraction + Preprocessing — 🔄 IN PROGRESS
-- [x] Built `src/data/edaic_extractor.py`
-- [x] Started extraction of 275 archives (visual: 49 dims, acoustic: 23 dims)
-- [ ] Verify extraction complete → check `D:\DL-Datasets\processed\edaic\extraction_report.json`
-  - If incomplete, re-run: `python -m src.data.edaic_extractor` (incremental)
-- [ ] Build `src/data/edaic_dataset.py` (PyTorch Dataset)
-  - Resample to 1 FPS, quality filter, windowing
-  - Splits from `wwwedaic/labels/detailed_lables.csv`
-- [ ] Re-run manifest generator to update E-DAIC entries with extracted paths
+### Step 3: E-DAIC Extraction + Preprocessing — ✅ DONE
 
-### Step 4: Unimodal Baselines — ⬜ QUEUED
-- [ ] Build `src/models/encoders.py` (GRU/Transformer encoders)
-- [ ] Build `src/training/trainer.py` (training loop + metrics)
-- [ ] Acoustic-only D-Vlog baseline
-- [ ] Visual-only D-Vlog baseline
-- [ ] Acoustic-only E-DAIC baseline
-- [ ] Visual-only E-DAIC baseline
-- [ ] Record metrics — **benchmarks to beat**: D-Vlog F1=0.78, E-DAIC F1=0.56
+- [x] Built `src/data/edaic_extractor.py` (idempotent, success/partial tracking)
+- [x] Extraction complete: 274 success + 1 partial (383_P acoustic-only) + 0 failed
+- [x] Built `src/data/edaic_dataset.py` (1Hz resample, quality filter, windowing)
+- [x] Re-ran manifest generator with extraction state tracking
+- [x] Saved train-only normalization stats to `D:\DL-Datasets\processed\edaic_stats\`
 
-### Step 5+: Model, Training, Evaluation, Inference — ⬜ QUEUED
-- [ ] (blocked on Step 4)
+### Step 4: Unimodal Baselines — ✅ DONE
+
+- [x] Built `src/model/encoders.py` (GRU-based encoders)
+- [x] Built `src/model/aggregation.py` (window-to-subject aggregation)
+- [x] Built `src/training/trainer.py` (training loop, BCE + focal loss, dev-only mode)
+- [x] Built `src/training/evaluate.py` (subject-level metrics, calibration, confusion CSV)
+- [x] Built `src/training/baselines.py` (baseline runner)
+- [x] Initial 3-seed baselines (30s windows):
+  - D-Vlog acoustic: dev F1 `0.6161 ± 0.0299`
+  - D-Vlog visual: dev F1 `0.5816 ± 0.0488`
+  - E-DAIC acoustic: dev F1 `0.4597 ± 0.0267`
+  - E-DAIC visual: dev F1 `0.4819 ± 0.0167`
+
+### Step 4b: Unimodal Dev-Stage Sweep — ✅ COMPLETE
+
+- [x] Built `src/training/benchmark_suite.py` (staged ablation harness)
+- [x] Built `src/paths.py` (shared path resolution)
+- [x] Added suite configs: `configs/unimodal_benchmark_v1.json`
+- [x] Full dev-stage sweep completed (~20h, process 37832, finished 2026-04-03 18:45 IST)
+- [x] All 4 tracks selected (frozen dev-stage configs):
+
+| Track | Window | Policy | Capacity | Norm | Agg | Dev F1 |
+|-------|--------|--------|----------|------|-----|--------|
+| D-Vlog Acoustic | **9s** | bce_balanced | h128_L1 | train | mean | **0.6935** |
+| D-Vlog Visual | **9s** | bce_balanced | h64_L1 | train | mean | **0.6101** |
+| E-DAIC Acoustic | **9s** | focal_balanced | h128_L2 | train | mean | **0.6059** |
+| E-DAIC Visual | **30s** | bce_balanced | h128_L2 | train | mean | **0.5325** |
+
+- [x] Key findings:
+  - 9s windows consistently best (except E-DAIC visual → 30s)
+  - Train-only normalization always beats provided stats
+  - E-DAIC tracks benefit from deeper/larger models (h128_L2)
+  - D-Vlog tracks prefer simpler models (h64–h128, L1)
+  - Focal loss only helped E-DAIC acoustic; BCE+balanced was best elsewhere
+
+### Step 4c: Unimodal Finalize — ✅ COMPLETE
+
+- [x] Finalize stage launched (process 24652, 2026-04-03 20:20 IST)
+- [x] Interrupted once; resumed (process 59052), then completed manually (process 55952)
+- [x] All 4 tracks finalized with 5 seeds each (7, 17, 27, 37, 47)
+- [x] Final milestone report generated: `results/benchmark_quality/unimodal_benchmark_v1/final/milestone_report.md`
+- [x] **Final locked test-set results** (source of truth for unimodal performance):
+
+| Track | Dev F1 (5-seed) | Test F1 (5-seed) |
+|-------|-----------------|------------------|
+| D-Vlog Acoustic | 0.6680 ± 0.0415 | **0.6630 ± 0.0100** |
+| D-Vlog Visual | 0.6028 ± 0.0189 | **0.5943 ± 0.0412** |
+| E-DAIC Acoustic | 0.5922 ± 0.0202 | **0.5134 ± 0.0257** |
+| E-DAIC Visual | 0.5220 ± 0.0292 | **0.5355 ± 0.0686** |
+
+- [x] Key observations:
+  - D-Vlog acoustic is the strongest unimodal track (test F1 0.6630)
+  - D-Vlog test F1 closely tracks dev F1 — good generalization
+  - E-DAIC test F1 drops from dev — expected due to WoZ→AI domain shift in test
+  - E-DAIC visual slightly beats E-DAIC acoustic on test (reversed from dev) — high variance
+  - Bimodal work is justified only if the next model beats the stronger unimodal track per dataset
+
+### Step 5: Bimodal Benchmark v1 — ✅ COMPLETE
+
+- [x] Added `BimodalSequenceClassifier` to `src/model/encoders.py`
+- [x] Extended trainer for multimodal batch inputs
+- [x] Extended benchmark suite for `modality = both`
+- [x] Added configs: `configs/bimodal_benchmark_v1.json`, `configs/bimodal_benchmark_smoke.json`
+- [x] Smoke test passed (pipeline validation)
+- [x] Real dev-stage sweep completed (`selection_ledger.json` completed at `2026-04-04 19:37:09`)
+- [x] **E-DAIC bimodal** dev-stage selection FROZEN:
+
+| Stage | Winner | Dev F1 |
+|-------|--------|--------|
+| A (window) | **15s** | 0.5245 |
+| B (policy) | **focal_balanced** | 0.5252 |
+| C (capacity) | **h128_L2** | 0.5352 |
+| D (norm) | **train** | 0.5352 |
+| Aggregation | **attention** | — |
+
+  - ⚠️ E-DAIC bimodal (0.5352) does NOT beat the finalized E-DAIC acoustic unimodal (dev 0.5922)
+  - The first fusion design may need a stronger architecture for E-DAIC
+
+- [x] **D-Vlog bimodal** dev-stage selection FROZEN:
+
+| Stage | Winner | Dev F1 |
+|-------|--------|--------|
+| A (window) | **9s** | 0.6947 |
+| B (policy) | **bce_balanced** | 0.6947 |
+| C (capacity) | **h128_L1** | 0.7024 |
+| D (norm) | **train** | 0.7024 |
+| Aggregation | **mean** | — |
+
+  - ✅ D-Vlog bimodal (0.7024) beats both finalized D-Vlog unimodal dev baselines
+  - `Fusion V1` is therefore a valid multimodal baseline, especially on D-Vlog
+
+- [x] Decision made from evidence:
+  - freeze `Fusion V1` as the benchmark baseline
+  - do not immediately finalize/promote it as the main architecture
+  - proceed next to `Fusion V2`
+
+### Step 6: Fusion V2 — 🎯 NEXT
+
+- [ ] Build the main upgrade architecture:
+  - heterogeneous modality bundles by dataset
+  - reliability-aware latent fusion
+  - teacher distillation from best unimodal checkpoints
+  - masked multitask supervision where labels exist
+  - learned subject-level aggregation
+- [ ] Run focused dev-stage V2 benchmark on both datasets
+- [ ] Run direct showdown:
+  - best unimodal baseline
+  - `Fusion V1`
+  - `Fusion V2`
+- [ ] Promote winners by evidence, not by narrative
 
 ---
 

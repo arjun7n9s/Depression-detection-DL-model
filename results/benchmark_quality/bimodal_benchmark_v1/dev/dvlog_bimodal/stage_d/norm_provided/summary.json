@@ -1,0 +1,158 @@
+{
+  "suite_track": "dvlog_bimodal",
+  "dataset": "dvlog",
+  "modality": "both",
+  "stage_name": "stage_d",
+  "candidate_name": "norm_provided",
+  "completed_at": "2026-04-04 19:37:08",
+  "selected_aggregation": "mean",
+  "include_test": false,
+  "experiment_config": {
+    "batch_size": 96,
+    "hidden_dim": 128,
+    "num_layers": 1,
+    "dropout": 0.3,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "epochs": 20,
+    "patience": 5,
+    "device": "cuda",
+    "aggregation_methods": [
+      "mean",
+      "topk",
+      "attention"
+    ],
+    "loss_name": "bce",
+    "balanced_sampling": true,
+    "use_pos_weight": false,
+    "focal_gamma": 2.0,
+    "focal_alpha": 0.75,
+    "normalization_source": "provided",
+    "num_workers": 0,
+    "min_valid_ratio": 0.5,
+    "window_size": 9,
+    "stride": 4
+  },
+  "train_config": {
+    "batch_size": 96,
+    "hidden_dim": 128,
+    "num_layers": 1,
+    "dropout": 0.3,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "epochs": 20,
+    "patience": 5,
+    "device": "cuda",
+    "aggregation_methods": [
+      "mean",
+      "topk",
+      "attention"
+    ],
+    "loss_name": "bce",
+    "focal_gamma": 2.0,
+    "focal_alpha": 0.75,
+    "use_pos_weight": false
+  },
+  "seeds": [
+    {
+      "seed": 7,
+      "best_epoch": 6,
+      "best_dev_method": "mean",
+      "dev_metrics": {
+        "num_subjects": 102,
+        "macro_f1": 0.6851851851851851,
+        "weighted_f1": 0.687363834422658,
+        "precision": 0.7450980392156863,
+        "recall": 0.6666666666666666,
+        "ece": 0.15773734086315525,
+        "brier_score": 0.23314409487344737,
+        "confusion_matrix": [
+          [
+            32,
+            13
+          ],
+          [
+            19,
+            38
+          ]
+        ],
+        "auroc": 0.7150097465886939,
+        "pr_auc": 0.7435767830665994
+      }
+    },
+    {
+      "seed": 17,
+      "best_epoch": 8,
+      "best_dev_method": "mean",
+      "dev_metrics": {
+        "num_subjects": 102,
+        "macro_f1": 0.7211139240506329,
+        "weighted_f1": 0.728512285927029,
+        "precision": 0.7205882352941176,
+        "recall": 0.8596491228070176,
+        "ece": 0.15513544387189349,
+        "brier_score": 0.2093789420134115,
+        "confusion_matrix": [
+          [
+            26,
+            19
+          ],
+          [
+            8,
+            49
+          ]
+        ],
+        "auroc": 0.7582846003898636,
+        "pr_auc": 0.7935248417931715
+      }
+    },
+    {
+      "seed": 27,
+      "best_epoch": 8,
+      "best_dev_method": "mean",
+      "dev_metrics": {
+        "num_subjects": 102,
+        "macro_f1": 0.6946402704007726,
+        "weighted_f1": 0.6971056892095322,
+        "precision": 0.75,
+        "recall": 0.6842105263157895,
+        "ece": 0.1985877737460434,
+        "brier_score": 0.23894894942108263,
+        "confusion_matrix": [
+          [
+            32,
+            13
+          ],
+          [
+            18,
+            39
+          ]
+        ],
+        "auroc": 0.7130604288499026,
+        "pr_auc": 0.7643468133274021
+      }
+    }
+  ],
+  "dev_metrics_mean": {
+    "auroc": 0.7287849252761535,
+    "brier_score": 0.22715732876931383,
+    "ece": 0.17048685282703072,
+    "macro_f1": 0.7003131265455301,
+    "num_subjects": 102.0,
+    "pr_auc": 0.7671494793957243,
+    "precision": 0.738562091503268,
+    "recall": 0.7368421052631579,
+    "weighted_f1": 0.704327269853073
+  },
+  "dev_metrics_std": {
+    "auroc": 0.02087459514613448,
+    "brier_score": 0.0127926374870244,
+    "ece": 0.01989872331517339,
+    "macro_f1": 0.015206457876939876,
+    "num_subjects": 0.0,
+    "pr_auc": 0.020487286227579758,
+    "precision": 0.012866025937927801,
+    "recall": 0.08713254050146983,
+    "weighted_f1": 0.01755775584644889
+  }
+}

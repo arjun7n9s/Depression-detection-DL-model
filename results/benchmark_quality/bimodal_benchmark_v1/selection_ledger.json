@@ -1,0 +1,239 @@
+{
+  "suite_name": "bimodal_benchmark_v1",
+  "completed_at": "2026-04-04 19:37:09",
+  "tracks": {
+    "edaic_bimodal": {
+      "dataset": "edaic",
+      "modality": "both",
+      "stages": {
+        "stage_a": {
+          "candidates": [
+            {
+              "candidate_name": "window_09",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_a/window_09/summary.json",
+              "dev_macro_f1_mean": 0.5163216705938225,
+              "selected_aggregation": "topk"
+            },
+            {
+              "candidate_name": "window_15",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_a/window_15/summary.json",
+              "dev_macro_f1_mean": 0.5244986760250404,
+              "selected_aggregation": "attention"
+            },
+            {
+              "candidate_name": "window_30",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_a/window_30/summary.json",
+              "dev_macro_f1_mean": 0.5162262031562944,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "window_15"
+        },
+        "stage_b": {
+          "candidates": [
+            {
+              "candidate_name": "bce_balanced",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_b/bce_balanced/summary.json",
+              "dev_macro_f1_mean": 0.5244986760250404,
+              "selected_aggregation": "attention"
+            },
+            {
+              "candidate_name": "bce_weighted",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_b/bce_weighted/summary.json",
+              "dev_macro_f1_mean": 0.4819500849392154,
+              "selected_aggregation": "attention"
+            },
+            {
+              "candidate_name": "focal_balanced",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_b/focal_balanced/summary.json",
+              "dev_macro_f1_mean": 0.5252251682092889,
+              "selected_aggregation": "attention"
+            }
+          ],
+          "selected": "focal_balanced"
+        },
+        "stage_c": {
+          "candidates": [
+            {
+              "candidate_name": "hidden64_layers1",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_c/hidden64_layers1/summary.json",
+              "dev_macro_f1_mean": 0.5252251682092889,
+              "selected_aggregation": "attention"
+            },
+            {
+              "candidate_name": "hidden128_layers1",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_c/hidden128_layers1/summary.json",
+              "dev_macro_f1_mean": 0.49460957672022415,
+              "selected_aggregation": "attention"
+            },
+            {
+              "candidate_name": "hidden128_layers2",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/edaic_bimodal/stage_c/hidden128_layers2/summary.json",
+              "dev_macro_f1_mean": 0.5352386199895268,
+              "selected_aggregation": "attention"
+            }
+          ],
+          "selected": "hidden128_layers2"
+        },
+        "stage_d": {
+          "candidates": [
+            {
+              "candidate_name": "norm_train",
+              "summary_path": null,
+              "dev_macro_f1_mean": 0.5352386199895268,
+              "selected_aggregation": "attention"
+            }
+          ],
+          "selected": "norm_train",
+          "note": "E-DAIC keeps train-only normalization fixed for this milestone."
+        }
+      },
+      "final_config": {
+        "batch_size": 96,
+        "hidden_dim": 128,
+        "num_layers": 2,
+        "dropout": 0.35,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 20,
+        "patience": 5,
+        "device": "cuda",
+        "aggregation_methods": [
+          "mean",
+          "topk",
+          "attention"
+        ],
+        "loss_name": "focal",
+        "balanced_sampling": true,
+        "use_pos_weight": false,
+        "focal_gamma": 2.0,
+        "focal_alpha": 0.75,
+        "normalization_source": "train",
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 15,
+        "stride": 7
+      },
+      "frozen_aggregation": "attention"
+    },
+    "dvlog_bimodal": {
+      "dataset": "dvlog",
+      "modality": "both",
+      "stages": {
+        "stage_a": {
+          "candidates": [
+            {
+              "candidate_name": "window_09",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_09/summary.json",
+              "dev_macro_f1_mean": 0.6946878129900688,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "window_15",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_15/summary.json",
+              "dev_macro_f1_mean": 0.6495409101082071,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "window_30",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_a/window_30/summary.json",
+              "dev_macro_f1_mean": 0.6909957145251263,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "window_09"
+        },
+        "stage_b": {
+          "candidates": [
+            {
+              "candidate_name": "bce_balanced",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_b/bce_balanced/summary.json",
+              "dev_macro_f1_mean": 0.6946878129900688,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "bce_weighted",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_b/bce_weighted/summary.json",
+              "dev_macro_f1_mean": 0.6721750518938089,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "focal_balanced",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_b/focal_balanced/summary.json",
+              "dev_macro_f1_mean": 0.6796277677871819,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "bce_balanced"
+        },
+        "stage_c": {
+          "candidates": [
+            {
+              "candidate_name": "hidden64_layers1",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_c/hidden64_layers1/summary.json",
+              "dev_macro_f1_mean": 0.6946878129900688,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "hidden128_layers1",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_c/hidden128_layers1/summary.json",
+              "dev_macro_f1_mean": 0.7023891463476414,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "hidden128_layers2",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_c/hidden128_layers2/summary.json",
+              "dev_macro_f1_mean": 0.653230251941071,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "hidden128_layers1"
+        },
+        "stage_d": {
+          "candidates": [
+            {
+              "candidate_name": "norm_train",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_d/norm_train/summary.json",
+              "dev_macro_f1_mean": 0.7023891463476414,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "norm_provided",
+              "summary_path": "results/benchmark_quality/bimodal_benchmark_v1/dev/dvlog_bimodal/stage_d/norm_provided/summary.json",
+              "dev_macro_f1_mean": 0.7003131265455301,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "norm_train"
+        }
+      },
+      "final_config": {
+        "batch_size": 96,
+        "hidden_dim": 128,
+        "num_layers": 1,
+        "dropout": 0.3,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 20,
+        "patience": 5,
+        "device": "cuda",
+        "aggregation_methods": [
+          "mean",
+          "topk",
+          "attention"
+        ],
+        "loss_name": "bce",
+        "balanced_sampling": true,
+        "use_pos_weight": false,
+        "focal_gamma": 2.0,
+        "focal_alpha": 0.75,
+        "normalization_source": "train",
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 9,
+        "stride": 4
+      },
+      "frozen_aggregation": "mean"
+    }
+  }
+}

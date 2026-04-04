@@ -1,0 +1,88 @@
+{
+  "num_examples": 102,
+  "bins": 10,
+  "ece": 0.17643760117895502,
+  "brier_score": 0.24136801470478292,
+  "bin_stats": [
+    {
+      "bin_index": 0,
+      "left": 0.0,
+      "right": 0.1,
+      "count": 13,
+      "mean_confidence": 0.03340060799083438,
+      "mean_accuracy": 0.23076923076923078
+    },
+    {
+      "bin_index": 1,
+      "left": 0.1,
+      "right": 0.2,
+      "count": 6,
+      "mean_confidence": 0.1617757288423447,
+      "mean_accuracy": 0.8333333333333334
+    },
+    {
+      "bin_index": 2,
+      "left": 0.2,
+      "right": 0.30000000000000004,
+      "count": 8,
+      "mean_confidence": 0.25694738746910983,
+      "mean_accuracy": 0.25
+    },
+    {
+      "bin_index": 3,
+      "left": 0.30000000000000004,
+      "right": 0.4,
+      "count": 5,
+      "mean_confidence": 0.3415669320484346,
+      "mean_accuracy": 0.4
+    },
+    {
+      "bin_index": 4,
+      "left": 0.4,
+      "right": 0.5,
+      "count": 7,
+      "mean_confidence": 0.4336922003980429,
+      "mean_accuracy": 0.14285714285714285
+    },
+    {
+      "bin_index": 5,
+      "left": 0.5,
+      "right": 0.6000000000000001,
+      "count": 6,
+      "mean_confidence": 0.569045354257303,
+      "mean_accuracy": 0.6666666666666666
+    },
+    {
+      "bin_index": 6,
+      "left": 0.6000000000000001,
+      "right": 0.7000000000000001,
+      "count": 11,
+      "mean_confidence": 0.6563110945111856,
+      "mean_accuracy": 0.5454545454545454
+    },
+    {
+      "bin_index": 7,
+      "left": 0.7000000000000001,
+      "right": 0.8,
+      "count": 11,
+      "mean_confidence": 0.7662731012494884,
+      "mean_accuracy": 0.6363636363636364
+    },
+    {
+      "bin_index": 8,
+      "left": 0.8,
+      "right": 0.9,
+      "count": 10,
+      "mean_confidence": 0.8488571209352005,
+      "mean_accuracy": 0.7
+    },
+    {
+      "bin_index": 9,
+      "left": 0.9,
+      "right": 1.0,
+      "count": 25,
+      "mean_confidence": 0.9718073007086288,
+      "mean_accuracy": 0.8
+    }
+  ]
+}

@@ -14,15 +14,17 @@ import pandas as pd
 
 from src.data.dvlog_dataset import create_dvlog_dataloaders
 from src.data.edaic_dataset import create_edaic_dataloaders
-from src.model.encoders import SequenceBinaryClassifier
+from src.model.encoders import BimodalSequenceClassifier, SequenceBinaryClassifier
 from src.paths import PROJECT_ROOT, repo_relative
 from src.training.trainer import TrainConfig, persist_seed_artifacts, set_seed, train_one_seed
 
 INPUT_DIMS = {
     ("dvlog", "acoustic"): 25,
     ("dvlog", "visual"): 136,
+    ("dvlog", "both"): {"visual": 136, "acoustic": 25},
     ("edaic", "acoustic"): 23,
     ("edaic", "visual"): 49,
+    ("edaic", "both"): {"visual": 49, "acoustic": 23},
 }
 
 
@@ -98,6 +100,25 @@ def _build_train_config(experiment: dict[str, Any]) -> TrainConfig:
         focal_gamma=experiment.get("focal_gamma", 2.0),
         focal_alpha=experiment.get("focal_alpha", 0.75),
         use_pos_weight=experiment.get("use_pos_weight", False),
+    )
+
+
+def _instantiate_model(track: dict[str, Any], experiment: dict[str, Any]):
+    if track["modality"] == "both":
+        dims = INPUT_DIMS[(track["dataset"], track["modality"])]
+        return BimodalSequenceClassifier(
+            visual_input_dim=dims["visual"],
+            acoustic_input_dim=dims["acoustic"],
+            hidden_dim=experiment["hidden_dim"],
+            num_layers=experiment["num_layers"],
+            dropout=experiment["dropout"],
+        )
+
+    return SequenceBinaryClassifier(
+        input_dim=INPUT_DIMS[(track["dataset"], track["modality"])],
+        hidden_dim=experiment["hidden_dim"],
+        num_layers=experiment["num_layers"],
+        dropout=experiment["dropout"],
     )
 
 
@@ -199,12 +220,7 @@ def _run_experiment(
     for seed in seeds:
         set_seed(seed)
         loaders = _build_loaders(track, experiment)
-        model = SequenceBinaryClassifier(
-            input_dim=INPUT_DIMS[(track["dataset"], track["modality"])],
-            hidden_dim=experiment["hidden_dim"],
-            num_layers=experiment["num_layers"],
-            dropout=experiment["dropout"],
-        )
+        model = _instantiate_model(track, experiment)
         result = train_one_seed(
             model=model,
             train_loader=loaders["train"],
@@ -312,11 +328,18 @@ def _write_final_report(output_root: Path, ledger: dict[str, Any]):
     for _, row in frame.iterrows():
         table_lines.append("| " + " | ".join(str(row[column]) for column in headers) + " |")
 
+    suite_name = str(ledger.get("suite_name", "benchmark_suite"))
+    suite_kind = "benchmark"
+    if "unimodal" in suite_name:
+        suite_kind = "unimodal"
+    elif "bimodal" in suite_name or "multimodal" in suite_name:
+        suite_kind = "bimodal"
+
     lines = [
-        "# Unimodal Benchmark Report",
+        f"# {suite_kind.capitalize()} Benchmark Report",
         "",
         f"- Generated: {_timestamp()}",
-        f"- Suite: {ledger['suite_name']}",
+        f"- Suite: {suite_name}",
         "",
         "## Final Baselines",
         "",
@@ -336,15 +359,17 @@ def _write_final_report(output_root: Path, ledger: dict[str, Any]):
 
     dvlog_norms = frame[frame["dataset"] == "dvlog"]["normalization_source"].unique().tolist()
     norm_note = ", ".join(sorted(str(item) for item in dvlog_norms)) if dvlog_norms else "not finalized"
-    lines.extend(
-        [
-            "## Conclusions",
-            "",
-            f"- D-Vlog normalization conclusion: final selected normalization sources = {norm_note}.",
-            "- Bimodal work is justified only if the next model is required to beat the stronger unimodal result on each dataset.",
-            "- This report is the source of truth for benchmark-quality unimodal performance.",
-        ]
-    )
+    lines.extend(["## Conclusions", ""])
+    if dvlog_norms:
+        lines.append(f"- D-Vlog normalization conclusion: final selected normalization sources = {norm_note}.")
+    if suite_kind == "unimodal":
+        lines.append("- Bimodal work is justified only if the next model is required to beat the stronger unimodal result on each dataset.")
+        lines.append("- This report is the source of truth for benchmark-quality unimodal performance.")
+    elif suite_kind == "bimodal":
+        lines.append("- Compare each bimodal result against the finalized unimodal baseline for the same dataset before increasing architecture complexity.")
+        lines.append("- This report is the source of truth for benchmark-quality bimodal performance.")
+    else:
+        lines.append("- This report is the source of truth for the finalized benchmark run.")
 
     report_path = output_root / "final" / "milestone_report.md"
     report_path.parent.mkdir(parents=True, exist_ok=True)

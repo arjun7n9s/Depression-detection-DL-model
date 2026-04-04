@@ -1,0 +1,7 @@
+{
+  "seed": 37,
+  "best_epoch": 8,
+  "best_method": "mean",
+  "best_dev_score": 0.5851851851851853,
+  "selected_method": "mean"
+}
