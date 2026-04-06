@@ -10,14 +10,14 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-active%20research-0f766e?style=for-the-badge" alt="Status"/>
-  <img src="https://img.shields.io/badge/snapshot-April%206%2C%202026-1d4ed8?style=for-the-badge" alt="Snapshot"/>
+  <img src="https://img.shields.io/badge/snapshot-April%207%2C%202026-1d4ed8?style=for-the-badge" alt="Snapshot"/>
   <img src="https://img.shields.io/badge/license-MIT-eab308?style=for-the-badge" alt="License"/>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/D--Vlog%20Winner-dvlog__vision__v3-15803d?style=flat-square&logo=checkmarx&logoColor=white" alt="D-Vlog Winner"/>
   <img src="https://img.shields.io/badge/E--DAIC%20Winner-edaic__bimodal-0f766e?style=flat-square&logo=checkmarx&logoColor=white" alt="E-DAIC Winner"/>
-  <img src="https://img.shields.io/badge/next-bridge%20training%20%2B%20live%20dashboard-7c3aed?style=flat-square&logo=target&logoColor=white" alt="Next Step"/>
+  <img src="https://img.shields.io/badge/next-live%20polish%20%2B%20demo%20refinement-7c3aed?style=flat-square&logo=target&logoColor=white" alt="Next Step"/>
 </p>
 
 ---
@@ -336,6 +336,7 @@ flowchart LR
 - Offline research uses strong benchmark protocols and curated artifacts
 - The bridge trains a projection from **MediaPipe landmarks → OpenFace AU space** using 773 paired videos
 - Only bridged features may be used for live inference — no shortcut mappings allowed
+- The live dashboard now renders mirrored face mesh, pose overlays, and a secondary tracker-projection stage from the same live subject state
 
 ---
 
@@ -530,9 +531,10 @@ These are the **source-of-truth models** for the repo:
 │   │
 │   └── 📂 inference/                     # Live inference layer
 │       ├── model_lock.py                 #   Strategic winner management
-│       ├── feature_extractor.py          #   MediaPipe real-time extraction
-│       ├── server.py                     #   Flask prototype server
-│       └── 📂 dashboard/                 #   Web UI + overlays + disclaimers
+│       ├── feature_extractor.py          #   Backend landmark + live feature extraction
+│       ├── live_runtime.py               #   Bridge + locked Vision V3 runtime
+???       ????????? server.py                     #   Flask inference + sync server
+│       └── 📂 dashboard/                 #   Web UI + live overlays + tracker projection
 │
 ├── 📂 configs/                           # Experiment configuration YAMLs
 ├── 📂 results/                           # Benchmark artifacts & leaderboards
@@ -591,20 +593,19 @@ timeline
         Bridge Feature Extraction : Completed
         Prototype Inference Server : Completed
         Bridge Training Stack      : Completed
-        Bridge Model Training      : In Progress
-        Live Inference Integration : In Progress
-        Dashboard + Overlays       : Planned
+        Bridge Model Training      : Completed
+        Live Inference Integration : Completed
+        Dashboard + Overlays       : Completed
 ```
 
 ### Immediate Target
 
-> By **Tuesday, April 7, 2026** — move from prototype server to a **live dashboard with video and overlays**, backed by:
+> Current focus: **live dashboard polish and demo refinement**.
 >
-> - Bridge-model training completion
-> - Bridge-to-live feature mapping
-> - Visual overlays on webcam stream
-> - Quality-aware display boundaries
-> - Honest messaging about system capabilities and limits
+> - smoother tracker projection and overlay cadence
+> - cleaner final dashboard copy and visual hierarchy
+> - session reliability checks across lighting and pose changes
+> - final demo-ready repo snapshot with the current inference stack
 
 ---
 

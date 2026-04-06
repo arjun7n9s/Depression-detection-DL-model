@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,7 @@ import numpy as np
 from flask import Flask, jsonify, request, send_from_directory
 
 from src.inference.feature_extractor import LiveExtractorConfig, LiveFeatureExtractor
+from src.inference.live_runtime import LiveDvlogRuntime, LiveDvlogRuntimeConfig
 from src.inference.model_lock import benchmark_winner, load_model_lock, preferred_direction
 from src.paths import DVLOG_BRIDGE_ROOT, PROJECT_ROOT, PROCESSED_ROOT, repo_relative
 
@@ -35,6 +37,8 @@ class InferenceServerConfig:
     debug: bool = False
     face_embedding_backend: str = "color_histogram"
     bridge_root: Path = DVLOG_BRIDGE_ROOT
+    runtime_device: str = "cpu"
+    live_sampling_hz: float = 1.0
 
 
 def _safe_json_load(path: Path) -> dict[str, Any] | None:
@@ -133,32 +137,50 @@ def _decode_image(payload: dict[str, Any]) -> np.ndarray:
     return frame
 
 
-def _prototype_status(extraction: dict[str, Any]) -> dict[str, Any]:
+def _prototype_status(extraction: dict[str, Any], runtime_payload: dict[str, Any] | None = None) -> dict[str, Any]:
     quality = extraction["quality"]
     face_valid_ratio = float(quality["face_valid_ratio"])
+    inference_available = bool(runtime_payload and runtime_payload.get("inference", {}).get("available"))
+    bridge_available = bool(runtime_payload and runtime_payload.get("bridge", {}).get("available"))
     if face_valid_ratio >= 1.0:
         readiness = "tracking_ready"
         message = "Visual tracking is healthy enough for prototype feature extraction."
     else:
         readiness = "tracking_weak"
         message = "Feature extraction worked, but face tracking is weak. Do not trust downstream risk estimates yet."
+    if bridge_available and inference_available:
+        readiness = "live_inference_ready"
+        message = "Bridge projection and Vision V3 live inference are both active."
+    elif bridge_available:
+        readiness = "bridge_ready"
+        message = "Bridge projection is active, but live Vision V3 inference is not available yet."
     return {
         "readiness": readiness,
         "message": message,
-        "prediction_available": False,
-        "why": "The live bridge model is not trained yet, so the server intentionally exposes features and quality only.",
+        "prediction_available": inference_available,
+        "why": "Live prediction is only exposed after the bridge and locked Vision V3 path are both available.",
     }
 
 
 def create_app(config: InferenceServerConfig | None = None) -> Flask:
     config = config or InferenceServerConfig()
     extractor = LiveFeatureExtractor(LiveExtractorConfig(face_embedding_backend=config.face_embedding_backend))
+    runtime = LiveDvlogRuntime(LiveDvlogRuntimeConfig(device=config.runtime_device))
+    request_state = {
+        "frame_seq": 0,
+        "last_request_end_ms": None,
+        "last_model_sample_ms": None,
+    }
 
     app = Flask(__name__, static_folder=str(DASHBOARD_DIR), static_url_path="/dashboard")
 
     @app.get("/")
     def dashboard_index():
         return send_from_directory(DASHBOARD_DIR, "index.html")
+
+    @app.get("/favicon.ico")
+    def favicon():
+        return send_from_directory(DASHBOARD_DIR, "favicon.svg", mimetype="image/svg+xml")
 
     @app.get("/health")
     def health():
@@ -167,7 +189,9 @@ def create_app(config: InferenceServerConfig | None = None) -> Flask:
                 "status": "ok",
                 "service": "mindsense-inference-prototype",
                 "locked_datasets": ["dvlog", "edaic"],
-                "prediction_mode": "features_only_until_bridge_trained",
+                "prediction_mode": "bridged_live_inference_when_context_ready",
+                "live_sampling_hz": config.live_sampling_hz,
+                "recommended_cadence_ms": int(round(1000.0 / max(config.live_sampling_hz, 1e-6))),
             }
         )
 
@@ -186,12 +210,36 @@ def create_app(config: InferenceServerConfig | None = None) -> Flask:
     @app.post("/api/extract-frame")
     def extract_frame():
         payload = request.get_json(silent=True) or {}
+        request_state["frame_seq"] += 1
+        frame_seq = int(request_state["frame_seq"])
+        started = time.perf_counter()
+        started_ms = int(time.time() * 1000)
+
         frame = _decode_image(payload)
         result = extractor.extract_frame(frame)
+        recommended_cadence_ms = int(round(1000.0 / max(config.live_sampling_hz, 1e-6)))
+        last_model_sample_ms = request_state["last_model_sample_ms"]
+        should_sample_model = last_model_sample_ms is None or (started_ms - int(last_model_sample_ms)) >= recommended_cadence_ms
+        runtime_payload = runtime.step(result, append_frame=should_sample_model)
+        if should_sample_model:
+            request_state["last_model_sample_ms"] = started_ms
+        finished_ms = int(time.time() * 1000)
+        processing_ms = round((time.perf_counter() - started) * 1000.0, 2)
+        last_end_ms = request_state["last_request_end_ms"]
+        inter_request_ms = None if last_end_ms is None else max(0, started_ms - int(last_end_ms))
+        request_state["last_request_end_ms"] = finished_ms
         return jsonify(
             {
                 "quality": result["quality"],
-                "prototype": _prototype_status(result),
+                "prototype": _prototype_status(result, runtime_payload),
+                "buffered_frames": runtime_payload["buffered_frames"],
+                "feature_activity": runtime_payload.get("feature_activity", 0.0),
+                "bridge": {
+                    key: value
+                    for key, value in runtime_payload["bridge"].items()
+                    if key not in {"visual_window", "acoustic_window"}
+                },
+                "inference": runtime_payload["inference"],
                 "modalities": {
                     key: {
                         "dim": int(values.shape[0]),
@@ -200,12 +248,23 @@ def create_app(config: InferenceServerConfig | None = None) -> Flask:
                     }
                     for key, values in result["modalities"].items()
                 },
+                "sync": {
+                    "frame_seq": frame_seq,
+                    "server_started_ms": started_ms,
+                    "server_finished_ms": finished_ms,
+                    "processing_ms": processing_ms,
+                    "inter_request_ms": inter_request_ms,
+                    "recommended_cadence_ms": recommended_cadence_ms,
+                    "model_sampled": bool(should_sample_model),
+                },
             }
         )
 
     @app.post("/api/reset-session")
     def reset_session():
         extractor.reset()
+        runtime.reset()
+        request_state["last_model_sample_ms"] = None
         return jsonify({"status": "reset"})
 
     return app
@@ -218,6 +277,8 @@ def build_argparser() -> argparse.ArgumentParser:
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--face-embedding-backend", default="color_histogram")
     parser.add_argument("--bridge-root", type=Path, default=DVLOG_BRIDGE_ROOT)
+    parser.add_argument("--runtime-device", default="cpu")
+    parser.add_argument("--live-sampling-hz", type=float, default=1.0)
     return parser
 
 
@@ -230,6 +291,8 @@ def main():
         debug=args.debug,
         face_embedding_backend=args.face_embedding_backend,
         bridge_root=args.bridge_root,
+        runtime_device=args.runtime_device,
+        live_sampling_hz=args.live_sampling_hz,
     )
     app = create_app(config)
     print("=" * 60)

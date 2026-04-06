@@ -1994,3 +1994,157 @@ What this means in simple words:
 - Run the bridge smoke config first.
 - If the smoke metrics look sane, run the full bridge training config.
 - After that, connect the resulting checkpoint into the prototype server so live extraction can emit bridged visual features instead of features-only diagnostics.
+
+## 2026-04-07 - Live Bridge Runtime Integrated
+
+### Session goal
+- Use the completed bridge training output instead of leaving the live server in features-only mode.
+- Connect bridge projection and locked `Vision V3` scoring into the running inference path.
+
+### Implemented
+- Added `src/inference/live_runtime.py`.
+  - Loads the trained bridge checkpoint from `results/bridge/dvlog_bridge_v1/checkpoint.pt`
+  - Loads the best local locked `Vision V3` seed from the D-Vlog showdown artifacts
+  - Buffers live frames
+  - Runs bridge projection once enough context exists
+  - Runs locked `Vision V3` inference once enough bridged context exists
+- Updated `src/inference/feature_extractor.py`.
+  - Now emits per-modality validity flags for live use
+- Updated `src/inference/server.py`.
+  - `/api/extract-frame` now returns:
+    - prototype readiness
+    - bridge availability
+    - live inference availability
+    - branch probabilities
+    - gate weights
+    - buffered frame count
+  - `/api/reset-session` now clears both extractor and runtime buffers
+
+### Verified
+- New live runtime files compile cleanly.
+- Server health endpoint still works.
+- Synthetic frame streaming reaches:
+  - `bridge.available = true`
+  - `inference.available = true`
+  - readiness = `live_inference_ready`
+  after enough buffered frames.
+
+### Interpretation
+- The project has crossed another boundary:
+  - not just bridge training
+  - not just prototype extraction
+  - but actual live bridged model inference on the locked D-Vlog path
+- The remaining major step is the visible product layer:
+  - dashboard UX
+  - video overlays
+  - quality overlays and disclaimers
+
+### Next recommended step
+- Relaunch the inference server with the integrated runtime.
+- Then build the dashboard surface around the now-working bridged live inference path.
+
+## 2026-04-07 - Live Dashboard Replaced Placeholder Shell
+
+### Session goal
+- Replace the old static landing page with the actual webcam-facing prototype dashboard.
+- Expose live bridge and live inference state visually instead of just listing endpoints.
+
+### Implemented
+- Replaced `src/inference/dashboard/index.html`.
+  - Added a real dashboard layout with:
+    - session readiness
+    - locked winner cards
+    - bridge coverage
+    - webcam panel
+    - live risk output
+    - branch probability meters
+    - gate weight meters
+    - bridge runtime diagnostics
+    - explicit system-boundary notes
+- Added `src/inference/dashboard/styles.css`.
+  - Responsive polished dashboard styling
+  - status pills, meters, progress rails, and live-video shell
+- Added `src/inference/dashboard/app.js`.
+  - Bootstraps:
+    - `/health`
+    - `/api/model-lock`
+    - `/api/bridge-status`
+    - `/api/benchmarks`
+  - Starts webcam capture
+  - Streams frames to `/api/extract-frame`
+  - Draws live face overlays
+  - Updates bridge state, buffered-context progress, inference output, and gate weights
+- Added `src/inference/dashboard/favicon.svg`.
+
+### Verified
+- Dashboard routes return successfully:
+  - `/`
+  - `/dashboard/styles.css`
+  - `/dashboard/app.js`
+  - `/dashboard/favicon.svg`
+- The frontend now matches the current backend reality:
+  - bridged live inference exists
+  - the UI is no longer stuck on the old "features only" placeholder copy
+
+### Interpretation
+- The project now has a real visible prototype layer rather than just backend readiness.
+- Remaining work is now refinement, not placeholder replacement.
+
+### Next recommended step
+- Run the server and validate the live webcam flow in-browser.
+- Then tighten any last-mile overlay, copy, or UX issues discovered in real usage.
+
+## 2026-04-07 - Dashboard Sync Refactor And Overlay Alignment
+
+### Session goal
+- Keep the new live overlays, but remove the conflicting hardcoded client-side "risk" logic.
+- Align live sampling with the bridge/model training timebase so server predictions track the real session more honestly.
+
+### Implemented
+- Updated `src/inference/server.py`.
+  - Added lightweight sync diagnostics to `/api/extract-frame`:
+    - `frame_seq`
+    - `processing_ms`
+    - `inter_request_ms`
+    - `recommended_cadence_ms`
+  - Added `feature_activity` passthrough to the response.
+  - Added `live_sampling_hz` and `recommended_cadence_ms` to `/health`.
+- Updated `src/inference/dashboard/index.html`.
+  - Reframed the right-hand panel as model-driven signal output rather than generic "risk assessment".
+  - Clarified that server branch probabilities are backend outputs, not browser heuristics.
+- Replaced `src/inference/dashboard/app.js`.
+  - Kept client-side MediaPipe overlays for face mesh and pose skeleton.
+  - Removed the browser-side pseudo-risk model and hardcoded behavioral scoring.
+  - Switched the dashboard to:
+    - client-side overlays and expression tracking
+    - server-side probability, band, branch probabilities, and gate weights
+  - Added sync-aware UI updates driven by real server payloads.
+  - Aligned live sampling cadence to the training pipeline timebase (`1.0s`).
+
+### Verified
+- `src/inference/server.py` compiles.
+- Dashboard assets load:
+  - `/`
+  - `/dashboard/app.js`
+- `/api/extract-frame` now returns:
+  - `bridge`
+  - `buffered_frames`
+  - `feature_activity`
+  - `inference`
+  - `modalities`
+  - `prototype`
+  - `quality`
+  - `sync`
+- `sync.recommended_cadence_ms` is `1000`, matching the bridge/video feature extraction timebase.
+
+### Interpretation
+- The prior dashboard drift came from two separate problems:
+  - a second browser-only risk logic path
+  - a live cadence faster than the training feature timebase
+- The dashboard is now structured so:
+  - overlays remain smooth and real-time
+  - server inference remains truthful to the trained pipeline
+
+### Next recommended step
+- Restart the server and validate the new browser behavior with a live webcam session.
+- If any lag or mismatch remains, tune overlay detection cadence separately from server sampling cadence rather than mixing the two again.

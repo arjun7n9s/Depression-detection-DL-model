@@ -3,180 +3,153 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindSense Prototype Dashboard</title>
-  <style>
-    :root {
-      --bg: #f4efe6;
-      --panel: rgba(255, 250, 242, 0.88);
-      --ink: #1f2933;
-      --muted: #5b6b79;
-      --accent: #0f766e;
-      --warn: #b45309;
-      --border: rgba(31, 41, 51, 0.12);
-      --shadow: 0 24px 50px rgba(31, 41, 51, 0.12);
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Segoe UI", "Aptos", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 35%),
-        radial-gradient(circle at top right, rgba(180, 83, 9, 0.10), transparent 30%),
-        linear-gradient(160deg, #f8f4ee 0%, var(--bg) 100%);
-      min-height: 100vh;
-    }
-
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 40px 20px 64px;
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 3vw, 3.4rem);
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-    }
-
-    .subtitle {
-      max-width: 760px;
-      color: var(--muted);
-      font-size: 1.02rem;
-      line-height: 1.6;
-      margin-bottom: 28px;
-    }
-
-    .hero,
-    .grid {
-      display: grid;
-      gap: 18px;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    }
-
-    .grid {
-      margin-top: 18px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 22px;
-      backdrop-filter: blur(14px);
-    }
-
-    .eyebrow {
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
-
-    .metric {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0;
-    }
-
-    .muted {
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    .list {
-      margin: 12px 0 0;
-      padding-left: 18px;
-      line-height: 1.7;
-      color: var(--muted);
-    }
-
-    .callout {
-      border-left: 4px solid var(--warn);
-      padding-left: 14px;
-      margin-top: 14px;
-      color: var(--muted);
-    }
-
-    code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.95em;
-      background: rgba(15, 118, 110, 0.09);
-      padding: 0.1em 0.35em;
-      border-radius: 6px;
-    }
-  </style>
+  <title>MindSense - Live Analysis Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="/dashboard/favicon.svg">
+  <link rel="stylesheet" href="/dashboard/styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <section>
-      <div class="eyebrow">MindSense Prototype</div>
-      <h1>Locked winners, live feature extraction, honest boundaries.</h1>
-      <p class="subtitle">
-        This prototype server exposes the strategic model lock, benchmark-backed winners, D-Vlog bridge readiness,
-        and live visual feature extraction. It intentionally does not emit real-time risk predictions until a proper
-        bridge model has been trained and validated.
-      </p>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">MS</div>
+        <div>
+          <h1>MindSense</h1>
+          <span class="version">Live Analysis Dashboard · Vision V3</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span id="session-timer" class="session-timer">00:00</span>
+        <button id="start-camera" class="btn btn-primary">Start Camera</button>
+        <button id="pause-camera" class="btn btn-secondary">Pause</button>
+        <button id="reset-session" class="btn btn-ghost">Reset</button>
+      </div>
+    </header>
+
+    <section class="primary-grid">
+      <article class="panel video-panel">
+        <div class="panel-head">
+          <span class="panel-title">Live Camera</span>
+          <span id="camera-pill" class="pill pill-neutral">Idle</span>
+        </div>
+        <div class="video-frame">
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div class="video-hud">
+            <div class="hud-chip"><span id="hud-face-dot" class="hud-dot hud-dot-off"></span> <span id="hud-face-text">Face</span></div>
+            <div class="hud-chip"><span id="hud-pose-dot" class="hud-dot hud-dot-off"></span> <span id="hud-pose-text">Pose</span></div>
+            <div class="hud-chip" id="hud-fps-chip">- fps</div>
+          </div>
+          <div id="video-message" class="video-message">
+            Start the camera to begin real-time behavioral analysis.
+          </div>
+        </div>
+        <div class="video-stats">
+          <div class="stat-chip"><span class="label">Face</span><strong id="face-detected" class="value">-</strong></div>
+          <div class="stat-chip"><span class="label">Cadence</span><strong id="loop-cadence" class="value">1.0s</strong></div>
+          <div class="stat-chip"><span class="label">Buffer</span><strong id="buffered-frames" class="value">0</strong></div>
+          <div class="stat-chip"><span class="label">Sync</span><strong id="last-api-state" class="value">Idle</strong></div>
+        </div>
+      </article>
+
+      <article class="panel risk-panel tracker-panel">
+        <div class="panel-head">
+          <span class="panel-title">Tracker Projection</span>
+          <span id="risk-pill" class="pill pill-neutral">Waiting</span>
+        </div>
+
+        <div class="tracker-stage-shell">
+          <canvas id="tracker-stage"></canvas>
+          <div class="tracker-stage-grid"></div>
+          <div id="tracker-stage-empty" class="tracker-stage-empty is-visible">
+            Mesh projection will appear here once face or pose tracking locks.
+          </div>
+          <div class="tracker-stage-hud">
+            <div class="tracker-hud-chip"><span id="tracker-face-dot" class="hud-dot hud-dot-off"></span> Face mesh</div>
+            <div class="tracker-hud-chip"><span id="tracker-pose-dot" class="hud-dot hud-dot-off"></span> Body pose</div>
+            <div class="tracker-hud-chip" id="tracker-fps-chip">- fps</div>
+          </div>
+        </div>
+
+      </article>
     </section>
 
-    <section class="hero">
-      <article class="card">
-        <div class="eyebrow">D-Vlog</div>
-        <p class="metric">Vision V3</p>
-        <p class="muted">Current benchmark winner and preferred direction.</p>
+    <section class="secondary-grid">
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Context</span>
+          <span id="readiness-pill" class="pill pill-neutral">Booting</span>
+        </div>
+        <div id="info-readiness" class="info-value">Initializing</div>
+        <p id="readiness-message" class="muted-sm">Loading runtime components.</p>
+        <div class="context-block">
+          <div class="progress-row">
+            <span>Frame buffer</span>
+            <span id="context-progress">0%</span>
+          </div>
+          <div class="progress-rail-sm">
+            <div id="context-progress-fill" class="progress-fill-sm"></div>
+          </div>
+        </div>
       </article>
-      <article class="card">
-        <div class="eyebrow">E-DAIC</div>
-        <p class="metric">Fusion V1</p>
-        <p class="muted">Current locked multimodal winner.</p>
-      </article>
-      <article class="card">
-        <div class="eyebrow">Prototype mode</div>
-        <p class="metric">Features only</p>
-        <p class="muted">Live extraction is on track; live risk scoring stays off until the bridge is validated.</p>
-      </article>
-    </section>
 
-    <section class="grid">
-      <article class="card">
-        <div class="eyebrow">Available endpoints</div>
-        <ul class="list">
-          <li><code>GET /health</code></li>
-          <li><code>GET /api/model-lock</code></li>
-          <li><code>GET /api/benchmarks</code></li>
-          <li><code>GET /api/bridge-status</code></li>
-          <li><code>POST /api/extract-frame</code></li>
-          <li><code>POST /api/reset-session</code></li>
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Bridge</span>
+          <span id="bridge-pill" class="pill pill-neutral">Checking</span>
+        </div>
+        <div id="bridge-state" class="info-value">Loading</div>
+        <div style="margin-top: 8px;">
+          <div class="stat-row"><span>Visual |mu|</span><strong id="bridge-visual-mean">0.0000</strong></div>
+          <div class="stat-row"><span>Visual sigma</span><strong id="bridge-visual-std">0.0000</strong></div>
+          <div class="stat-row"><span>Acoustic |mu|</span><strong id="bridge-acoustic-mean">0.0000</strong></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Expression Readout</span>
+          <span id="expression-pill" class="pill pill-neutral">Waiting</span>
+        </div>
+        <div class="modality-grid">
+          <div class="mod-chip"><div class="mod-icon">:)</div><div class="mod-name">Smile</div><div id="mod-smile" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">^^</div><div class="mod-name">Brow</div><div id="mod-brow" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">O</div><div class="mod-name">Eyes</div><div id="mod-eyes" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">U</div><div class="mod-name">Mouth</div><div id="mod-mouth" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">MV</div><div class="mod-name">Move</div><div id="mod-movement" class="mod-val">-</div></div>
+        </div>
+        <p id="calibration-note" class="muted-sm" style="margin-top:10px;">Expression tracking will activate when face is detected.</p>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Live Tracking Signals</span>
+        </div>
+        <div class="modality-grid">
+          <div class="mod-chip"><div class="mod-icon">VIS</div><div class="mod-name">Visual</div><div id="mod-visual" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">BDY</div><div class="mod-name">Body</div><div id="mod-body" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">HND</div><div class="mod-name">Hands</div><div id="mod-hands" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">GZ</div><div class="mod-name">Gaze</div><div id="mod-gaze" class="mod-val">-</div></div>
+          <div class="mod-chip"><div class="mod-icon">AFF</div><div class="mod-name">Affect</div><div id="mod-affect" class="mod-val">-</div></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-title">System</span>
+        </div>
+        <ul class="notes-list">
+          <li>Locked winner: <strong>Vision V3</strong> (D-Vlog)</li>
+          <li>Bridge projects live features to training space</li>
+          <li>Online calibration corrects for distribution shift</li>
+          <li>Tracker projection mirrors the same live subject state</li>
+          <li>Server inference samples at the training-aligned timebase</li>
+          <li>Research prototype - not clinical</li>
         </ul>
-      </article>
-
-      <article class="card">
-        <div class="eyebrow">What this is for</div>
-        <ul class="list">
-          <li>Verify the repo knows which models are strategically locked.</li>
-          <li>Inspect bridge coverage before student/teacher projection work.</li>
-          <li>Test webcam-frame style visual feature extraction with quality signals.</li>
-          <li>Keep the demo honest while the bridge model is still missing.</li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <div class="eyebrow">Important boundary</div>
-        <p class="muted">
-          The training stack uses offline feature spaces. The live extractor uses a proxy visual stack for prototype work.
-          Those spaces are not interchangeable yet.
-        </p>
-        <p class="callout">
-          No live depression-risk prediction should be shown from this server until the bridge is trained and benchmarked.
-        </p>
       </article>
     </section>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.js" crossorigin="anonymous"></script>
+  <script src="/dashboard/app.js"></script>
 </body>
 </html>
