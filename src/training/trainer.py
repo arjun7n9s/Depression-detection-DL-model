@@ -246,6 +246,14 @@ def persist_seed_artifacts(seed_dir: Path, seed: int, result: dict, selected_met
         ),
         encoding="utf-8",
     )
+    torch.save(
+        {
+            "seed": seed,
+            "selected_method": selected_method,
+            "state_dict": result["state_dict"],
+        },
+        seed_dir / "checkpoint.pt",
+    )
 
     _write_split_artifacts(seed_dir, "dev", result["dev_results"][selected_method])
     if result["test_results"] is not None:

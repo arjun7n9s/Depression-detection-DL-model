@@ -1,0 +1,91 @@
+{
+  "suite_name": "fusion_v2_showdown",
+  "completed_at": "2026-04-05 16:25:35",
+  "tracks": {
+    "edaic_fusion_v2": {
+      "dataset": "edaic",
+      "modality": "rich_av",
+      "stages": {
+        "frozen": {
+          "candidates": [],
+          "selected": "locked_run"
+        }
+      },
+      "final_config": {
+        "batch_size": 8,
+        "hidden_dim": 128,
+        "dropout": 0.3,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 12,
+        "patience": 3,
+        "device": "cuda",
+        "balanced_sampling": true,
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 9,
+        "stride": 4,
+        "latent_num": 8,
+        "cross_attn_heads": 4,
+        "self_attn_layers": 4,
+        "self_attn_heads": 4,
+        "gate_variant": "quality_mixture",
+        "subject_aggregation": "transformer",
+        "modality_dropout": 0.15,
+        "freeze_warm_start_epochs": 3,
+        "fused_binary_weight": 1.0,
+        "acoustic_aux_weight": 0.3,
+        "visual_aux_weight": 0.15,
+        "teacher_kl_weight": 0.2,
+        "phq_regression_weight": 0.25,
+        "phq_severity_weight": 0.1,
+        "gate_entropy_weight": 0.02,
+        "normalization_source": "train",
+        "bundle_name": "rich_av"
+      },
+      "frozen_aggregation": "transformer"
+    },
+    "dvlog_fusion_v2": {
+      "dataset": "dvlog",
+      "modality": "current_av",
+      "stages": {
+        "frozen": {
+          "candidates": [],
+          "selected": "locked_run"
+        }
+      },
+      "final_config": {
+        "batch_size": 8,
+        "hidden_dim": 128,
+        "dropout": 0.3,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 12,
+        "patience": 3,
+        "device": "cuda",
+        "balanced_sampling": true,
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 9,
+        "stride": 4,
+        "latent_num": 8,
+        "cross_attn_heads": 4,
+        "self_attn_layers": 4,
+        "self_attn_heads": 4,
+        "gate_variant": "fused_only",
+        "subject_aggregation": "transformer",
+        "modality_dropout": 0.0,
+        "freeze_warm_start_epochs": 3,
+        "fused_binary_weight": 1.0,
+        "acoustic_aux_weight": 0.3,
+        "visual_aux_weight": 0.15,
+        "teacher_kl_weight": 0.2,
+        "phq_regression_weight": 0.25,
+        "phq_severity_weight": 0.1,
+        "gate_entropy_weight": 0.02,
+        "normalization_source": "train"
+      },
+      "frozen_aggregation": "transformer"
+    }
+  }
+}

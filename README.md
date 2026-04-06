@@ -6,7 +6,7 @@
 ![Public Snapshot](https://img.shields.io/badge/public%20snapshot-curated%20stable-1d4ed8)
 ![Unimodal](https://img.shields.io/badge/unimodal%20benchmark-finalized-15803d)
 ![Bimodal](https://img.shields.io/badge/bimodal%20v1-dev--stage%20complete-f59e0b)
-![Next Step](https://img.shields.io/badge/next-Fusion%20V2-7c3aed)
+![Next Step](https://img.shields.io/badge/next-bridge%20%2B%20inference%20prep-7c3aed)
 ![License](https://img.shields.io/badge/license-MIT-eab308)
 
 This repo is the public research log for the project as it actually exists today. It includes the verified data-foundation layer, finalized unimodal benchmark results, implemented bimodal `Fusion V1` code and curated benchmark artifacts, plus the running progress log in `team_progress`.
@@ -22,10 +22,11 @@ This repo is the public research log for the project as it actually exists today
 | Milestone unimodal baselines | Complete |
 | Benchmark-quality unimodal search | Complete |
 | Locked final unimodal benchmark runs | Complete |
-| Bimodal acoustic+visual `Fusion V1` | Implemented and dev-stage benchmark complete |
-| Bimodal smoke verification | Complete |
-| Next architecture milestone | `Fusion V2` implementation |
-| Live inference / dashboard | Not started yet |
+| Bimodal acoustic+visual `Fusion V1` | Implemented and locked benchmark complete |
+| Bimodal `Fusion V2` | Implemented, benchmarked, not promoted |
+| D-Vlog `Vision V3` | Implemented, benchmarked, promoted |
+| Strategic model lock | Complete and downstream-ready |
+| Live inference / dashboard | Prototype scaffolding started |
 
 ## What Is Public In This Repo
 
@@ -69,9 +70,9 @@ Key readouts:
 - E-DAIC acoustic was the strongest unimodal branch on dev, but E-DAIC visual slightly edged it on final test with higher variance.
 - Final locked runs are complete, so the repo has moved beyond dev-stage-only reporting.
 
-## Bimodal Fusion V1 Snapshot
+## Bimodal Fusion Snapshot
 
-The first multimodal architecture is implemented as `Fusion V1` and its full dev-stage benchmark suite completed on **April 4, 2026 at 19:37 IST**. These are dev-stage selection results only, not finalized test-set benchmark claims.
+The first multimodal architecture is implemented as `Fusion V1`, and `Fusion V2` was later benchmarked in a corrected locked showdown. The source-of-truth multimodal winners are now frozen by dataset.
 
 | Track | Selected window | Selected policy | Selected capacity | Frozen aggregation | Best dev macro F1 |
 |---|---|---|---|---|---:|
@@ -82,7 +83,35 @@ Evidence-backed interpretation:
 - `Fusion V1` is a valid multimodal baseline.
 - On `D-Vlog`, `Fusion V1` already beats both finalized unimodal dev baselines.
 - On `E-DAIC`, `Fusion V1` does not yet beat the stronger acoustic unimodal baseline.
-- That split result is exactly why the next milestone is **`Fusion V2`**, not immediate promotion of `Fusion V1` as the final architecture.
+
+## Locked Winners
+
+These are the current best verified models after the locked `Vision V3` D-Vlog showdown in `results/benchmark_quality/vision_v3_dvlog_showdown/final/benchmark_summary.csv` and the corrected synced `Fusion V2` showdown for E-DAIC.
+
+| Dataset | Locked winner | Test macro F1 | Why it stays locked |
+|---|---|---:|---|
+| `D-Vlog` | `dvlog_vision_v3` | `0.6666 +/- 0.0310` | `Vision V3` slightly beat the locked acoustic benchmark on final test while matching the project’s vision-first goal |
+| `E-DAIC` | `edaic_bimodal` (`Fusion V1`) | `0.5563 +/- 0.0342` | corrected `Fusion V2` still failed to transfer to test despite clearing the dev bar |
+
+Evidence-backed interpretation:
+- `Fusion V2` was a useful research step, but it is not promoted on either dataset.
+- `Vision V3` is now the promoted D-Vlog direction and the current best verified D-Vlog model.
+- `E-DAIC` currently favors the locked `Fusion V1` bimodal model.
+- Any future multimodal push should be treated as a new research milestone rather than a continuation of the current promotion path.
+
+## Preferred Architecture Direction
+
+This project is **vision-first**. Audio is an auxiliary signal, not the primary identity of the system.
+
+Decision rule:
+- if a `vision` or `fusion` model is within about `0.05` test macro F1 of the best acoustic model, prefer the `vision` or `fusion` path for product/research direction
+- acoustic-only remains the strict metric reference, not automatically the preferred architecture
+
+Current interpretation under that rule:
+- `D-Vlog` benchmark winner: `dvlog_vision_v3`
+- `D-Vlog` preferred direction: `dvlog_vision_v3`
+- `E-DAIC` benchmark winner: `edaic_bimodal` (`Fusion V1`)
+- `E-DAIC` preferred direction: `edaic_bimodal` (`Fusion V1`)
 
 ## Public Repro Notes
 
@@ -124,9 +153,11 @@ flowchart LR
 | D-Vlog loader | Complete | Verified subject and window counts across train/valid/test | This step converts raw feature files into repeatable model-ready windows |
 | E-DAIC loader | Complete | Verified 1 Hz resampling, quality filtering, and modality-aware window creation | E-DAIC is messy enough that loader correctness directly affects every downstream metric |
 | Locked unimodal benchmark | Complete | Final milestone report + benchmark summary CSV | This gives us the benchmark numbers we can cite publicly today |
-| Bimodal `Fusion V1` implementation | Complete | Bimodal model code, runner support, configs, smoke outputs | This proves the repo now supports real multimodal training rather than only unimodal benchmarking |
-| Bimodal `Fusion V1` dev benchmark | Complete | `results/benchmark_quality/bimodal_benchmark_v1/selection_ledger.json` | This gave us evidence for where simple fusion works and where it still falls short |
-| Next architecture milestone | Ready to start | `Fusion V2` plan captured in `implementation_plan.md` | We need a stronger multimodal architecture, not just more repetitions of the same fusion recipe |
+| Bimodal `Fusion V1` implementation | Complete | Bimodal model code, runner support, configs, smoke outputs | This proved the repo supports real multimodal training rather than only unimodal benchmarking |
+| Bimodal `Fusion V1` locked benchmark | Complete | `results/benchmark_quality/fusion_v1_locked/final/benchmark_summary.csv` | This froze the first multimodal reference honestly against final test metrics |
+| Bimodal `Fusion V2` benchmark + synced showdown | Complete | `results/benchmark_quality/fusion_v2_showdown_synced/final/benchmark_summary.csv` | This tested the stronger fusion idea and showed it was not yet promotion-worthy |
+| D-Vlog `Vision V3` benchmark + showdown | Complete | `results/benchmark_quality/vision_v3_dvlog_showdown/final/benchmark_summary.csv` | This is the first vision-first architecture to beat the locked D-Vlog acoustic benchmark on final test |
+| Next architecture milestone | Replan from stronger position | Vision V3 D-Vlog locked showdown + E-DAIC gap | D-Vlog now has a promoted vision-first winner; the next question is how to extend or adapt that progress |
 
 ### Recorded Results We Can Stand Behind
 
@@ -137,8 +168,11 @@ flowchart LR
 | Final D-Vlog acoustic benchmark | test macro F1 `0.6630 +/- 0.0100` | Current strongest finalized unimodal result in the repo |
 | Final E-DAIC acoustic benchmark | dev macro F1 `0.5922 +/- 0.0202` | Strongest unimodal E-DAIC dev reference that multimodal models must beat |
 | Final E-DAIC visual benchmark | test macro F1 `0.5355 +/- 0.0686` | Shows longer-context visual modeling can stay competitive on final test |
-| `Fusion V1` D-Vlog bimodal | dev macro F1 `0.7024` | First clear sign that fusion is already helping on D-Vlog |
-| `Fusion V1` E-DAIC bimodal | dev macro F1 `0.5352` | First fusion baseline works, but is not yet strong enough to beat the best E-DAIC unimodal reference |
+| `Fusion V1` D-Vlog bimodal | test macro F1 `0.6131 +/- 0.0111` | Useful multimodal baseline, but not the final D-Vlog winner |
+| `Fusion V1` E-DAIC bimodal | test macro F1 `0.5563 +/- 0.0342` | Current best verified E-DAIC model in the repo |
+| Corrected `Fusion V2` D-Vlog showdown | test macro F1 `0.6279 +/- 0.0142` | Better than `Fusion V1` on D-Vlog test, but still below acoustic-only |
+| Corrected `Fusion V2` E-DAIC showdown | test macro F1 `0.4871 +/- 0.0658` | Cleared the dev bar but failed to hold up on final test |
+| `Vision V3` D-Vlog showdown | test macro F1 `0.6666 +/- 0.0310` | First promoted vision-first D-Vlog winner; slightly above acoustic on final test |
 
 ### Why These Steps Matter
 
@@ -158,14 +192,16 @@ flowchart LR
 - The repo already contains a finalized unimodal benchmark pack.
 - The repo already contains an implemented bimodal baseline with a completed dev-stage benchmark.
 - The current architectural decision is evidence-backed:
-  - freeze `Fusion V1` as the multimodal baseline
-  - build `Fusion V2` as the main upgrade path
+  - lock `dvlog_vision_v3` as the D-Vlog winner
+  - lock `edaic_bimodal` (`Fusion V1`) as the E-DAIC winner
+  - treat `Fusion V2` as an explored but not promoted branch
+  - treat `Vision V3` as the first promoted D-Vlog vision-first architecture
 
 ### What We're Doing Next
 
-1. Keep `Fusion V1` as the benchmark baseline rather than prematurely promoting it as the final multimodal model.
-2. Implement `Fusion V2` with stronger modality encoders, reliability-aware latent fusion, teacher distillation, masked multitask supervision, and learned subject-level aggregation.
-3. Benchmark `Fusion V2` directly against the strongest unimodal model and `Fusion V1` on both datasets.
-4. Promote winners by evidence, not by narrative.
+1. Freeze the current winners as the milestone outcome: `dvlog_vision_v3` for D-Vlog and `edaic_bimodal` for E-DAIC.
+2. Keep `Fusion V2` as benchmark evidence, not as a promoted architecture.
+3. Build the downstream bridge and honest live-inference scaffolding around the locked winners.
+4. Continue reporting dataset-specific winners rather than forcing one universal champion.
 
 For a narrative log of the work as it happened, see `team_progress`.

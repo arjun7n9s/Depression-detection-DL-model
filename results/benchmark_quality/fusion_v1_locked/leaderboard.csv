@@ -1,0 +1,3 @@
+stage,track,dataset,modality,candidate,selected_aggregation,dev_macro_f1_mean,dev_macro_f1_std,test_macro_f1_mean,test_macro_f1_std,summary_path
+final_locked,dvlog_bimodal,dvlog,both,locked_run,mean,0.682041223843626,0.04041589290677001,0.6131049553931067,0.011077399854771491,results/benchmark_quality/fusion_v1_locked/final/dvlog_bimodal/locked_run/summary.json
+final_locked,edaic_bimodal,edaic,both,locked_run,attention,0.511208238707225,0.06700016255953072,0.5562721155655937,0.03417248478734069,results/benchmark_quality/fusion_v1_locked/final/edaic_bimodal/locked_run/summary.json

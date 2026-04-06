@@ -66,7 +66,12 @@ History.md
 
 # Local scratch / non-public artifacts
 _check_report.py
+_edaic_analysis.py
 results/benchmark_quality/benchmark_suite_smoke/
+results/benchmark_quality/_fusion_v2_artifact_smoke/
+results/benchmark_quality/fusion_v2_showdown/
+results/benchmark_quality/**/seed_*/
+results/benchmark_quality/**/checkpoint.pt
 results/benchmark_quality/unimodal_benchmark_v1/logs/
 results/baselines/dvlog_acoustic_20260402_213734/
 results/baselines/dvlog_visual_20260402_213838/

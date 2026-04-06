@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindSense Prototype Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: rgba(255, 250, 242, 0.88);
+      --ink: #1f2933;
+      --muted: #5b6b79;
+      --accent: #0f766e;
+      --warn: #b45309;
+      --border: rgba(31, 41, 51, 0.12);
+      --shadow: 0 24px 50px rgba(31, 41, 51, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Aptos", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 35%),
+        radial-gradient(circle at top right, rgba(180, 83, 9, 0.10), transparent 30%),
+        linear-gradient(160deg, #f8f4ee 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 3vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .hero,
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .grid {
+      margin-top: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(14px);
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .metric {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .list {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .callout {
+      border-left: 4px solid var(--warn);
+      padding-left: 14px;
+      margin-top: 14px;
+      color: var(--muted);
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95em;
+      background: rgba(15, 118, 110, 0.09);
+      padding: 0.1em 0.35em;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section>
+      <div class="eyebrow">MindSense Prototype</div>
+      <h1>Locked winners, live feature extraction, honest boundaries.</h1>
+      <p class="subtitle">
+        This prototype server exposes the strategic model lock, benchmark-backed winners, D-Vlog bridge readiness,
+        and live visual feature extraction. It intentionally does not emit real-time risk predictions until a proper
+        bridge model has been trained and validated.
+      </p>
+    </section>
+
+    <section class="hero">
+      <article class="card">
+        <div class="eyebrow">D-Vlog</div>
+        <p class="metric">Vision V3</p>
+        <p class="muted">Current benchmark winner and preferred direction.</p>
+      </article>
+      <article class="card">
+        <div class="eyebrow">E-DAIC</div>
+        <p class="metric">Fusion V1</p>
+        <p class="muted">Current locked multimodal winner.</p>
+      </article>
+      <article class="card">
+        <div class="eyebrow">Prototype mode</div>
+        <p class="metric">Features only</p>
+        <p class="muted">Live extraction is on track; live risk scoring stays off until the bridge is validated.</p>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="eyebrow">Available endpoints</div>
+        <ul class="list">
+          <li><code>GET /health</code></li>
+          <li><code>GET /api/model-lock</code></li>
+          <li><code>GET /api/benchmarks</code></li>
+          <li><code>GET /api/bridge-status</code></li>
+          <li><code>POST /api/extract-frame</code></li>
+          <li><code>POST /api/reset-session</code></li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="eyebrow">What this is for</div>
+        <ul class="list">
+          <li>Verify the repo knows which models are strategically locked.</li>
+          <li>Inspect bridge coverage before student/teacher projection work.</li>
+          <li>Test webcam-frame style visual feature extraction with quality signals.</li>
+          <li>Keep the demo honest while the bridge model is still missing.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="eyebrow">Important boundary</div>
+        <p class="muted">
+          The training stack uses offline feature spaces. The live extractor uses a proxy visual stack for prototype work.
+          Those spaces are not interchangeable yet.
+        </p>
+        <p class="callout">
+          No live depression-risk prediction should be shown from this server until the bridge is trained and benchmarked.
+        </p>
+      </article>
+    </section>
+  </div>
+</body>
+</html>

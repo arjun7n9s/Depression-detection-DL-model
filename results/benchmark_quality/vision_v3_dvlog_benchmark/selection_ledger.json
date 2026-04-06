@@ -1,0 +1,123 @@
+{
+  "suite_name": "vision_v3_dvlog_benchmark",
+  "completed_at": "2026-04-06 14:09:20",
+  "tracks": {
+    "dvlog_vision_v3": {
+      "dataset": "dvlog",
+      "modality": "visual_full_aux_audio",
+      "stages": {
+        "stage_a": {
+          "candidates": [
+            {
+              "candidate_name": "existing_visual_only",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_a/existing_visual_only/summary.json",
+              "dev_macro_f1_mean": 0.4384995281028896,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "visual_pose",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_a/visual_pose/summary.json",
+              "dev_macro_f1_mean": 0.5289203878921183,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "visual_pose_hands_gaze",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_a/visual_pose_hands_gaze/summary.json",
+              "dev_macro_f1_mean": 0.6308522106139463,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "visual_full_aux_audio",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_a/visual_full_aux_audio/summary.json",
+              "dev_macro_f1_mean": 0.6579970740455818,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "visual_full_aux_audio"
+        },
+        "stage_b": {
+          "candidates": [
+            {
+              "candidate_name": "fixed_prior",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_b/fixed_prior/summary.json",
+              "dev_macro_f1_mean": 0.6653313036020336,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "learned_prior",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_b/learned_prior/summary.json",
+              "dev_macro_f1_mean": 0.6414839816343649,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "fixed_prior"
+        },
+        "stage_c": {
+          "candidates": [
+            {
+              "candidate_name": "subject_mean",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_c/subject_mean/summary.json",
+              "dev_macro_f1_mean": 0.708669263706109,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "subject_transformer",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_c/subject_transformer/summary.json",
+              "dev_macro_f1_mean": 0.654108266854323,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "subject_mean"
+        },
+        "stage_d": {
+          "candidates": [
+            {
+              "candidate_name": "dropout_off",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_d/dropout_off/summary.json",
+              "dev_macro_f1_mean": 0.6734645931952374,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "dropout_on",
+              "summary_path": "results/benchmark_quality/vision_v3_dvlog_benchmark/dev/dvlog_vision_v3/stage_d/dropout_on/summary.json",
+              "dev_macro_f1_mean": 0.708669263706109,
+              "selected_aggregation": "mean"
+            }
+          ],
+          "selected": "dropout_on"
+        }
+      },
+      "final_config": {
+        "batch_size": 8,
+        "hidden_dim": 128,
+        "dropout": 0.3,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 12,
+        "patience": 3,
+        "device": "cuda",
+        "balanced_sampling": true,
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 9,
+        "stride": 4,
+        "subject_aggregation": "mean",
+        "fusion_variant": "fixed_prior",
+        "fixed_prior_weights": [
+          0.1,
+          0.6,
+          0.3
+        ],
+        "modality_dropout": 0.1,
+        "mixture_binary_weight": 1.0,
+        "visual_aux_weight": 0.35,
+        "acoustic_aux_weight": 0.1,
+        "teacher_kl_weight": 0.0,
+        "gate_entropy_weight": 0.01,
+        "normalization_source": "train",
+        "bundle_name": "visual_full_aux_audio"
+      },
+      "frozen_aggregation": "mean"
+    }
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "suite_name": "fusion_v2_benchmark",
+  "completed_at": "2026-04-05 14:28:46",
+  "tracks": {
+    "edaic_fusion_v2": {
+      "dataset": "edaic",
+      "modality": "current_av",
+      "stages": {
+        "stage_a": {
+          "candidates": [
+            {
+              "candidate_name": "current_av",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_a/current_av/summary.json",
+              "dev_macro_f1_mean": 0.5371710526315789,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "rich_av",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_a/rich_av/summary.json",
+              "dev_macro_f1_mean": 0.5977667319130734,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "rich_av"
+        },
+        "stage_b": {
+          "candidates": [
+            {
+              "candidate_name": "window_09",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_b/window_09/summary.json",
+              "dev_macro_f1_mean": 0.5806754648218063,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "window_15",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_b/window_15/summary.json",
+              "dev_macro_f1_mean": 0.5785826484472462,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "window_09"
+        },
+        "stage_c": {
+          "candidates": [
+            {
+              "candidate_name": "fused_only",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_c/fused_only/summary.json",
+              "dev_macro_f1_mean": 0.4444444444444444,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "quality_mixture",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_c/quality_mixture/summary.json",
+              "dev_macro_f1_mean": 0.5846597122271063,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "quality_mixture"
+        },
+        "stage_d": {
+          "candidates": [
+            {
+              "candidate_name": "freeze3",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_d/freeze3/summary.json",
+              "dev_macro_f1_mean": 0.5977667319130734,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "freeze5",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_d/freeze5/summary.json",
+              "dev_macro_f1_mean": 0.585410199556541,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "freeze3"
+        }
+      },
+      "final_config": {
+        "batch_size": 8,
+        "hidden_dim": 128,
+        "dropout": 0.3,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 12,
+        "patience": 3,
+        "device": "cuda",
+        "balanced_sampling": true,
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 9,
+        "stride": 4,
+        "latent_num": 8,
+        "cross_attn_heads": 4,
+        "self_attn_layers": 4,
+        "self_attn_heads": 4,
+        "gate_variant": "quality_mixture",
+        "subject_aggregation": "transformer",
+        "modality_dropout": 0.15,
+        "freeze_warm_start_epochs": 3,
+        "fused_binary_weight": 1.0,
+        "acoustic_aux_weight": 0.3,
+        "visual_aux_weight": 0.15,
+        "teacher_kl_weight": 0.2,
+        "phq_regression_weight": 0.25,
+        "phq_severity_weight": 0.1,
+        "gate_entropy_weight": 0.02,
+        "normalization_source": "train",
+        "bundle_name": "rich_av"
+      },
+      "frozen_aggregation": "transformer"
+    },
+    "dvlog_fusion_v2": {
+      "dataset": "dvlog",
+      "modality": "current_av",
+      "stages": {
+        "stage_a": {
+          "candidates": [
+            {
+              "candidate_name": "subject_mean",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_a/subject_mean/summary.json",
+              "dev_macro_f1_mean": 0.6521611726584845,
+              "selected_aggregation": "mean"
+            },
+            {
+              "candidate_name": "subject_transformer",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_a/subject_transformer/summary.json",
+              "dev_macro_f1_mean": 0.653132742115517,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "subject_transformer"
+        },
+        "stage_b": {
+          "candidates": [
+            {
+              "candidate_name": "fused_only",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_b/fused_only/summary.json",
+              "dev_macro_f1_mean": 0.6668499162614209,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "quality_mixture",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_b/quality_mixture/summary.json",
+              "dev_macro_f1_mean": 0.653132742115517,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "fused_only"
+        },
+        "stage_c": {
+          "candidates": [
+            {
+              "candidate_name": "dropout_off",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_c/dropout_off/summary.json",
+              "dev_macro_f1_mean": 0.6429776626995913,
+              "selected_aggregation": "transformer"
+            },
+            {
+              "candidate_name": "dropout_on",
+              "summary_path": "results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_c/dropout_on/summary.json",
+              "dev_macro_f1_mean": 0.6102213615064717,
+              "selected_aggregation": "transformer"
+            }
+          ],
+          "selected": "dropout_off"
+        }
+      },
+      "final_config": {
+        "batch_size": 8,
+        "hidden_dim": 128,
+        "dropout": 0.3,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "epochs": 12,
+        "patience": 3,
+        "device": "cuda",
+        "balanced_sampling": true,
+        "num_workers": 0,
+        "min_valid_ratio": 0.5,
+        "window_size": 9,
+        "stride": 4,
+        "latent_num": 8,
+        "cross_attn_heads": 4,
+        "self_attn_layers": 4,
+        "self_attn_heads": 4,
+        "gate_variant": "fused_only",
+        "subject_aggregation": "transformer",
+        "modality_dropout": 0.0,
+        "freeze_warm_start_epochs": 3,
+        "fused_binary_weight": 1.0,
+        "acoustic_aux_weight": 0.3,
+        "visual_aux_weight": 0.15,
+        "teacher_kl_weight": 0.2,
+        "phq_regression_weight": 0.25,
+        "phq_severity_weight": 0.1,
+        "gate_entropy_weight": 0.02,
+        "normalization_source": "train"
+      },
+      "frozen_aggregation": "transformer"
+    }
+  }
+}

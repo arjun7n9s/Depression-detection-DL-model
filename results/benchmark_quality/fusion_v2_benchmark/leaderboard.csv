@@ -1,0 +1,15 @@
+stage,track,dataset,modality,candidate,selected_aggregation,dev_macro_f1_mean,dev_macro_f1_std,test_macro_f1_mean,test_macro_f1_std,summary_path
+stage_a,dvlog_fusion_v2,dvlog,current_av,subject_transformer,transformer,0.653132742115517,0.020099019439808536,,,results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_a/subject_transformer/summary.json
+stage_a,dvlog_fusion_v2,dvlog,current_av,subject_mean,mean,0.6521611726584845,0.013073186987493992,,,results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_a/subject_mean/summary.json
+stage_a,edaic_fusion_v2,edaic,current_av,current_av,transformer,0.5371710526315789,0.034882376621305666,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_a/current_av/summary.json
+stage_a,edaic_fusion_v2,edaic,rich_av,rich_av,transformer,0.5977667319130734,0.06304311878117835,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_a/rich_av/summary.json
+stage_b,dvlog_fusion_v2,dvlog,current_av,fused_only,transformer,0.6668499162614209,0.009127055240111561,,,results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_b/fused_only/summary.json
+stage_b,dvlog_fusion_v2,dvlog,current_av,quality_mixture,transformer,0.653132742115517,0.020099019439808536,,,results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_b/quality_mixture/summary.json
+stage_b,edaic_fusion_v2,edaic,rich_av,window_09,transformer,0.5806754648218063,0.06769407273051892,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_b/window_09/summary.json
+stage_b,edaic_fusion_v2,edaic,rich_av,window_15,transformer,0.5785826484472462,0.09551608693113857,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_b/window_15/summary.json
+stage_c,dvlog_fusion_v2,dvlog,current_av,dropout_off,transformer,0.6429776626995913,0.023352883453888355,,,results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_c/dropout_off/summary.json
+stage_c,dvlog_fusion_v2,dvlog,current_av,dropout_on,transformer,0.6102213615064717,0.03263790774712213,,,results/benchmark_quality/fusion_v2_benchmark/dev/dvlog_fusion_v2/stage_c/dropout_on/summary.json
+stage_c,edaic_fusion_v2,edaic,rich_av,quality_mixture,transformer,0.5846597122271063,0.06585056929130419,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_c/quality_mixture/summary.json
+stage_c,edaic_fusion_v2,edaic,rich_av,fused_only,transformer,0.4444444444444444,0.0,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_c/fused_only/summary.json
+stage_d,edaic_fusion_v2,edaic,rich_av,freeze3,transformer,0.5977667319130734,0.06304311878117835,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_d/freeze3/summary.json
+stage_d,edaic_fusion_v2,edaic,rich_av,freeze5,transformer,0.585410199556541,0.06555174252385962,,,results/benchmark_quality/fusion_v2_benchmark/dev/edaic_fusion_v2/stage_d/freeze5/summary.json

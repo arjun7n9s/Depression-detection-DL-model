@@ -1,0 +1,189 @@
+{
+  "suite_track": "edaic_fusion_v2",
+  "dataset": "edaic",
+  "modality": "rich_av",
+  "stage_name": "stage_c",
+  "candidate_name": "fused_only",
+  "completed_at": "2026-04-05 12:50:17",
+  "selected_aggregation": "transformer",
+  "include_test": false,
+  "experiment_config": {
+    "batch_size": 8,
+    "hidden_dim": 128,
+    "dropout": 0.3,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "epochs": 12,
+    "patience": 3,
+    "device": "cuda",
+    "balanced_sampling": true,
+    "num_workers": 0,
+    "min_valid_ratio": 0.5,
+    "window_size": 9,
+    "stride": 4,
+    "latent_num": 8,
+    "cross_attn_heads": 4,
+    "self_attn_layers": 4,
+    "self_attn_heads": 4,
+    "gate_variant": "fused_only",
+    "subject_aggregation": "transformer",
+    "modality_dropout": 0.15,
+    "freeze_warm_start_epochs": 3,
+    "fused_binary_weight": 1.0,
+    "acoustic_aux_weight": 0.3,
+    "visual_aux_weight": 0.15,
+    "teacher_kl_weight": 0.2,
+    "phq_regression_weight": 0.25,
+    "phq_severity_weight": 0.1,
+    "gate_entropy_weight": 0.02,
+    "normalization_source": "train",
+    "bundle_name": "rich_av"
+  },
+  "train_config": {
+    "batch_size": 8,
+    "hidden_dim": 128,
+    "dropout": 0.3,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "epochs": 12,
+    "patience": 3,
+    "device": "cuda",
+    "freeze_warm_start_epochs": 3,
+    "modality_dropout": 0.15,
+    "fused_binary_weight": 1.0,
+    "acoustic_aux_weight": 0.3,
+    "visual_aux_weight": 0.15,
+    "teacher_kl_weight": 0.2,
+    "phq_regression_weight": 0.25,
+    "phq_severity_weight": 0.1,
+    "gate_entropy_weight": 0.02
+  },
+  "seeds": [
+    {
+      "seed": 7,
+      "best_epoch": 1,
+      "dev_metrics": {
+        "num_subjects": 55,
+        "macro_f1": 0.4444444444444444,
+        "binary_f1": 0.0,
+        "weighted_f1": 0.711111111111111,
+        "precision": 0.0,
+        "recall": 0.0,
+        "ece": 0.10636852275241507,
+        "brier_score": 0.17119948717710645,
+        "confusion_matrix": [
+          [
+            44,
+            0
+          ],
+          [
+            11,
+            0
+          ]
+        ],
+        "auroc": 0.5082644628099173,
+        "pr_auc": 0.28813278543988297
+      },
+      "dev_gate_stats": {
+        "gate_acoustic_mean": 0.0,
+        "gate_visual_mean": 0.0,
+        "gate_fused_mean": 1.0,
+        "gate_acoustic_std": 0.0,
+        "gate_visual_std": 0.0,
+        "gate_fused_std": 0.0
+      }
+    },
+    {
+      "seed": 17,
+      "best_epoch": 4,
+      "dev_metrics": {
+        "num_subjects": 55,
+        "macro_f1": 0.4444444444444444,
+        "binary_f1": 0.0,
+        "weighted_f1": 0.711111111111111,
+        "precision": 0.0,
+        "recall": 0.0,
+        "ece": 0.19249022006988525,
+        "brier_score": 0.19861305855246833,
+        "confusion_matrix": [
+          [
+            44,
+            0
+          ],
+          [
+            11,
+            0
+          ]
+        ],
+        "auroc": 0.5206611570247934,
+        "pr_auc": 0.21401762878805108
+      },
+      "dev_gate_stats": {
+        "gate_acoustic_mean": 0.0,
+        "gate_visual_mean": 0.0,
+        "gate_fused_mean": 1.0,
+        "gate_acoustic_std": 0.0,
+        "gate_visual_std": 0.0,
+        "gate_fused_std": 0.0
+      }
+    },
+    {
+      "seed": 27,
+      "best_epoch": 1,
+      "dev_metrics": {
+        "num_subjects": 55,
+        "macro_f1": 0.4444444444444444,
+        "binary_f1": 0.0,
+        "weighted_f1": 0.711111111111111,
+        "precision": 0.0,
+        "recall": 0.0,
+        "ece": 0.10646092837507071,
+        "brier_score": 0.17140659305010655,
+        "confusion_matrix": [
+          [
+            44,
+            0
+          ],
+          [
+            11,
+            0
+          ]
+        ],
+        "auroc": 0.47107438016528924,
+        "pr_auc": 0.23090388031985837
+      },
+      "dev_gate_stats": {
+        "gate_acoustic_mean": 0.0,
+        "gate_visual_mean": 0.0,
+        "gate_fused_mean": 1.0,
+        "gate_acoustic_std": 0.0,
+        "gate_visual_std": 0.0,
+        "gate_fused_std": 0.0
+      }
+    }
+  ],
+  "dev_metrics_mean": {
+    "auroc": 0.5,
+    "binary_f1": 0.0,
+    "brier_score": 0.1804063795932271,
+    "ece": 0.13510655706579033,
+    "macro_f1": 0.4444444444444444,
+    "num_subjects": 55.0,
+    "pr_auc": 0.24435143151593083,
+    "precision": 0.0,
+    "recall": 0.0,
+    "weighted_f1": 0.7111111111111109
+  },
+  "dev_metrics_std": {
+    "auroc": 0.021070328568565243,
+    "binary_f1": 0.0,
+    "brier_score": 0.012874343795686971,
+    "ece": 0.04057639477598951,
+    "macro_f1": 0.0,
+    "num_subjects": 0.0,
+    "pr_auc": 0.03171636366567093,
+    "precision": 0.0,
+    "recall": 0.0,
+    "weighted_f1": 1.1102230246251565e-16
+  }
+}

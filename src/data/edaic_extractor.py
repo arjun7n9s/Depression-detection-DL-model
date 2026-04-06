@@ -29,13 +29,14 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
+from scipy.io import loadmat
 
 from src.data.dataset_audit import EDAIC_ARCHIVES_DIR
 
 
 PROCESSED_EDAIC_DIR = Path(r"D:\DL-Datasets\processed\edaic")
 REPORT_PATH = PROCESSED_EDAIC_DIR / "extraction_report.json"
-EXTRACTOR_VERSION = "2.0"
+EXTRACTOR_VERSION = "3.0"
 
 OPENFACE_POSE_COLS = ["pose_Tx", "pose_Ty", "pose_Tz", "pose_Rx", "pose_Ry", "pose_Rz"]
 OPENFACE_GAZE_COLS = [
@@ -97,6 +98,10 @@ COMPLETE_FILES = [
     "success.npy",
     "acoustic.npy",
     "acoustic_timestamps.npy",
+    "mfcc.npy",
+    "mfcc_timestamps.npy",
+    "cnn_resnet.npy",
+    "cnn_resnet_timestamps.npy",
     "metadata.json",
 ]
 
@@ -114,7 +119,7 @@ def _subject_dir_complete(pid_dir: Path) -> bool:
     return metadata.get("extractor_version") == EXTRACTOR_VERSION and metadata.get("status") == "success"
 
 
-def _read_target_members(archive_path: Path) -> tuple[str | None, str | None, list[str]]:
+def _read_target_members(archive_path: Path) -> tuple[str | None, str | None, str | None, bytes | None, list[str]]:
     """
     Read the two feature CSV payloads directly from the archive.
 
@@ -124,38 +129,51 @@ def _read_target_members(archive_path: Path) -> tuple[str | None, str | None, li
     pid = archive_path.stem.replace(".tar", "").split("_")[0]
     openface_name = f"{pid}_OpenFace2.1.0_Pose_gaze_AUs.csv"
     egemaps_name = f"{pid}_OpenSMILE2.3.0_egemaps.csv"
+    mfcc_name = f"{pid}_OpenSMILE2.3.0_mfcc.csv"
+    cnn_resnet_name = f"{pid}_CNN_ResNet.mat"
 
     openface_content = None
     egemaps_content = None
+    mfcc_content = None
+    cnn_resnet_content = None
     warnings: list[str] = []
 
     with tarfile.open(str(archive_path), "r:gz") as tar:
         try:
             for member in tar:
                 basename = os.path.basename(member.name)
-                if basename not in {openface_name, egemaps_name}:
+                if basename not in {openface_name, egemaps_name, mfcc_name, cnn_resnet_name}:
                     continue
                 try:
                     extracted = tar.extractfile(member)
                     if extracted is None:
                         warnings.append(f"{basename}: extractfile returned None")
                         continue
-                    content = extracted.read().decode("utf-8", errors="replace")
+                    raw = extracted.read()
                 except (tarfile.TarError, EOFError, OSError) as exc:
                     warnings.append(f"{basename}: {exc}")
                     continue
 
                 if basename == openface_name:
-                    openface_content = content
+                    openface_content = raw.decode("utf-8", errors="replace")
                 elif basename == egemaps_name:
-                    egemaps_content = content
+                    egemaps_content = raw.decode("utf-8", errors="replace")
+                elif basename == mfcc_name:
+                    mfcc_content = raw.decode("utf-8", errors="replace")
+                elif basename == cnn_resnet_name:
+                    cnn_resnet_content = raw
 
-                if openface_content is not None and egemaps_content is not None:
+                if (
+                    openface_content is not None
+                    and egemaps_content is not None
+                    and mfcc_content is not None
+                    and cnn_resnet_content is not None
+                ):
                     break
         except (tarfile.TarError, EOFError, OSError) as exc:
             warnings.append(str(exc))
 
-    return openface_content, egemaps_content, warnings
+    return openface_content, egemaps_content, mfcc_content, cnn_resnet_content, warnings
 
 
 def extract_openface_features(csv_content: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -214,6 +232,51 @@ def extract_egemaps_features(csv_content: str) -> tuple[np.ndarray, np.ndarray, 
     )
 
 
+def extract_mfcc_features(csv_content: str) -> tuple[np.ndarray, np.ndarray, list[str]]:
+    reader = csv.DictReader(io.StringIO(csv_content), delimiter=";")
+    fieldnames = [field.strip() for field in (reader.fieldnames or [])]
+    feature_cols = [field for field in fieldnames if field not in EGEMAPS_METADATA_COLS]
+    if "frameTime" not in fieldnames:
+        raise ValueError("Missing MFCC frameTime column")
+
+    rows = []
+    timestamps = []
+    for raw_row in reader:
+        row = {key.strip(): value.strip() for key, value in raw_row.items() if key is not None and value is not None}
+        try:
+            rows.append([float(row[col]) for col in feature_cols])
+            timestamps.append(float(row["frameTime"]))
+        except (KeyError, ValueError):
+            continue
+
+    return (
+        np.asarray(rows, dtype=np.float32),
+        np.asarray(timestamps, dtype=np.float32),
+        feature_cols,
+    )
+
+
+def extract_cnn_resnet_features(mat_content: bytes, visual_timestamps: np.ndarray | None) -> tuple[np.ndarray, np.ndarray]:
+    mat = loadmat(io.BytesIO(mat_content))
+    feature = None
+    for key, value in mat.items():
+        if key.startswith("__"):
+            continue
+        if isinstance(value, np.ndarray) and value.ndim == 2:
+            feature = value.astype(np.float32)
+            break
+    if feature is None:
+        raise ValueError("Unable to locate 2D feature matrix in CNN ResNet MAT file")
+
+    if visual_timestamps is not None and len(visual_timestamps) == len(feature):
+        timestamps = visual_timestamps.astype(np.float32)
+    elif visual_timestamps is not None and len(visual_timestamps) > 1:
+        timestamps = np.linspace(float(visual_timestamps[0]), float(visual_timestamps[-1]), num=len(feature), dtype=np.float32)
+    else:
+        timestamps = np.arange(len(feature), dtype=np.float32) / 30.0
+    return feature, timestamps
+
+
 def process_archive(archive_path: Path, output_dir: Path) -> dict:
     pid_dir = output_dir / archive_path.stem.replace(".tar", "")
     pid_dir.mkdir(parents=True, exist_ok=True)
@@ -232,8 +295,10 @@ def process_archive(archive_path: Path, output_dir: Path) -> dict:
 
     openface_content = None
     egemaps_content = None
+    mfcc_content = None
+    cnn_resnet_content = None
     try:
-        openface_content, egemaps_content, warnings = _read_target_members(archive_path)
+        openface_content, egemaps_content, mfcc_content, cnn_resnet_content, warnings = _read_target_members(archive_path)
         result["warnings"].extend(warnings)
     except (tarfile.TarError, EOFError, OSError) as exc:
         result["warnings"].append(str(exc))
@@ -246,8 +311,11 @@ def process_archive(archive_path: Path, output_dir: Path) -> dict:
         "warnings": list(result["warnings"]),
         "visual_available": False,
         "acoustic_available": False,
+        "mfcc_available": False,
+        "cnn_resnet_available": False,
     }
 
+    visual_timestamps = None
     if openface_content is not None:
         try:
             visual, visual_timestamps, confidence, success = extract_openface_features(openface_content)
@@ -285,7 +353,38 @@ def process_archive(archive_path: Path, output_dir: Path) -> dict:
         except ValueError as exc:
             result["warnings"].append(f"acoustic_parse_error: {exc}")
 
-    if metadata["visual_available"] and metadata["acoustic_available"]:
+    if mfcc_content is not None:
+        try:
+            mfcc, mfcc_timestamps, mfcc_feature_cols = extract_mfcc_features(mfcc_content)
+            np.save(str(pid_dir / "mfcc.npy"), mfcc)
+            np.save(str(pid_dir / "mfcc_timestamps.npy"), mfcc_timestamps)
+            metadata.update(
+                {
+                    "mfcc_available": True,
+                    "mfcc_shape": list(mfcc.shape),
+                    "mfcc_timestamp_shape": list(mfcc_timestamps.shape),
+                    "mfcc_columns": mfcc_feature_cols,
+                }
+            )
+        except ValueError as exc:
+            result["warnings"].append(f"mfcc_parse_error: {exc}")
+
+    if cnn_resnet_content is not None:
+        try:
+            cnn_resnet, cnn_timestamps = extract_cnn_resnet_features(cnn_resnet_content, visual_timestamps)
+            np.save(str(pid_dir / "cnn_resnet.npy"), cnn_resnet)
+            np.save(str(pid_dir / "cnn_resnet_timestamps.npy"), cnn_timestamps)
+            metadata.update(
+                {
+                    "cnn_resnet_available": True,
+                    "cnn_resnet_shape": list(cnn_resnet.shape),
+                    "cnn_resnet_timestamp_shape": list(cnn_timestamps.shape),
+                }
+            )
+        except ValueError as exc:
+            result["warnings"].append(f"cnn_resnet_parse_error: {exc}")
+
+    if metadata["visual_available"] and metadata["acoustic_available"] and metadata["mfcc_available"] and metadata["cnn_resnet_available"]:
         result["status"] = "success"
     elif metadata["visual_available"] or metadata["acoustic_available"]:
         result["status"] = "partial"
@@ -302,6 +401,8 @@ def process_archive(archive_path: Path, output_dir: Path) -> dict:
             "status": metadata["status"],
             "visual_available": metadata["visual_available"],
             "acoustic_available": metadata["acoustic_available"],
+            "mfcc_available": metadata["mfcc_available"],
+            "cnn_resnet_available": metadata["cnn_resnet_available"],
             "warnings": metadata["warnings"],
         }
     )

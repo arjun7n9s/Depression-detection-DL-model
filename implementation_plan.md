@@ -25,7 +25,7 @@ Our target: **match or exceed** these benchmarks via multi-task learning, PHQ re
 
 ## Current Verified State
 
-This block is the current source of truth for the repo as of **April 4, 2026**. The detailed sections below include historical design context and archived architecture notes, but the active roadmap should be read from this block, the **Execution Order**, and the **Project Progress Tracker**.
+This block is the current source of truth for the repo as of **April 6, 2026**. The detailed sections below include historical design context and archived architecture notes, but the active roadmap should be read from this block, the **Execution Order**, and the **Project Progress Tracker**.
 
 ### Completed
 
@@ -38,24 +38,39 @@ This block is the current source of truth for the repo as of **April 4, 2026**. 
 - `Fusion V1` bimodal implementation
 - `Fusion V1` bimodal smoke verification
 - `Fusion V1` bimodal dev-stage benchmark sweep
+- `Fusion V1` locked final benchmark
+- `Fusion V2` implementation
+- `Fusion V2` dev benchmark and corrected synced showdown
+- `Vision V3` D-Vlog implementation
+- `Vision V3` D-Vlog raw-video extraction
+- `Vision V3` D-Vlog benchmark and locked showdown
 
 ### Current milestone interpretation
 
 - `Fusion V1` is now a **real multimodal benchmark baseline**, not just a concept.
-- `Fusion V1` is promising on `D-Vlog`, where it beats the finalized unimodal dev references.
-- `Fusion V1` is **not yet strong enough on `E-DAIC`** to be promoted as the main architecture.
-- The correct next milestone is therefore **`Fusion V2`**, not immediate `Fusion V1` promotion.
+- corrected `Fusion V2` improved over `Fusion V1` on `D-Vlog` test, but still did not beat the locked acoustic baseline.
+- corrected `Fusion V2` cleared the `E-DAIC` dev bar, but still failed to transfer on final test.
+- `Vision V3` then beat the locked D-Vlog acoustic benchmark on final test in a 5-seed showdown.
+- the locked winners are therefore:
+  - `D-Vlog`: `dvlog_vision_v3`
+  - `E-DAIC`: `edaic_bimodal` (`Fusion V1`)
+- the preferred architecture direction is slightly different because this project is vision-first:
+  - if a `vision` or `fusion` model is within `0.05` test macro F1 of the best acoustic model, prefer the `vision` or `fusion` path
+  - `D-Vlog` no longer needs a split interpretation because `Vision V3` is now both the benchmark winner and the preferred direction
+  - `E-DAIC` keeps `edaic_bimodal` (`Fusion V1`) as both winner and preferred direction
+- `Fusion V2` should be retained as benchmark evidence, not promoted as the new main architecture.
+- `Vision V3` is the new promoted D-Vlog architecture.
 
 ### Next official milestone
 
-`Fusion V2` will be the main architecture milestone, built around:
+Freeze the current winners and use them as the new anchor for the next milestone. The open question is no longer whether D-Vlog can support a vision-first winner; it is how to extend that progress and whether E-DAIC needs a separate visual-core path.
 
-- heterogeneous modality bundles by dataset
-- reliability-aware latent fusion
-- teacher distillation from unimodal checkpoints
-- masked multitask supervision where labels exist
-- learned subject-level aggregation
-- direct showdown against finalized unimodal baselines and `Fusion V1`
+Useful next-step directions now are:
+
+- preserving richer E-DAIC temporal structure rather than the current 1 Hz compression
+- reproducing a closer subset of the reference pipeline for apples-to-apples comparison
+- validating a simpler low-parameter E-DAIC visual-core or late-fusion baseline before another complex fusion stack
+- strengthening `Vision V3` with better pretrained visual features rather than expanding acoustic complexity first
 
 ---
 
@@ -799,14 +814,16 @@ D:\DL-Datasets\                        (external SSD — large data processing)
 | 4b | Benchmark | Unimodal dev-stage sweep (window/policy/capacity/norm ablations) | Step 4 | ✅ DONE |
 | 4c | Benchmark | Unimodal finalize: locked 5-seed test-set evaluation | Step 4b | ✅ DONE |
 | 5 | Bimodal | `Fusion V1` bimodal dev-stage sweep via `BimodalSequenceClassifier` | Step 4c | ✅ DONE |
-| 6 | Model | `Fusion V2`: reliability-aware latent multimodal model | Step 5 | 🎯 NEXT |
-| 7 | Benchmark | `Fusion V2` focused dev-stage benchmark + showdown vs unimodal + `Fusion V1` | Step 6 | ⬜ Queued |
-| 8 | Eval | Final locked multimodal comparison, subject-level reporting, calibration, error taxonomy | Step 7 | ⬜ Queued |
-| 9 | Inference | Live UI with async pipeline, streaming audio, honest boundaries, failure-case testing | Step 8 | ⬜ Queued |
-| 10 | Bridge | Feature-space bridge: OpenFace + MediaPipe on 773 D-Vlog videos → projection model | Step 8 | ✅ Videos Ready |
+| 6 | Model | `Fusion V2`: reliability-aware latent multimodal model | Step 5 | ✅ DONE |
+| 7 | Benchmark | `Fusion V2` focused dev-stage benchmark + showdown vs unimodal + `Fusion V1` | Step 6 | ✅ DONE |
+| 8 | Eval | Final locked multimodal comparison, subject-level reporting, calibration, error taxonomy | Step 7 | ✅ DONE |
+| 8b | Model | `Vision V3` D-Vlog vision-first benchmark path | Step 8 | ✅ DONE |
+| 8c | Lock | Strategic model lock for downstream use (`dvlog_vision_v3`, `edaic_bimodal`) | Step 8b | ✅ DONE |
+| 9 | Inference | Live UI with async pipeline, streaming audio, honest boundaries, failure-case testing | Step 8c | 🚧 STARTED |
+| 10 | Bridge | Feature-space bridge: OpenFace + MediaPipe on 773 D-Vlog videos → projection model | Step 8c | ✅ Videos Ready |
 | 11 | Text | Transcript corpus audit → speaker ID → text modality ablation (gated fusion) | Step 8 | Future |
 | 12 | Body | Body-movement research: MediaPipe Pose on 773 D-Vlog videos → ablation | Step 10 | Future |
-| 13 | Docs | Model cards, project honesty section, privacy policy | Step 8 | Future |
+| 13 | Docs | Model cards, project honesty section, privacy policy | Step 8c | Future |
 
 ---
 

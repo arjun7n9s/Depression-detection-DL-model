@@ -1,0 +1,31 @@
+{
+  "suite_name": "vision_v3_dvlog_showdown",
+  "model_family": "vision_v3",
+  "output_root": "results/benchmark_quality/vision_v3_dvlog_showdown",
+  "final_seeds": [7, 17, 27, 37, 47],
+  "report_references": [
+    {
+      "name": "unimodal_benchmark_v1",
+      "path": "results/benchmark_quality/unimodal_benchmark_v1/final/benchmark_summary.csv"
+    },
+    {
+      "name": "fusion_v1_locked",
+      "path": "results/benchmark_quality/fusion_v1_locked/final/benchmark_summary.csv"
+    },
+    {
+      "name": "fusion_v2_showdown_synced",
+      "path": "results/benchmark_quality/fusion_v2_showdown_synced/final/benchmark_summary.csv"
+    }
+  ],
+  "tracks": [
+    {
+      "name": "dvlog_vision_v3",
+      "dataset": "dvlog",
+      "bundle_name": "visual_full_aux_audio",
+      "frozen_final": {
+        "source_selection_ledger": "results/benchmark_quality/vision_v3_dvlog_benchmark/selection_ledger.json",
+        "source_track": "dvlog_vision_v3"
+      }
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+stage,track,dataset,modality,candidate,selected_aggregation,dev_macro_f1_mean,dev_macro_f1_std,test_macro_f1_mean,test_macro_f1_std,summary_path
+final_locked,dvlog_vision_v3,dvlog,visual_full_aux_audio,locked_run,mean,0.661605979293358,0.03202493264055907,0.6666043397680148,0.03103698485988923,results/benchmark_quality/vision_v3_dvlog_showdown/final/dvlog_vision_v3/locked_run/summary.json

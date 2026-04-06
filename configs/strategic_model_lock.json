@@ -1,0 +1,61 @@
+{
+  "locked_at": "2026-04-06",
+  "policy": {
+    "project_priority": "vision_first",
+    "selection_rule": "Prefer visual-first or fusion models when they are the benchmark winner or remain within the accepted project margin of the best acoustic baseline."
+  },
+  "datasets": {
+    "dvlog": {
+      "benchmark_winner": {
+        "track": "dvlog_vision_v3",
+        "model_family": "vision_v3",
+        "modality_profile": "visual_full_aux_audio",
+        "selected_aggregation": "mean",
+        "window_size": 9,
+        "test_macro_f1_mean": 0.6666043397680148,
+        "test_macro_f1_std": 0.03103698485988923,
+        "source_summary": "results/benchmark_quality/vision_v3_dvlog_showdown/final/dvlog_vision_v3/locked_run/summary.json"
+      },
+      "preferred_direction": {
+        "track": "dvlog_vision_v3",
+        "reason": "Vision V3 is now both the benchmark winner and the preferred vision-first architecture on D-Vlog."
+      },
+      "fallback_reference": {
+        "track": "dvlog_acoustic",
+        "test_macro_f1_mean": 0.6629850130213909,
+        "test_macro_f1_std": 0.009991912647991987,
+        "source_summary": "results/benchmark_quality/unimodal_benchmark_v1/final/dvlog_acoustic/locked_run/summary.json"
+      }
+    },
+    "edaic": {
+      "benchmark_winner": {
+        "track": "edaic_bimodal",
+        "model_family": "fusion_v1",
+        "modality_profile": "both",
+        "selected_aggregation": "attention",
+        "window_size": 15,
+        "test_macro_f1_mean": 0.5562721155655937,
+        "test_macro_f1_std": 0.03417248478734069,
+        "source_summary": "results/benchmark_quality/fusion_v1_locked/final/edaic_bimodal/locked_run/summary.json"
+      },
+      "preferred_direction": {
+        "track": "edaic_bimodal",
+        "reason": "Fusion V1 remains the strongest verified E-DAIC model and still fits the project preference for non-acoustic-only paths."
+      },
+      "fallback_reference": {
+        "track": "edaic_visual",
+        "test_macro_f1_mean": 0.5355378511959381,
+        "test_macro_f1_std": 0.06863785195059706,
+        "source_summary": "results/benchmark_quality/unimodal_benchmark_v1/final/edaic_visual/locked_run/summary.json"
+      }
+    }
+  },
+  "next_phase": {
+    "phase": "bridge_and_inference",
+    "sequence": [
+      "Freeze strategic winners as the downstream source of truth.",
+      "Use D-Vlog Vision V3 as the bridge and prototype inference anchor.",
+      "Keep E-DAIC Fusion V1 as the offline evaluation anchor until a separate E-DAIC upgrade is justified."
+    ]
+  }
+}

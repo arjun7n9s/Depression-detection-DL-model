@@ -111,6 +111,7 @@ def compute_metrics(subject_predictions: pd.DataFrame) -> dict:
     metrics = {
         "num_subjects": int(len(subject_predictions)),
         "macro_f1": float(f1_score(y_true, y_pred, average="macro")),
+        "binary_f1": float(f1_score(y_true, y_pred, average="binary", zero_division=0)),
         "weighted_f1": float(f1_score(y_true, y_pred, average="weighted")),
         "precision": float(precision_score(y_true, y_pred, zero_division=0)),
         "recall": float(recall_score(y_true, y_pred, zero_division=0)),
@@ -176,15 +177,19 @@ def save_calibration_summary(subject_predictions: pd.DataFrame, output_dir: Path
 
 
 def write_error_review(subject_predictions: pd.DataFrame, output_path: Path):
-    false_positives = subject_predictions[(subject_predictions["label"] == 0) & (subject_predictions["prediction"] == 1)]
-    false_negatives = subject_predictions[(subject_predictions["label"] == 1) & (subject_predictions["prediction"] == 0)]
+    predictions = subject_predictions.copy()
+    if "num_windows" not in predictions.columns:
+        predictions["num_windows"] = 1
+
+    false_positives = predictions[(predictions["label"] == 0) & (predictions["prediction"] == 1)]
+    false_negatives = predictions[(predictions["label"] == 1) & (predictions["prediction"] == 0)]
 
     lines = [
         "# Error Review",
         "",
         f"- False positives: {len(false_positives)}",
         f"- False negatives: {len(false_negatives)}",
-        f"- Subjects with <= 2 windows: {int(np.sum(subject_predictions['num_windows'] <= 2))}",
+        f"- Subjects with <= 2 windows: {int(np.sum(predictions['num_windows'] <= 2))}",
         "",
         "## Highest-confidence false positives",
     ]
@@ -195,8 +200,8 @@ def write_error_review(subject_predictions: pd.DataFrame, output_path: Path):
     for _, row in false_negatives.sort_values("probability", ascending=True).head(10).iterrows():
         lines.append(f"- {row['subject_id']}: p={row['probability']:.4f}, windows={int(row['num_windows'])}")
 
-    sparse_failures = subject_predictions[
-        (subject_predictions["num_windows"] <= 2) & (subject_predictions["prediction"] != subject_predictions["label"])
+    sparse_failures = predictions[
+        (predictions["num_windows"] <= 2) & (predictions["prediction"] != predictions["label"])
     ]
     lines.extend(["", "## Sparse-window failures"])
     if len(sparse_failures) == 0:

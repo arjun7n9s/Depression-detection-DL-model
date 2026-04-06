@@ -1,0 +1,68 @@
+{
+  "suite_name": "fusion_v1_locked",
+  "model_family": "classic",
+  "output_root": "results/benchmark_quality/fusion_v1_locked",
+  "final_seeds": [7, 17, 27, 37, 47],
+  "tracks": [
+    {
+      "name": "edaic_bimodal",
+      "dataset": "edaic",
+      "modality": "both",
+      "frozen_final": {
+        "final_config": {
+          "batch_size": 96,
+          "hidden_dim": 128,
+          "num_layers": 2,
+          "dropout": 0.35,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0001,
+          "epochs": 20,
+          "patience": 5,
+          "device": "cuda",
+          "aggregation_methods": ["mean", "topk", "attention"],
+          "loss_name": "focal",
+          "balanced_sampling": true,
+          "use_pos_weight": false,
+          "focal_gamma": 2.0,
+          "focal_alpha": 0.75,
+          "normalization_source": "train",
+          "num_workers": 0,
+          "min_valid_ratio": 0.5,
+          "window_size": 15,
+          "stride": 7
+        },
+        "frozen_aggregation": "attention"
+      }
+    },
+    {
+      "name": "dvlog_bimodal",
+      "dataset": "dvlog",
+      "modality": "both",
+      "frozen_final": {
+        "final_config": {
+          "batch_size": 96,
+          "hidden_dim": 128,
+          "num_layers": 1,
+          "dropout": 0.3,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0001,
+          "epochs": 20,
+          "patience": 5,
+          "device": "cuda",
+          "aggregation_methods": ["mean", "topk", "attention"],
+          "loss_name": "bce",
+          "balanced_sampling": true,
+          "use_pos_weight": false,
+          "focal_gamma": 2.0,
+          "focal_alpha": 0.75,
+          "normalization_source": "train",
+          "num_workers": 0,
+          "min_valid_ratio": 0.5,
+          "window_size": 9,
+          "stride": 4
+        },
+        "frozen_aggregation": "mean"
+      }
+    }
+  ]
+}

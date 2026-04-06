@@ -1,0 +1,36 @@
+{
+  "suite_name": "fusion_v2_showdown",
+  "model_family": "fusion_v2",
+  "output_root": "results/benchmark_quality/fusion_v2_showdown_synced",
+  "final_seeds": [7, 17, 27, 37, 47],
+  "report_references": [
+    {
+      "name": "unimodal_benchmark_v1",
+      "path": "results/benchmark_quality/unimodal_benchmark_v1/final/benchmark_summary.csv"
+    },
+    {
+      "name": "fusion_v1_locked",
+      "path": "results/benchmark_quality/fusion_v1_locked/final/benchmark_summary.csv"
+    }
+  ],
+  "tracks": [
+    {
+      "name": "edaic_fusion_v2",
+      "dataset": "edaic",
+      "bundle_name": "rich_av",
+      "frozen_final": {
+        "source_selection_ledger": "results/benchmark_quality/fusion_v2_benchmark/selection_ledger.json",
+        "source_track": "edaic_fusion_v2"
+      }
+    },
+    {
+      "name": "dvlog_fusion_v2",
+      "dataset": "dvlog",
+      "bundle_name": "current_av",
+      "frozen_final": {
+        "source_selection_ledger": "results/benchmark_quality/fusion_v2_benchmark/selection_ledger.json",
+        "source_track": "dvlog_fusion_v2"
+      }
+    }
+  ]
+}

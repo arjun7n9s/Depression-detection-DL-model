@@ -1,0 +1,2 @@
+stage,track,dataset,modality,candidate,selected_aggregation,dev_macro_f1_mean,dev_macro_f1_std,test_macro_f1_mean,test_macro_f1_std,summary_path
+smoke,dvlog_vision_v3,dvlog,visual_pose_hands_gaze,vision_pose_hands_gaze_smoke,transformer,0.5452991452991452,0.0,,,results/benchmark_quality/vision_v3_dvlog_smoke/dev/dvlog_vision_v3/smoke/vision_pose_hands_gaze_smoke/summary.json

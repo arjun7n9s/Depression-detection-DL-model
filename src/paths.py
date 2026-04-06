@@ -39,6 +39,11 @@ DVLOG_VIDEOS_DIR = _path_from_env("MINDSENSE_DVLOG_VIDEOS_DIR") or _first_existi
     PROJECT_ROOT / "data" / "dvlog_videos",
 )
 
+DVLOG_BRIDGE_ROOT = _path_from_env("MINDSENSE_DVLOG_BRIDGE_ROOT") or _first_existing(
+    EXTERNAL_DATA_ROOT / "dvlog_bridge_features",
+    PROCESSED_ROOT / "dvlog_bridge_features",
+)
+
 RESULTS_ROOT = PROJECT_ROOT / "results"
 
 

@@ -1636,3 +1636,304 @@ What this means in simple words:
 ### Next recommended step
 - Push the curated public snapshot to GitHub as one clean research-progress commit.
 - After publication, start `Fusion V2` implementation rather than spending more time on `Fusion V1` promotion.
+
+## 2026-04-05 - Corrected Fusion V2 Showdown + Milestone Lock
+
+### Session goal
+- Verify whether the first `Fusion V2` showdown result was trustworthy.
+- Re-run the locked showdown with the exact dev-selected configs rather than stale copied settings.
+- Decide whether to continue tuning `Fusion V2` or freeze the best current models honestly.
+
+### Implemented
+- Found a configuration bug in the original `fusion_v2_showdown` suite:
+  - `E-DAIC` showdown used `15s` even though the dev benchmark selected `9s`
+  - `D-Vlog` showdown used stale `quality_mixture + dropout_on` settings instead of the actual selected config
+- Updated `src/training/benchmark_suite.py` so frozen final suites can inherit exact selected configs directly from a source `selection_ledger.json`.
+- Updated `configs/fusion_v2_showdown.json` to pull locked configs from `results/benchmark_quality/fusion_v2_benchmark/selection_ledger.json`.
+- Ran the corrected synced showdown under:
+  - `results/benchmark_quality/fusion_v2_showdown_synced/`
+- Locked the actual milestone winners into the project status docs.
+
+### Verified
+- Corrected synced showdown completed at `2026-04-05 16:25:35`.
+- Corrected locked `Fusion V2` configs used:
+  - `E-DAIC`: `rich_av`, `9s`, `quality_mixture`, `freeze3`
+  - `D-Vlog`: `current_av`, `9s`, `fused_only`, `dropout_off`
+- Final corrected benchmark summary:
+  - `D-Vlog acoustic`: test macro F1 `0.6630 +/- 0.0100`
+  - `D-Vlog Fusion V2`: test macro F1 `0.6279 +/- 0.0142`
+  - `D-Vlog Fusion V1`: test macro F1 `0.6131 +/- 0.0111`
+  - `E-DAIC Fusion V1`: test macro F1 `0.5563 +/- 0.0342`
+  - `E-DAIC visual`: test macro F1 `0.5355 +/- 0.0686`
+  - `E-DAIC acoustic`: test macro F1 `0.5134 +/- 0.0257`
+  - `E-DAIC Fusion V2`: test macro F1 `0.4871 +/- 0.0658`
+
+### Discrepancies found
+- The original first `Fusion V2` showdown was not a trustworthy promotion signal because it used stale frozen configs.
+- Even after correcting that mistake, `Fusion V2` still did not win either dataset:
+  - on `D-Vlog`, it improved over `Fusion V1` but still lost to `dvlog_acoustic`
+  - on `E-DAIC`, it still failed to transfer from dev to final test
+- This means the milestone conclusion did not change, but the corrected evidence is now trustworthy.
+
+### Artifacts produced
+- `results/benchmark_quality/fusion_v2_showdown_synced/final/benchmark_summary.csv`
+- `results/benchmark_quality/fusion_v2_showdown_synced/final/milestone_report.md`
+- Updated `README.md`
+- Updated `implementation_plan.md`
+
+### Next recommended step
+- Freeze the milestone winners as the current source of truth:
+  - `D-Vlog` winner = `dvlog_acoustic`
+  - `E-DAIC` winner = `edaic_bimodal` (`Fusion V1`)
+- Do not spend more benchmark time on the current `Fusion V2` line for this milestone.
+- Only open a new multimodal milestone if it materially changes the problem setup rather than just retuning the same architecture family.
+
+## 2026-04-05 - Vision-First Priority Rule Locked
+
+### Session goal
+- Record the product/research priority rule after milestone lock.
+- Distinguish strict benchmark winners from preferred architecture direction.
+
+### Implemented
+- Updated the source-of-truth docs so acoustic-only is no longer treated as automatically preferred when it wins by a small margin.
+- Added the explicit preference rule:
+  - if `vision` or `fusion` is within `0.05` test macro F1 of the best acoustic model, prefer `vision` or `fusion`
+
+### Verified
+- Locked benchmark winners remain unchanged:
+  - `D-Vlog` winner = `dvlog_acoustic`
+  - `E-DAIC` winner = `edaic_bimodal` (`Fusion V1`)
+- Preferred architecture directions are now:
+  - `D-Vlog` preferred direction = `dvlog_fusion_v2`
+  - `E-DAIC` preferred direction = `edaic_bimodal` (`Fusion V1`)
+
+### Discrepancies found
+- Pure metric ranking and preferred system direction are not identical for `D-Vlog`.
+- This is intentional because the project is building a vision model with audio as an auxiliary signal, not an audio model with optional vision.
+
+### Artifacts produced
+- Updated `README.md`
+- Updated `implementation_plan.md`
+
+### Next recommended step
+- Treat the current milestone as locked.
+- If a new milestone starts, make it explicitly vision-first:
+  - stronger pretrained visual representations
+  - audio used as auxiliary context
+  - no new acoustic-heavy milestone unless it directly improves the vision-first system
+
+## 2026-04-05 - Vision V3 Plan Drafted
+
+### Session goal
+- Turn the new vision-first product rule into a concrete next milestone.
+- Decide whether adding pretrained components is actually justified and, if so, which ones.
+
+### Implemented
+- Created `vision_v3_plan.md` as the next milestone blueprint.
+- Grounded the plan on the locked winners plus the vision-first preference rule.
+- Chose a D-Vlog-first execution path for the next milestone because:
+  - raw videos are already available for `773/961` subjects
+  - corrected `Fusion V2` is already within the acceptable margin of the acoustic winner
+  - visual enrichment is more likely to move the preferred architecture than more acoustic tuning
+
+### Verified
+- The recommended pretrained additions are visual-first:
+  - face affect / emotion embeddings
+  - body pose landmarks
+  - hand landmarks
+  - gaze + blink features
+- The plan keeps audio as an auxiliary branch rather than the main model identity.
+- The plan treats `E-DAIC` as a separate visual-core repair track rather than forcing the same D-Vlog-heavy strategy onto it.
+
+### Discrepancies found
+- The best future direction and the current strict benchmark winner still differ on `D-Vlog`.
+- This is acceptable because the project rule now explicitly prefers vision/fusion when it stays within `0.05` of the acoustic leader.
+
+### Artifacts produced
+- `vision_v3_plan.md`
+
+### Next recommended step
+- Start implementing the D-Vlog visual feature extraction layer for `Vision V3`.
+- Keep `E-DAIC` on the simpler visual-core + late-fusion path until stronger evidence justifies anything more complex.
+
+## 2026-04-05 - Vision V3 First Tranche Implemented
+
+### Session goal
+- Turn `Vision V3` from a planning document into an actual runnable code path.
+- Build the first D-Vlog-first vision-first stack without disturbing the locked benchmark winners.
+
+### Implemented
+- Added `src/data/dvlog_video_extractor.py`.
+  - extracts raw-video features for D-Vlog using available local backends
+  - writes subject-indexed `body_pose`, `hand_pose`, `gaze_blink`, timestamps, masks, and optional `face_affect_embed`
+  - supports `color_histogram`, `torchvision_resnet18`, or `none` for the face embedding backend
+- Added `src/data/vision_v3_datasets.py`.
+  - defines the new D-Vlog Vision V3 bundles
+  - loads extracted raw-video modalities together with existing visual and optional acoustic arrays
+  - emits a subject-level modality-dict batch contract with quality features and masks
+- Added `src/model/vision_v3.py`.
+  - implements a visual-core model with a light auxiliary audio branch
+  - supports `fixed_prior` and `learned_prior` mixture strategies
+- Added `src/training/vision_v3.py`.
+  - binary training/evaluation loop
+  - gate stats, quality-slice metrics, teacher-alignment outputs, calibration, confusion, and error review artifacts
+- Extended `src/training/benchmark_suite.py` to support `model_family = "vision_v3"`.
+- Added configs:
+  - `configs/vision_v3_dvlog_smoke.json`
+  - `configs/vision_v3_dvlog_benchmark.json`
+  - `configs/vision_v3_dvlog_showdown.json`
+
+### Verified
+- All new and modified Vision V3 files compile cleanly.
+- The new Vision V3 modules import successfully.
+- A synthetic forward pass through `VisionV3Model` succeeded with the expected output contract.
+- The benchmark harness can now load all three Vision V3 config files and recognizes `model_family = "vision_v3"`.
+
+### Discrepancies found
+- The raw-video extractor is real, but the actual D-Vlog Vision V3 benchmark is still blocked on feature extraction being run.
+- `face_affect_embed` is not yet an affect-specialized model by default:
+  - default backend is lightweight `color_histogram`
+  - optional `torchvision_resnet18` support is in place as the first pretrained hook
+- This is intentionally the first tranche, not the full final visual stack.
+
+### Artifacts produced
+- `src/data/dvlog_video_extractor.py`
+- `src/data/vision_v3_datasets.py`
+- `src/model/vision_v3.py`
+- `src/training/vision_v3.py`
+- `configs/vision_v3_dvlog_smoke.json`
+- `configs/vision_v3_dvlog_benchmark.json`
+- `configs/vision_v3_dvlog_showdown.json`
+
+### Next recommended step
+- Run the D-Vlog raw-video extractor.
+- Then run the Vision V3 smoke suite.
+- If smoke passes, move into the D-Vlog Vision V3 dev benchmark.
+
+## 2026-04-06 - Vision V3 D-Vlog Showdown Promoted
+
+### Session goal
+- Decide whether `Vision V3` is just a promising dev-stage direction or an actually promoted D-Vlog architecture.
+- Compare it honestly against the locked acoustic, visual, `Fusion V1`, and corrected `Fusion V2` references.
+
+### Implemented
+- Ran the full D-Vlog `Vision V3` dev benchmark and locked showdown.
+- Kept the promoted config synced to the dev selection:
+  - bundle = `visual_full_aux_audio`
+  - fusion = `fixed_prior`
+  - subject aggregation = `mean`
+  - modality dropout = `on`
+
+### Verified
+- `Vision V3` dev benchmark selected:
+  - `visual_full_aux_audio`
+  - `fixed_prior`
+  - `subject_mean`
+  - `dropout_on`
+- Dev winner from the benchmark:
+  - macro F1 `0.7087`
+- Locked showdown result from `results/benchmark_quality/vision_v3_dvlog_showdown/final/benchmark_summary.csv`:
+  - `dvlog_vision_v3`: test macro F1 `0.6666 +/- 0.0310`
+  - `dvlog_acoustic`: test macro F1 `0.6630 +/- 0.0100`
+  - `dvlog_fusion_v2`: test macro F1 `0.6279 +/- 0.0142`
+  - `dvlog_bimodal` (`Fusion V1`): test macro F1 `0.6131 +/- 0.0111`
+  - `dvlog_visual`: test macro F1 `0.5943 +/- 0.0412`
+
+### Discrepancies found
+- `Vision V3` did not win by a huge margin over acoustic, but it **did** beat it on final test.
+- That removes the earlier D-Vlog split between benchmark winner and preferred direction:
+  - `Vision V3` is now both
+
+### Artifacts produced
+- `results/benchmark_quality/vision_v3_dvlog_benchmark/selection_ledger.json`
+- `results/benchmark_quality/vision_v3_dvlog_benchmark/leaderboard.csv`
+- `results/benchmark_quality/vision_v3_dvlog_showdown/final/benchmark_summary.csv`
+- `results/benchmark_quality/vision_v3_dvlog_showdown/final/milestone_report.md`
+
+### Next recommended step
+- Freeze `dvlog_vision_v3` as the new D-Vlog source-of-truth winner.
+- Keep `edaic_bimodal` (`Fusion V1`) as the E-DAIC winner until a separate E-DAIC upgrade earns promotion.
+- Replan the next milestone around extending `Vision V3` and deciding whether E-DAIC gets its own visual-core milestone.
+
+## 2026-04-06 - Strategic Model Lock Added
+
+### Session goal
+- Convert the benchmark outcome into an explicit downstream-ready lock instead of leaving it implicit across multiple result folders.
+- Align the original execution order so the next step is the bridge and inference phase, not more model-family churn.
+
+### Implemented
+- Added `configs/strategic_model_lock.json` as the source-of-truth registry for the chosen downstream models.
+- Added `src/inference/model_lock.py` and `src/inference/__init__.py` so code can load the locked winner and preferred direction per dataset.
+- Updated the execution order so the current locked choices and next phase are explicit.
+
+### Verified
+- Strategic lock choices are:
+  - `D-Vlog` = `dvlog_vision_v3`
+  - `E-DAIC` = `edaic_bimodal` (`Fusion V1`)
+- This is strategically consistent with the project rule:
+  - D-Vlog gets the promoted vision-first winner
+  - E-DAIC keeps the strongest verified fusion path rather than falling back to acoustic-only
+- The original-plan next step is now clearly the downstream phase:
+  - bridge preparation
+  - live inference preparation
+
+### Artifacts produced
+- `configs/strategic_model_lock.json`
+- `src/inference/model_lock.py`
+- `src/inference/__init__.py`
+- Updated `implementation_plan.md`
+
+### Next recommended step
+- Treat the strategic lock file as the model-selection source of truth.
+- Move directly into the original downstream plan:
+  - bridge preparation for D-Vlog
+  - inference/dashboard preparation using the locked winners
+
+## 2026-04-06 - Bridge And Inference Scaffolding Started
+
+### Session goal
+- Start the original downstream dev phase after the strategic lock instead of adding another round of model-family churn.
+- Put real code behind the bridge and live-inference plan while keeping the current system honest about what is and is not validated.
+
+### Implemented
+- Added `src/data/bridge_extractor.py`.
+  - Prepares paired D-Vlog bridge data for the raw-video subset.
+  - Writes:
+    - `student_modalities.npz`
+    - `teacher_targets.npz`
+    - `metadata.json`
+  - Aggregates run status into `bridge_report.json`
+- Added `src/inference/feature_extractor.py`.
+  - Reuses the Vision V3 visual extraction path for live-compatible frame-level feature extraction.
+  - Emits:
+    - `visual`
+    - `body_pose`
+    - `hand_pose`
+    - `gaze_blink`
+    - `face_affect_embed`
+  - Also emits explicit quality metadata per frame.
+- Added `src/inference/server.py`.
+  - Small Flask prototype server with:
+    - `GET /health`
+    - `GET /api/model-lock`
+    - `GET /api/benchmarks`
+    - `GET /api/bridge-status`
+    - `POST /api/extract-frame`
+    - `POST /api/reset-session`
+- Added `src/inference/dashboard/index.html`.
+  - Lightweight dashboard shell that explains the locked winners, the current bridge state, and the honesty boundary.
+
+### Verified
+- `src/data/bridge_extractor.py` compiles cleanly.
+- `src/inference/feature_extractor.py` compiles cleanly.
+- Flask is available locally.
+- The server module imports cleanly and exposes the intended endpoints.
+
+### Important boundary
+- The live path is still **features-only**.
+- We are **not** exposing live depression-risk predictions yet.
+- That remains blocked on the bridge model being trained and validated.
+
+### Next recommended step
+- Run a short bridge-prep sanity pass.
+- Then launch the prototype inference server locally and verify the endpoints and dashboard.

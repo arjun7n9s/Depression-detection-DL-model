@@ -49,11 +49,14 @@ class SequenceBinaryClassifier(nn.Module):
             nn.Linear(hidden_dim, 1),
         )
 
-    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+    def encode(self, inputs: torch.Tensor) -> torch.Tensor:
         mask = inputs.abs().sum(dim=-1) > 0
         encoded, _ = self.gru(inputs)
         pooled = self.pool(encoded, mask)
-        pooled = self.dropout(pooled)
+        return self.dropout(pooled)
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        pooled = self.encode(inputs)
         return self.head(pooled).squeeze(-1)
 
 
