@@ -912,7 +912,7 @@ What changed since the last simple summary:
 - we now have the best settings chosen for all 4 unimodal tracks
 
 What this means in simple words:
-- the “search and compare many options” part is over
+- the "search and compare many options" part is over
 - for each single-modality branch, the system has now decided what settings worked best on the dev set
 - this is exactly what we needed before running the final locked benchmark runs
 
@@ -986,7 +986,7 @@ What is happening now:
 - the next finalized run, `D-Vlog visual`, has already started
 
 What this means in simple words:
-- the “final confirmation” phase is working properly
+- the "final confirmation" phase is working properly
 - we are no longer just setting things up
 - the benchmark pack is now producing actual final locked outputs
 ## 2026-04-04 - Finalize Resume (02:05 IST)
@@ -1089,7 +1089,7 @@ What is still not done:
 - `E-DAIC visual`
 
 What this means in simple words:
-- the problem is no longer just “waiting for training”
+- the problem is no longer just "waiting for training"
 - finalize is being interrupted before it can continue
 - we need one more debugging-style restart to see the exact error live
 ## 2026-04-04 - Finalize Checkpoint (04:14 IST)
@@ -1937,3 +1937,60 @@ What this means in simple words:
 ### Next recommended step
 - Run a short bridge-prep sanity pass.
 - Then launch the prototype inference server locally and verify the endpoints and dashboard.
+
+## 2026-04-06 - Bridge Training Stack Implemented
+
+### Session goal
+- Continue the original downstream plan after bridge data prep and the prototype server.
+- Build the actual bridge-model training layer instead of stopping at feature-only live extraction.
+
+### Implemented
+- Added `src/data/bridge_dataset.py`.
+  - Loads paired D-Vlog bridge subjects from `D:\DL-Datasets\dvlog_bridge_features`.
+  - Builds fixed-length sequence windows per fold.
+  - Computes train-fold normalization stats for:
+    - student modalities
+    - visual teacher targets
+    - acoustic teacher targets
+- Added `src/model/bridge.py`.
+  - Sequence projection model using a bidirectional GRU encoder.
+  - Predicts:
+    - `visual_teacher` as the primary bridge target
+    - `acoustic_teacher` as an auxiliary target
+- Added `src/training/bridge.py`.
+  - JSON-config-driven bridge training CLI.
+  - Tracks:
+    - masked visual MSE / MAE
+    - masked visual cosine similarity
+    - optional acoustic auxiliary MSE / MAE
+  - Saves:
+    - `checkpoint.pt`
+    - `history.json`
+    - `summary.json`
+- Added configs:
+  - `configs/dvlog_bridge_smoke.json`
+  - `configs/dvlog_bridge_train.json`
+- Cleaned `src/inference/__init__.py`.
+  - Removed eager server import so `python -m src.inference.server` no longer needs to warn about prior module import state.
+
+### Verified
+- New bridge files compile cleanly.
+- Bridge datasets load successfully for train / valid / test.
+- Sample tensor shapes are correct:
+  - student input: `(B, 30, 318)`
+  - visual target: `(B, 30, 136)`
+  - acoustic target: `(B, 30, 25)`
+- A tiny local bridge artifact smoke completed successfully and wrote bridge metrics without crashing.
+
+### Interpretation
+- The repo now has all three downstream layers in place:
+  - bridge data prep
+  - prototype inference server
+  - bridge model training stack
+- The remaining next step is no longer "write bridge code."
+- The remaining next step is to **run the bridge training smoke and full train**, then wire the trained checkpoint into the live path.
+
+### Next recommended step
+- Run the bridge smoke config first.
+- If the smoke metrics look sane, run the full bridge training config.
+- After that, connect the resulting checkpoint into the prototype server so live extraction can emit bridged visual features instead of features-only diagnostics.

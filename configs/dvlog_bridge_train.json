@@ -1,0 +1,19 @@
+{
+  "bridge_root": "D:/DL-Datasets/dvlog_bridge_features",
+  "output_root": "results/bridge/dvlog_bridge_v1",
+  "seed": 7,
+  "batch_size": 32,
+  "window_size": 30,
+  "stride": 15,
+  "hidden_dim": 256,
+  "num_layers": 2,
+  "dropout": 0.2,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "epochs": 12,
+  "patience": 3,
+  "device": "cuda",
+  "include_acoustic_target": true,
+  "acoustic_loss_weight": 0.15,
+  "cosine_loss_weight": 0.1
+}
