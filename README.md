@@ -1,526 +1,643 @@
-# MindSense
+<p align="center">
+  <img src="assets/banner.png" alt="MindSense — Vision-First Multimodal Depression Risk Estimation" width="100%"/>
+</p>
 
-> Vision-first multimodal depression-risk estimation from facial behavior, body cues, gaze patterns, and auxiliary audio across E-DAIC and D-Vlog.
+<h1 align="center">MindSense</h1>
 
-![Status](https://img.shields.io/badge/status-active%20research-0f766e)
-![Snapshot](https://img.shields.io/badge/public%20snapshot-April%206%2C%202026-1d4ed8)
-![D-Vlog Winner](https://img.shields.io/badge/D--Vlog-dvlog__vision__v3-15803d)
-![E-DAIC Winner](https://img.shields.io/badge/E--DAIC-edaic__bimodal-0f766e)
-![Next Step](https://img.shields.io/badge/next-bridge%20training%20%2B%20live%20dashboard-7c3aed)
-![License](https://img.shields.io/badge/license-MIT-eab308)
+<p align="center">
+  <strong>Vision-first multimodal depression-risk estimation from facial behavior, body cues, gaze patterns, and auxiliary audio across E-DAIC and D-Vlog.</strong>
+</p>
 
-## The Idea
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active%20research-0f766e?style=for-the-badge" alt="Status"/>
+  <img src="https://img.shields.io/badge/snapshot-April%206%2C%202026-1d4ed8?style=for-the-badge" alt="Snapshot"/>
+  <img src="https://img.shields.io/badge/license-MIT-eab308?style=for-the-badge" alt="License"/>
+</p>
 
-MindSense is a research system for **depression-risk estimation from behavior**, not a clinical diagnostic tool.
-
-The project started with a simple question:
-
-Can we build a technically honest, benchmark-backed system that reads depression-relevant signals from:
-
-- facial motion and expression
-- gaze and blink behavior
-- body and hand movement
-- acoustic patterns as support
-
-And can we do it in a way that works across **controlled interviews** and **in-the-wild videos**, while staying explicit about failure modes, dataset shift, and deployment limits?
-
-That question shaped the entire project:
-
-- start with audited, reproducible data foundations
-- build strong unimodal references first
-- earn multimodal complexity only when it beats a real bar
-- prefer **vision or fusion** over acoustic-only when performance is close enough
-- build a bridge to live inference instead of pretending offline training features and webcam-time features are interchangeable
+<p align="center">
+  <img src="https://img.shields.io/badge/D--Vlog%20Winner-dvlog__vision__v3-15803d?style=flat-square&logo=checkmarx&logoColor=white" alt="D-Vlog Winner"/>
+  <img src="https://img.shields.io/badge/E--DAIC%20Winner-edaic__bimodal-0f766e?style=flat-square&logo=checkmarx&logoColor=white" alt="E-DAIC Winner"/>
+  <img src="https://img.shields.io/badge/next-bridge%20training%20%2B%20live%20dashboard-7c3aed?style=flat-square&logo=target&logoColor=white" alt="Next Step"/>
+</p>
 
 ---
 
-## Planned Approach In Short
+## 📑 Table of Contents
 
-The project plan has always been evidence-first:
+<details>
+<summary><strong>Click to expand</strong></summary>
 
-1. Audit both datasets and make the data pipeline trustworthy.
-2. Build unimodal baselines strong enough to act as real references.
-3. Build `Fusion V1` as the first multimodal benchmark baseline.
-4. Push to `Fusion V2` only if `V1` exposes real ceiling limits.
-5. Pivot to a true **vision-first** architecture when the evidence says richer visual representation matters more than more acoustic tuning.
-6. Lock the best model **per dataset**, not by narrative, but by benchmark evidence.
-7. Build the bridge and live inference layer only after the offline winner is actually known.
+- [The Idea](#-the-idea)
+- [Why This Problem Is Hard](#-why-this-problem-is-hard)
+- [Technology Stack](#-technology-stack)
+- [System Architecture](#-system-architecture)
+  - [End-to-End Pipeline](#end-to-end-pipeline)
+  - [Model Strategy & Selection](#model-strategy--selection)
+  - [Vision V3 Architecture](#vision-v3-architecture-d-vlog-winner)
+  - [Deployment & Bridge Strategy](#deployment--bridge-strategy)
+- [Project Evolution](#-project-evolution)
+  - [Phase 1: Data Foundation](#phase-1-data-foundation)
+  - [Phase 2: Unimodal References](#phase-2-unimodal-references)
+  - [Fusion V1](#fusion-v1--first-multimodal-baseline)
+  - [Fusion V2](#fusion-v2--ambitious-upgrade)
+  - [Vision V3](#vision-v3--the-breakthrough)
+- [Benchmark Results](#-benchmark-results)
+  - [Locked Winners](#current-locked-winners)
+  - [Performance Progression](#performance-progression-d-vlog-test-macro-f1)
+- [Repository Layout](#-repository-layout)
+- [Benchmark Artifacts](#-benchmark-artifacts)
+- [Roadmap](#-roadmap)
+- [Responsible Use](#-responsible-use)
+- [License](#-license)
 
-That logic is what produced the current state:
-
-- `D-Vlog` winner: `dvlog_vision_v3`
-- `E-DAIC` winner: `edaic_bimodal` (`Fusion V1`)
-
----
-
-## Why This Problem Is Hard
-
-The project is hard for reasons that are technical, statistical, and dataset-specific:
-
-- `E-DAIC` has real domain shift between train/dev and test.
-- `D-Vlog` is larger, but much noisier and more varied.
-- Depression labels are sparse and behaviorally indirect.
-- Offline feature spaces and live webcam-time feature spaces are different problems.
-- Strong acoustic baselines are easy to fall back to, but the project direction is deliberately **vision-first**.
-
-That means the repo is not just chasing a single model score. It is trying to build a system that is:
-
-- benchmark-credible
-- architecture-aware
-- deployment-aware
-- honest about what has and has not been validated
+</details>
 
 ---
 
-## Technology Stack
+## 🧠 The Idea
 
-### Core Stack
+MindSense is a research system for **depression-risk estimation from behavior** — not a clinical diagnostic tool.
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)
-![CUDA](https://img.shields.io/badge/CUDA-enabled-76B900?logo=nvidia&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-array%20compute-013243?logo=numpy&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-evaluation%20tables-150458?logo=pandas&logoColor=white)
-![OpenCV](https://img.shields.io/badge/OpenCV-video%20processing-5C3EE8?logo=opencv&logoColor=white)
-![Torchvision](https://img.shields.io/badge/Torchvision-pretrained%20hooks-EE4C2C?logo=pytorch&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-prototype%20server-000000?logo=flask&logoColor=white)
+The project started with a single question:
 
-### Why These Choices
+> *Can we build a technically honest, benchmark-backed system that reads depression-relevant signals from facial motion, gaze behavior, body movement, and acoustic patterns — and can we make it work across **controlled interviews** and **in-the-wild videos**, while staying explicit about failure modes, dataset shift, and deployment limits?*
 
-| Technology | Why we use it |
-|---|---|
-| `Python` | Fast research iteration, easy data tooling, and strong ML ecosystem fit |
-| `PyTorch` | Flexible enough for rapid architecture pivots from unimodal baselines to latent fusion to vision-first models |
-| `CUDA` on RTX 5060 | Practical training on local hardware without forcing cloud dependency into the milestone path |
-| `NumPy` + `Pandas` | Stable array processing, benchmark ledgers, summaries, calibration outputs, and metric slicing |
-| `OpenCV` | Efficient local video decoding and live-compatible frame processing without overcomplicating the first inference layer |
-| `Torchvision` | Lightweight pretrained hook support for future stronger visual encoders |
-| `Flask` | Simple, explicit prototype server for bridge status, model lock state, and live feature extraction endpoints |
-| JSON / CSV result artifacts | Machine-readable experiment state, selection ledgers, milestone reports, and reproducible comparisons |
+That question shaped every architectural decision:
 
-### Datasets
+| Principle | What it means |
+|:---|:---|
+| 🔍 **Audited foundations** | Start with verified, reproducible data pipelines before any modeling |
+| 📊 **Unimodal references first** | No multimodal claims without strong single-modality baselines to beat |
+| 🏆 **Earn complexity** | Each architecture level must prove value against real benchmarks |
+| 👁️ **Vision-first strategy** | Prefer vision or fusion over acoustic-only when performance is comparable |
+| 🌉 **Bridged deployment** | Never pretend offline training features and live webcam features are interchangeable |
 
-| Dataset | Role in project | Why it matters |
-|---|---|---|
-| `E-DAIC` | Clinical-style interview benchmark | Harder transfer problem, PHQ-linked labels, stricter generalization challenge |
-| `D-Vlog` | In-the-wild behavioral benchmark | Best place to validate a vision-first real-world direction |
+> [!IMPORTANT]
+> This project uses an **evidence-led architecture selection** process. Models are promoted based on benchmark showdowns, not narrative preference. The locked winners below are chosen because they won verified 5-seed test evaluations.
 
 ---
 
-## Architecture We Planned
-
-### Offline Research Stack
-
-```mermaid
-flowchart LR
-    A[Dataset audit] --> B[Manifest + extraction]
-    B --> C[Verified loaders]
-    C --> D[Unimodal baselines]
-    D --> E[Fusion V1]
-    E --> F[Fusion V2]
-    F --> G[Vision V3]
-    G --> H[Strategic model lock]
-    H --> I[Bridge training]
-    I --> J[Live dashboard]
-```
-
-### Current Model Strategy
+## 🎯 Why This Problem Is Hard
 
 ```mermaid
 flowchart TD
-    A[Raw / processed features] --> B[Dataset-specific loaders]
-    B --> C[Unimodal references]
-    B --> D[Fusion V1 baseline]
-    B --> E[Fusion V2 reliability-aware latent fusion]
-    B --> F[Vision V3 visual-core model]
-    C --> G[Benchmark showdown]
-    D --> G
-    E --> G
-    F --> G
-    G --> H[Strategic lock per dataset]
+    ROOT["🧠 Depression Detection\nWhy Is It Hard?"]
+
+    ROOT --> DS["📦 Dataset Challenges"]
+    ROOT --> TB["⚙️ Technical Barriers"]
+    ROOT --> ST["🎯 Strategic Tension"]
+
+    DS --> DS1["E-DAIC domain shift\ntrain ↔ test"]
+    DS --> DS2["D-Vlog noise and\nvariation"]
+    DS --> DS3["Sparse and indirect\nlabels"]
+
+    TB --> TB1["Offline vs live\nfeature spaces"]
+    TB --> TB2["Vision representation\nstrength"]
+    TB --> TB3["Multimodal fusion\nstability"]
+
+    ST --> ST1["Strong acoustic\nbaselines"]
+    ST --> ST2["Vision-first\ncommitment"]
+    ST --> ST3["Deployment\nreadiness"]
+
+    style ROOT fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#e2e8f0
+    style DS fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
+    style TB fill:#3b0764,stroke:#c084fc,stroke-width:2px,color:#e2e8f0
+    style ST fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#e2e8f0
+    style DS1 fill:#164e63,stroke:#22d3ee,color:#e2e8f0
+    style DS2 fill:#164e63,stroke:#22d3ee,color:#e2e8f0
+    style DS3 fill:#164e63,stroke:#22d3ee,color:#e2e8f0
+    style TB1 fill:#4a044e,stroke:#e879f9,color:#e2e8f0
+    style TB2 fill:#4a044e,stroke:#e879f9,color:#e2e8f0
+    style TB3 fill:#4a044e,stroke:#e879f9,color:#e2e8f0
+    style ST1 fill:#78350f,stroke:#f59e0b,color:#e2e8f0
+    style ST2 fill:#78350f,stroke:#f59e0b,color:#e2e8f0
+    style ST3 fill:#78350f,stroke:#f59e0b,color:#e2e8f0
 ```
 
-### Deployment Strategy
+The problem is hard for reasons that are **technical**, **statistical**, and **dataset-specific**:
+
+- **E-DAIC** has real domain shift — the test set uses AI-controlled interviews while training uses Wizard-of-Oz sessions
+- **D-Vlog** is larger but much noisier, with uncontrolled in-the-wild video conditions
+- Depression labels are **sparse and behaviorally indirect** — no clean signals to latch onto
+- **Offline** feature spaces (OpenFace AUs, eGeMAPS) and **live** webcam features (MediaPipe) are fundamentally different problems
+- Strong acoustic baselines are easy to fall back to, but the project direction is deliberately **vision-first**
+
+> [!NOTE]
+> The system is not chasing a single model score. It is building something that is benchmark-credible, architecture-aware, deployment-aware, and honest about what has and hasn't been validated.
+
+---
+
+## 🛠️ Technology Stack
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" alt="PyTorch"/>
+  <img src="https://img.shields.io/badge/CUDA-RTX%205060-76B900?style=flat-square&logo=nvidia&logoColor=white" alt="CUDA"/>
+  <img src="https://img.shields.io/badge/OpenCV-video-5C3EE8?style=flat-square&logo=opencv&logoColor=white" alt="OpenCV"/>
+  <img src="https://img.shields.io/badge/Flask-server-000000?style=flat-square&logo=flask&logoColor=white" alt="Flask"/>
+  <img src="https://img.shields.io/badge/NumPy-compute-013243?style=flat-square&logo=numpy&logoColor=white" alt="NumPy"/>
+  <img src="https://img.shields.io/badge/Pandas-analysis-150458?style=flat-square&logo=pandas&logoColor=white" alt="Pandas"/>
+</p>
+
+<details>
+<summary><strong>Why these choices?</strong></summary>
+
+| Technology | Rationale |
+|:---|:---|
+| **Python 3.12** | Fast research iteration, rich ML ecosystem, easy data tooling |
+| **PyTorch 2.x** | Flexible enough for rapid architecture pivots — unimodal → latent fusion → vision-first |
+| **CUDA on RTX 5060** | Practical local training without forcing cloud dependency into the milestone path |
+| **NumPy + Pandas** | Stable array processing, benchmark ledgers, calibration outputs, and metric slicing |
+| **OpenCV** | Efficient video decoding and live-compatible frame processing |
+| **Torchvision** | Lightweight pretrained hook support for stronger visual encoders |
+| **Flask** | Simple prototype server for bridge status, model lock, and feature extraction endpoints |
+
+</details>
+
+### Datasets
+
+| Dataset | Setting | Participants | Role | Why it matters |
+|:---|:---|:---:|:---|:---|
+| **E-DAIC** | Clinical interviews | 275 | Controlled benchmark | Harder transfer problem, PHQ-linked labels, strict generalization challenge |
+| **D-Vlog** | YouTube vlogs (in-the-wild) | 961 | Real-world benchmark | Best place to validate a vision-first approach on uncontrolled data |
+
+---
+
+## 🏗️ System Architecture
+
+### End-to-End Pipeline
+
+This diagram shows the complete research pipeline from raw data to live deployment:
 
 ```mermaid
 flowchart LR
-    A[Raw D-Vlog videos] --> B[Vision V3 feature extraction]
-    B --> C[Bridge dataset]
-    C --> D[Bridge projection model]
-    D --> E[Prototype inference server]
-    E --> F[Live dashboard with overlays]
+    subgraph DATA["📦 Data Foundation"]
+        direction TB
+        A1["🔍 Dataset Audit"]
+        A2["📋 Manifest Generation"]
+        A3["✅ Verified Loaders"]
+        A1 --> A2 --> A3
+    end
+
+    subgraph TRAIN["🧪 Research & Training"]
+        direction TB
+        B1["📊 Unimodal Baselines"]
+        B2["🔗 Fusion V1"]
+        B3["⚡ Fusion V2"]
+        B4["👁️ Vision V3"]
+        B1 --> B2 --> B3 --> B4
+    end
+
+    subgraph EVAL["🏆 Evaluation"]
+        direction TB
+        C1["📈 Benchmark Showdown"]
+        C2["🔒 Strategic Model Lock"]
+        C1 --> C2
+    end
+
+    subgraph DEPLOY["🚀 Deployment"]
+        direction TB
+        D1["🌉 Bridge Training"]
+        D2["🖥️ Inference Server"]
+        D3["📺 Live Dashboard"]
+        D1 --> D2 --> D3
+    end
+
+    DATA --> TRAIN --> EVAL --> DEPLOY
+
+    style DATA fill:#0d1b2a,stroke:#1b9aaa,stroke-width:2px,color:#e0e0e0
+    style TRAIN fill:#0d1b2a,stroke:#7c3aed,stroke-width:2px,color:#e0e0e0
+    style EVAL fill:#0d1b2a,stroke:#15803d,stroke-width:2px,color:#e0e0e0
+    style DEPLOY fill:#0d1b2a,stroke:#ea580c,stroke-width:2px,color:#e0e0e0
 ```
 
-### What This Means In Practice
+### Model Strategy & Selection
 
-- Offline research uses strong benchmark protocols and curated artifacts.
-- Live inference is **not** allowed to skip the bridge.
-- The bridge is the technical boundary between:
-  - offline teacher feature spaces
-  - live-compatible extracted feature spaces
+The core architecture decision process — four competing model families evaluated against real benchmarks:
 
-That boundary is central to the honesty of the project.
+```mermaid
+flowchart TD
+    RAW["🗃️ Raw & Processed Features<br/><i>E-DAIC: OpenFace AUs + eGeMAPS</i><br/><i>D-Vlog: Landmarks + LLDs</i>"]
+
+    RAW --> LOAD["📂 Dataset-Specific Loaders<br/><i>Quality-filtered, normalized, windowed</i>"]
+
+    LOAD --> UNI["🎯 Unimodal References<br/><code>acoustic-only │ visual-only</code>"]
+    LOAD --> FV1["🔗 Fusion V1<br/><code>bimodal baseline</code>"]
+    LOAD --> FV2["⚡ Fusion V2<br/><code>reliability-aware latent fusion</code>"]
+    LOAD --> VV3["👁️ Vision V3<br/><code>visual-core + aux audio</code>"]
+
+    UNI --> SHOW["🏆 Benchmark Showdown<br/><i>5-seed locked test evaluation</i>"]
+    FV1 --> SHOW
+    FV2 --> SHOW
+    VV3 --> SHOW
+
+    SHOW --> LOCK["🔒 Strategic Lock Per Dataset"]
+
+    LOCK --> DVLOG["✅ D-Vlog → <code>dvlog_vision_v3</code>"]
+    LOCK --> EDAIC["✅ E-DAIC → <code>edaic_bimodal</code>"]
+
+    style RAW fill:#1e293b,stroke:#64748b,stroke-width:2px,color:#e2e8f0
+    style LOAD fill:#1e293b,stroke:#64748b,stroke-width:2px,color:#e2e8f0
+    style UNI fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
+    style FV1 fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
+    style FV2 fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
+    style VV3 fill:#1a2e1a,stroke:#22c55e,stroke-width:2px,color:#e2e8f0
+    style SHOW fill:#2d1b4e,stroke:#a855f7,stroke-width:2px,color:#e2e8f0
+    style LOCK fill:#1c1917,stroke:#eab308,stroke-width:2px,color:#e2e8f0
+    style DVLOG fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#e2e8f0
+    style EDAIC fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#e2e8f0
+```
+
+### Vision V3 Architecture (D-Vlog Winner)
+
+The detailed internal architecture of the winning Vision V3 model:
+
+```mermaid
+flowchart TD
+    subgraph INPUT["Input Signals — Raw D-Vlog Video"]
+        direction LR
+        I1["🦴 Body Pose<br/><i>MediaPipe Pose</i>"]
+        I2["🤲 Hand Pose<br/><i>MediaPipe Hands</i>"]
+        I3["👁️ Gaze & Blink<br/><i>Eye tracking</i>"]
+        I4["😐 Face Affect<br/><i>Embedding path</i>"]
+        I5["🔊 Audio<br/><i>Auxiliary only</i>"]
+    end
+
+    subgraph ENCODE["Feature Encoding"]
+        direction LR
+        E1["Visual Encoder<br/><code>CNN + BiGRU</code>"]
+        E2["Acoustic Encoder<br/><code>TCN + BiGRU</code>"]
+    end
+
+    subgraph FUSE["Fusion Layer"]
+        F1["Vision-Core Fusion<br/><i>Visual features are primary</i><br/><i>Audio provides auxiliary support</i>"]
+    end
+
+    subgraph AGG["Subject-Level Aggregation"]
+        G1["Subject Mean Pooling<br/><i>Window → Subject prediction</i>"]
+    end
+
+    subgraph OUT["Output"]
+        H1["Binary Depression Risk<br/><code>depressed │ not-depressed</code>"]
+    end
+
+    I1 & I2 & I3 & I4 --> E1
+    I5 --> E2
+    E1 & E2 --> F1
+    F1 --> G1
+    G1 --> H1
+
+    style INPUT fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
+    style ENCODE fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#e2e8f0
+    style FUSE fill:#1a2e1a,stroke:#4ade80,stroke-width:2px,color:#e2e8f0
+    style AGG fill:#27272a,stroke:#a1a1aa,stroke-width:2px,color:#e2e8f0
+    style OUT fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#e2e8f0
+```
+
+### Deployment & Bridge Strategy
+
+> [!WARNING]
+> Live inference is **not allowed to skip the bridge**. The bridge is the technical boundary between offline teacher feature spaces and live-compatible extracted feature spaces. This boundary is central to the honesty of the project.
+
+```mermaid
+flowchart LR
+    subgraph OFFLINE["🔬 Offline World"]
+        direction TB
+        O1["Trained Vision V3<br/><i>OpenFace features</i>"]
+        O2["Teacher Embeddings<br/><i>Known feature space</i>"]
+        O1 --> O2
+    end
+
+    subgraph BRIDGE["🌉 Bridge Layer"]
+        direction TB
+        B1["Raw D-Vlog Videos<br/><i>773 subjects available</i>"]
+        B2["Paired Extraction<br/><i>OpenFace + MediaPipe<br/>on same frames</i>"]
+        B3["Bridge Projection Model<br/><i>MediaPipe → OpenFace space</i>"]
+        B1 --> B2 --> B3
+    end
+
+    subgraph LIVE["📺 Live World"]
+        direction TB
+        L1["Webcam Stream<br/><i>MediaPipe features</i>"]
+        L2["Bridge-Projected Features<br/><i>Mapped to trained space</i>"]
+        L3["Live Risk Estimation<br/><i>Dashboard + overlays</i>"]
+        L1 --> L2 --> L3
+    end
+
+    OFFLINE --> BRIDGE --> LIVE
+
+    style OFFLINE fill:#0d1b2a,stroke:#1b9aaa,stroke-width:2px,color:#e0e0e0
+    style BRIDGE fill:#1c1917,stroke:#f59e0b,stroke-width:2px,color:#e0e0e0
+    style LIVE fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#e0e0e0
+```
+
+**What this means in practice:**
+
+- Offline research uses strong benchmark protocols and curated artifacts
+- The bridge trains a projection from **MediaPipe landmarks → OpenFace AU space** using 773 paired videos
+- Only bridged features may be used for live inference — no shortcut mappings allowed
 
 ---
 
-## Project Story
+## 📖 Project Evolution
 
-This project did not go from idea to "final model" in one line. It grew in stages, and each stage changed what the next one had to solve.
+The project grew in stages. Each stage changed what the next one had to solve.
 
 ### Phase 1: Data Foundation
 
-The first phase was not modeling. It was trust-building:
+The first phase was not modeling — it was **trust-building**:
 
-- dataset audit
-- manifest generation
-- extraction recovery
-- normalization handling
-- split verification
-- modality shape verification
+- ✅ Full dataset audit across both E-DAIC and D-Vlog
+- ✅ Manifest-first data system with extraction recovery
+- ✅ Normalization handling and split verification
+- ✅ Modality shape verification and quality flagging
 
-What this gave us:
-
-- `D-Vlog` and `E-DAIC` loaders we could actually believe
-- explicit handling of damaged or partial samples
-- a reproducible benchmark substrate instead of ad hoc scripts
+**What this gave us:** Loaders we could actually believe, explicit handling of damaged/partial samples, and a reproducible benchmark substrate.
 
 ### Phase 2: Unimodal References
 
-Before building multimodal systems, we built strong unimodal references.
+Before building multimodal systems, we built **strong unimodal references** to set a real bar.
 
-Locked 5-seed unimodal results:
+> 5-seed locked unimodal results:
 
 | Track | Dev macro F1 | Test macro F1 |
-|---|---:|---:|
-| `dvlog_acoustic` | `0.6680 +/- 0.0415` | `0.6630 +/- 0.0100` |
-| `dvlog_visual` | `0.6028 +/- 0.0189` | `0.5943 +/- 0.0412` |
-| `edaic_acoustic` | `0.5922 +/- 0.0202` | `0.5134 +/- 0.0257` |
-| `edaic_visual` | `0.5220 +/- 0.0292` | `0.5355 +/- 0.0686` |
+|:---|---:|---:|
+| `dvlog_acoustic` | `0.6680 ± 0.0415` | `0.6630 ± 0.0100` |
+| `dvlog_visual` | `0.6028 ± 0.0189` | `0.5943 ± 0.0412` |
+| `edaic_acoustic` | `0.5922 ± 0.0202` | `0.5134 ± 0.0257` |
+| `edaic_visual` | `0.5220 ± 0.0292` | `0.5355 ± 0.0686` |
 
-What this told us:
-
-- `D-Vlog` acoustic was the initial bar to beat.
-- `E-DAIC` was unstable enough that unimodal visual and acoustic each mattered in different ways.
-- Any multimodal claim had to beat real references, not weak placeholders.
+> [!TIP]
+> D-Vlog acoustic (`0.6630` test F1) became the bar to beat. Any multimodal claim had to surpass real references — not weak placeholders.
 
 ---
 
-## Fusion V1
+### Fusion V1 — First Multimodal Baseline
 
-`Fusion V1` was our first true multimodal architecture milestone.
+The repo's first benchmark-quality bimodal path: joint visual + acoustic training with subject-level aggregation.
 
-### What We Did In V1
+| Dataset | Dev Highlight | Locked Test macro F1 |
+|:---|---:|---:|
+| `D-Vlog` | `0.7024` | `0.6131 ± 0.0111` |
+| `E-DAIC` | `0.5352` | `0.5563 ± 0.0342` |
 
-- built the repo's first benchmark-quality bimodal path
-- integrated joint visual + acoustic training
-- added subject-level aggregation and benchmark harness support
-- froze the first real multimodal reference per dataset
+<details>
+<summary><strong>What worked and what didn't</strong></summary>
 
-### Best Verified `Fusion V1` Results
-
-| Dataset | Dev highlight | Locked test macro F1 |
-|---|---:|---:|
-| `D-Vlog` | `0.7024` dev macro F1 | `0.6131 +/- 0.0111` |
-| `E-DAIC` | `0.5352` dev macro F1 | `0.5563 +/- 0.0342` |
-
-### Why V1 Mattered
-
-`Fusion V1` proved that:
-
-- the repo could train and evaluate real multimodal models
+**✅ What V1 proved:**
+- The repo could train and evaluate real multimodal models
 - D-Vlog could benefit from multimodal reasoning
-- E-DAIC needed something stronger and more careful than simple bimodal fusion
+- E-DAIC needed something stronger than simple bimodal fusion
 
-### What Went Wrong In V1
+**❌ What pushed us forward:**
+- On E-DAIC, it still trailed the stronger acoustic dev bar
+- On D-Vlog, the locked test result wasn't enough to justify calling it the final architecture
 
-`Fusion V1` was not enough as the final answer because:
+→ This pushed the project toward **Fusion V2**.
 
-- on `E-DAIC`, it still trailed the stronger acoustic dev bar
-- on `D-Vlog`, it looked promising, but the locked test result was not enough to justify calling it the final architecture
-
-That pushed the project toward `Fusion V2`.
+</details>
 
 ---
 
-## Fusion V2
+### Fusion V2 — Ambitious Upgrade
 
-`Fusion V2` was the ambitious multimodal upgrade.
-
-### What We Added In V2
-
-- heterogeneous modality bundles by dataset
-- richer E-DAIC modality support
-- reliability-aware latent fusion
-- teacher-style auxiliary supervision
-- stronger subject-level aggregation
-- gate logging and quality-aware analysis
-
-### What Went Right
-
-`Fusion V2` was not a dead end. It moved the project forward in important ways:
-
-- it improved over `Fusion V1` on `D-Vlog` test
-- it cleared the planned E-DAIC dev bar
-- it proved the richer benchmark harness and evidence-led showdown system
-
-Corrected synced `Fusion V2` showdown:
+Fusion V2 added reliability-aware latent fusion, teacher-style auxiliary supervision, heterogeneous modality bundles, and stronger subject-level aggregation.
 
 | Dataset | Test macro F1 |
-|---|---:|
-| `D-Vlog Fusion V2` | `0.6279 +/- 0.0142` |
-| `E-DAIC Fusion V2` | `0.4871 +/- 0.0658` |
+|:---|---:|
+| `D-Vlog Fusion V2` | `0.6279 ± 0.0142` |
+| `E-DAIC Fusion V2` | `0.4871 ± 0.0658` |
 
-### What Went Wrong In V2
+<details>
+<summary><strong>What worked and what didn't</strong></summary>
 
-`Fusion V2` still did not become the promoted architecture because:
+**✅ What V2 proved:**
+- Improved over Fusion V1 on D-Vlog test
+- Cleared the planned E-DAIC dev bar
+- Proved the richer benchmark harness and evidence-led showdown system
 
-- on `D-Vlog`, it still stayed below the strongest acoustic baseline
-- on `E-DAIC`, it improved on dev but failed to transfer on final test
-- the architecture got better, but not stable enough where it mattered
+**❌ What pushed us further:**
+- On D-Vlog, still stayed below the strongest acoustic baseline
+- On E-DAIC, improved on dev but **failed to transfer on final test**
+- The architecture got better, but not stable enough where it mattered
 
-What V2 taught us:
+**Key lesson:** Richer fusion alone was not the answer. The visual side needed **stronger representation** — leading to the Vision V3 pivot.
 
-- richer fusion alone was not the answer
-- our visual side still needed stronger representation
-- the project needed a clearer commitment to a **vision-first** direction
-
-That is what led to `Vision V3`.
-
----
-
-## Vision V3
-
-`Vision V3` was the strategic pivot.
-
-It was not "Fusion V2 but larger." It was a different idea:
-
-- treat vision as the center of the system
-- use richer raw-video-derived visual signals
-- keep audio as auxiliary support
-- make D-Vlog the proving ground for the vision-first direction
-
-### What We Added In V3
-
-- D-Vlog raw-video extraction pipeline
-- richer visual bundles:
-  - body pose
-  - hand pose
-  - gaze and blink
-  - face-affect embedding path
-- a new subject-level vision-first model family
-- a dedicated Vision V3 smoke, dev benchmark, and showdown path
-
-### What Happened In V3
-
-This is where the project crossed an important threshold.
-
-Vision V3 dev benchmark:
-
-- selected `visual_full_aux_audio`
-- selected `fixed_prior`
-- selected `subject_mean`
-- selected `dropout_on`
-- reached `0.7087` dev macro F1
-
-Vision V3 locked showdown:
-
-| Track | Test macro F1 |
-|---|---:|
-| `dvlog_vision_v3` | `0.6666 +/- 0.0310` |
-| `dvlog_acoustic` | `0.6630 +/- 0.0100` |
-
-### Why V3 Was The Breakthrough
-
-`Vision V3` did not win by a huge margin. It won in a more important way:
-
-- it became the first **vision-first** D-Vlog architecture to beat the locked acoustic benchmark on final test
-- it matched the project's strategic direction
-- it turned "vision-first" from aspiration into a benchmark-backed result
-
-That is why the repo now locks:
-
-- `D-Vlog` -> `dvlog_vision_v3`
-- `E-DAIC` -> `edaic_bimodal`
+</details>
 
 ---
 
-## Current Locked Winners
+### Vision V3 — The Breakthrough
 
-These are the current source-of-truth models for the repo.
+Vision V3 was not "Fusion V2 but larger." It was a **fundamentally different idea**: treat vision as the center of the system.
 
-| Dataset | Locked winner | Test macro F1 | Why it is locked |
-|---|---|---:|---|
-| `D-Vlog` | `dvlog_vision_v3` | `0.6666 +/- 0.0310` | Best verified D-Vlog model and aligned with the project's vision-first direction |
-| `E-DAIC` | `edaic_bimodal` (`Fusion V1`) | `0.5563 +/- 0.0342` | Strongest verified E-DAIC result after V2 failed to hold on final test |
+**What changed:**
+- 🎬 D-Vlog raw-video extraction pipeline (body pose, hand pose, gaze & blink, face-affect embeddings)
+- 👁️ New subject-level vision-first model family
+- 🔊 Audio demoted to auxiliary support only
+- 📊 Dedicated smoke → dev benchmark → showdown evaluation path
 
-Strategic rule:
+> **Dev benchmark:** `0.7087` macro F1 — highest dev score in project history
 
-- if a vision or fusion model is the winner, we lock it
-- if a vision or fusion model is within about `0.05` of acoustic, it stays the preferred direction
-- acoustic-only is a reference, not the default identity of the system
+**Locked showdown (the moment of truth):**
 
----
+| Track | Test macro F1 | |
+|:---|---:|:---:|
+| **`dvlog_vision_v3`** | **`0.6666 ± 0.0310`** | 🏆 |
+| `dvlog_acoustic` | `0.6630 ± 0.0100` | — |
 
-## What We Chose And Why
-
-The final choices were not made by style preference alone.
-
-### D-Vlog
-
-We chose `dvlog_vision_v3` because:
-
-- it won the final showdown
-- it validated the vision-first hypothesis
-- it gave the project a real visual deployment direction
-
-### E-DAIC
-
-We chose `edaic_bimodal` (`Fusion V1`) because:
-
-- it remained the strongest verified E-DAIC model
-- `Fusion V2` looked better on dev but failed to hold on final test
-- the honest answer was to keep the stronger verified model, not force a narrative upgrade
+> [!IMPORTANT]
+> **Why V3 was the breakthrough:** It didn't win by a huge margin. It won in a *more important way* — it became the first **vision-first** D-Vlog architecture to beat the locked acoustic benchmark on final test. It turned "vision-first" from aspiration into a **benchmark-backed result**.
 
 ---
 
-## Current Progress Snapshot
+## 📊 Benchmark Results
 
-### Completed
+### Current Locked Winners
 
-- dataset audit and manifest system
-- D-Vlog and E-DAIC verified loaders
-- unimodal baselines
-- locked unimodal benchmark suite
-- `Fusion V1` implementation and locked benchmark
-- `Fusion V2` implementation, benchmark, and corrected synced showdown
-- `Vision V3` D-Vlog implementation
-- D-Vlog raw-video extraction
-- `Vision V3` D-Vlog benchmark and locked showdown
-- strategic model lock
-- bridge feature extraction
-- prototype inference server
-- bridge training stack implementation
+These are the **source-of-truth models** for the repo:
 
-### In Progress
+| Dataset | Locked Winner | Test macro F1 | Why It's Locked |
+|:---|:---|:---:|:---|
+| **D-Vlog** | `dvlog_vision_v3` | **`0.6666 ± 0.0310`** | Best verified D-Vlog model, aligned with vision-first direction |
+| **E-DAIC** | `edaic_bimodal` (Fusion V1) | **`0.5563 ± 0.0342`** | Strongest verified E-DAIC result; V2 failed to hold on final test |
 
-- bridge model training
-- live inference integration
-- dashboard layer for prototype visualization
+**Strategic locking rule:**
+- If a vision or fusion model is the winner → lock it
+- If a vision or fusion model is within `~0.05` of acoustic → it stays the preferred direction
+- Acoustic-only is a reference, not the default identity
+
+### Performance Progression (D-Vlog Test macro F1)
+
+| Architecture | Test F1 | | Progression |
+|:---|:---:|:---|:---|
+| Visual Only | `0.5943` | ▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░ | Baseline visual — weakest |
+| Acoustic Only | `0.6630` | ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░ | **The bar to beat** |
+| Fusion V1 | `0.6131` | ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░ | First multimodal — approaching |
+| Fusion V2 | `0.6279` | ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░ | Improved but still below acoustic |
+| **Vision V3** | **`0.6666`** | **▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░** | **🏆 Crossed the acoustic bar** |
+
+> The progression tells a clear story: unimodal visual was weak, acoustic set the bar, fusion architectures approached it, and **Vision V3 finally crossed it**.
+
+### Decision Rationale
+
+<details>
+<summary><strong>D-Vlog: Why <code>dvlog_vision_v3</code>?</strong></summary>
+
+- Won the final showdown on locked 5-seed test evaluation
+- Validated the vision-first hypothesis with benchmark evidence
+- Gave the project a real visual deployment direction
+
+</details>
+
+<details>
+<summary><strong>E-DAIC: Why <code>edaic_bimodal</code> (Fusion V1)?</strong></summary>
+
+- Remained the strongest verified E-DAIC model after all showdowns
+- Fusion V2 looked better on dev but failed to transfer on final test
+- The honest answer: keep the stronger verified model, not force a narrative upgrade
+
+</details>
 
 ---
 
-## Benchmark Artifacts Published
+## 📁 Repository Layout
 
-Key curated result roots in this repo:
-
-- `results/benchmark_quality/fusion_v1_locked/`
-- `results/benchmark_quality/fusion_v2_smoke/`
-- `results/benchmark_quality/fusion_v2_benchmark/`
-- `results/benchmark_quality/fusion_v2_showdown_synced/`
-- `results/benchmark_quality/vision_v3_dvlog_smoke/`
-- `results/benchmark_quality/vision_v3_dvlog_benchmark/`
-- `results/benchmark_quality/vision_v3_dvlog_showdown/`
-
-These include:
-
-- summary JSONs
-- config snapshots
-- selection ledgers
-- leaderboards
-- milestone reports
-
-Heavy local-only artifacts such as per-seed checkpoints are intentionally excluded from Git.
-
----
-
-## Repository Layout
-
-```text
-src/
-  data/
-    dataset_audit.py
-    edaic_extractor.py
-    dvlog_video_extractor.py
-    fusion_v2_datasets.py
-    vision_v3_datasets.py
-    bridge_extractor.py
-    bridge_dataset.py
-  model/
-    encoders.py
-    fusion_v2.py
-    vision_v3.py
-    bridge.py
-  training/
-    baselines.py
-    benchmark_suite.py
-    fusion_v2.py
-    vision_v3.py
-    bridge.py
-  inference/
-    model_lock.py
-    feature_extractor.py
-    server.py
-    dashboard/
-configs/
-results/
-team_progress
-implementation_plan.md
+```
+📦 MindSense
+├── 📂 src/
+│   ├── 📂 data/                          # Data pipelines & loaders
+│   │   ├── dataset_audit.py              #   Dataset quality audit
+│   │   ├── edaic_extractor.py            #   E-DAIC archive extraction (274 + 1 partial)
+│   │   ├── dvlog_video_extractor.py      #   D-Vlog raw video feature extraction
+│   │   ├── fusion_v2_datasets.py         #   Fusion V2 heterogeneous loaders
+│   │   ├── vision_v3_datasets.py         #   Vision V3 visual bundle loaders
+│   │   ├── bridge_extractor.py           #   OpenFace + MediaPipe paired extraction
+│   │   └── bridge_dataset.py             #   Bridge training dataset
+│   │
+│   ├── 📂 model/                         # Model architectures
+│   │   ├── encoders.py                   #   Visual (CNN+BiGRU) & Acoustic (TCN+BiGRU)
+│   │   ├── fusion_v2.py                  #   Reliability-aware latent fusion
+│   │   ├── vision_v3.py                  #   Vision-core model with aux audio
+│   │   └── bridge.py                     #   Feature space bridge projection
+│   │
+│   ├── 📂 training/                      # Training & evaluation
+│   │   ├── baselines.py                  #   Unimodal baseline runners
+│   │   ├── benchmark_suite.py            #   5-seed benchmark harness
+│   │   ├── fusion_v2.py                  #   Fusion V2 training loop
+│   │   ├── vision_v3.py                  #   Vision V3 training loop
+│   │   └── bridge.py                     #   Bridge model training
+│   │
+│   └── 📂 inference/                     # Live inference layer
+│       ├── model_lock.py                 #   Strategic winner management
+│       ├── feature_extractor.py          #   MediaPipe real-time extraction
+│       ├── server.py                     #   Flask prototype server
+│       └── 📂 dashboard/                 #   Web UI + overlays + disclaimers
+│
+├── 📂 configs/                           # Experiment configuration YAMLs
+├── 📂 results/                           # Benchmark artifacts & leaderboards
+├── 📂 assets/                            # Project media & visuals
+├── 📄 implementation_plan.md             # Detailed technical plan (v5.2)
+├── 📄 team_progress                      # Progress tracking
+└── 📄 LICENSE                            # MIT License
 ```
 
 ---
 
-## Responsible Use
+## 📦 Benchmark Artifacts
 
-This project is a research and prototype system for **behavioral risk estimation**.
+All curated benchmark results are published in `results/benchmark_quality/`:
 
-It is **not**:
+| Artifact Root | Contents |
+|:---|:---|
+| `fusion_v1_locked/` | Locked Fusion V1 5-seed results, configs, and leaderboard |
+| `fusion_v2_smoke/` | Fusion V2 smoke test validation |
+| `fusion_v2_benchmark/` | Full Fusion V2 dev-stage benchmark |
+| `fusion_v2_showdown_synced/` | Corrected synced Fusion V2 showdown |
+| `vision_v3_dvlog_smoke/` | Vision V3 smoke test validation |
+| `vision_v3_dvlog_benchmark/` | Vision V3 full dev benchmark with selection |
+| `vision_v3_dvlog_showdown/` | **Final locked showdown — V3 vs acoustic** |
 
-- a clinical diagnosis system
-- a substitute for professional evaluation
-- a validated real-time mental health screening product
+Each includes: summary JSONs, config snapshots, selection ledgers, leaderboards, and milestone reports.
+
+> [!NOTE]
+> Heavy local-only artifacts (per-seed checkpoints, raw extracted features) are intentionally excluded from Git via `.gitignore`.
+
+---
+
+## 🗺️ Roadmap
+
+```mermaid
+timeline
+    title MindSense Development Timeline
+
+    section Data Foundation
+        Dataset Audit           : Completed
+        Manifest System         : Completed
+        Verified Loaders        : Completed
+
+    section Unimodal Baselines
+        Acoustic Baselines      : Completed
+        Visual Baselines        : Completed
+        Locked Benchmark Suite  : Completed
+
+    section Multimodal Research
+        Fusion V1 Bimodal       : Completed
+        Fusion V2 Latent Fusion : Completed
+        Vision V3 Visual-Core   : Completed
+        Model Lock Decision     : Completed
+
+    section Deployment
+        Bridge Feature Extraction : Completed
+        Prototype Inference Server : Completed
+        Bridge Training Stack      : Completed
+        Bridge Model Training      : In Progress
+        Live Inference Integration : In Progress
+        Dashboard + Overlays       : Planned
+```
+
+### Immediate Target
+
+> By **Tuesday, April 7, 2026** — move from prototype server to a **live dashboard with video and overlays**, backed by:
+>
+> - Bridge-model training completion
+> - Bridge-to-live feature mapping
+> - Visual overlays on webcam stream
+> - Quality-aware display boundaries
+> - Honest messaging about system capabilities and limits
+
+---
+
+## ⚖️ Responsible Use
+
+> [!CAUTION]
+> This project is a **research and prototype system** for behavioral risk estimation. It is **not** a clinical diagnosis system, a substitute for professional evaluation, or a validated real-time mental health screening product.
 
 The live layer remains intentionally conservative:
 
-- bridge first
-- live prediction later
-- honesty always
+```
+🌉  Bridge first
+📊  Live prediction later
+🤝  Honesty always
+```
+
+The system is designed to be explicit about:
+- What the model is trained on vs. what the live demo uses
+- Which parts are validated vs. exploratory
+- Known failure modes and demographic limitations
 
 ---
 
-## Immediate Next Step
+## 📄 License
 
-The next milestone target is explicit:
-
-By **Tuesday, April 7, 2026**, the goal is to move from the current prototype server to a **live dashboard with video and overlays**, backed by:
-
-- bridge-model training
-- bridge-to-live feature mapping
-- visual overlays
-- quality-aware display boundaries
-- honest messaging around what the live system can and cannot claim
-
-That is the next step the repo is now built to support.
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## Why This Project Matters
+<p align="center">
+  <strong>MindSense</strong> — Evidence-led architecture selection. Benchmark-backed results. Honest deployment.
+</p>
 
-The strongest part of this repo is not a single model score.
-
-It is that the project now has:
-
-- audited data foundations
-- benchmark-backed references
-- an evidence-led architecture story
-- a real V1 -> V2 -> V3 progression
-- a promoted vision-first winner on D-Vlog
-- a disciplined lock decision on E-DAIC
-- a concrete bridge path toward live inference
-
-That means the work was not wasted at any phase:
-
-- `V1` made multimodal benchmarking real
-- `V2` exposed where richer fusion helps and where it still fails
-- `V3` proved the vision-first direction can actually win
-
-And now the project can move from model selection to system realization.
+<p align="center">
+  <sub>Built with discipline. Every phase earned. From audited data to vision-first winner.</sub>
+</p>
