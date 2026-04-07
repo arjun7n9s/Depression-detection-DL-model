@@ -2148,3 +2148,68 @@ What this means in simple words:
 ### Next recommended step
 - Restart the server and validate the new browser behavior with a live webcam session.
 - If any lag or mismatch remains, tune overlay detection cadence separately from server sampling cadence rather than mixing the two again.
+
+## 2026-04-07 - Production Hardening Pass For Live Inference
+
+### Session goal
+- Move the live stack from "advanced prototype" toward a production-grade project foundation.
+- Replace best-effort runtime behavior with explicit diagnostics, camera controls, deployable serving, and a cleaner server-owned video pipeline.
+
+### Implemented
+- Hardened `src/inference/server.py`.
+  - Added runtime diagnostics endpoints:
+    - `/api/runtime-info`
+    - `/api/camera/config`
+    - `/api/camera/probe`
+    - legacy `/api/status` compatibility
+  - Added camera reconfiguration flow without manual code edits.
+  - Added safer lifecycle cleanup and tolerant MediaPipe shutdown handling.
+  - Added optional `waitress` serving path for non-dev deployment.
+  - Added `--auto-start-camera`.
+- Added `src/inference/wsgi.py` as a production entrypoint.
+- Added `requirements.txt` with the live inference/runtime dependencies.
+- Hardened `src/inference/camera.py`.
+  - Added blank-frame rejection during warmup.
+  - Added camera probe helpers and frame diagnostics.
+- Upgraded the live dashboard:
+  - `src/inference/dashboard/index.html`
+  - `src/inference/dashboard/styles.css`
+  - `src/inference/dashboard/app.js`
+  - Added camera source/backend controls.
+  - Added camera probing UI and diagnostics readout.
+  - Added better operator-side error handling for start/stop/config flows.
+- Promoted the smoother reference video pipeline into the repo:
+  - `src/inference/reference_metrics.py`
+  - `src/inference/reference_face_analyzer.py`
+  - `src/inference/reference_body_analyzer.py`
+  - `src/inference/reference_behavior_extractor.py`
+  - The server now uses richer face/body analysis for the MJPEG feed and live metrics.
+
+### Verified
+- Python compile passes for the hardened inference stack:
+  - camera
+  - overlay renderer
+  - reference analyzers
+  - server
+  - wsgi entrypoint
+- Flask route checks passed for:
+  - `/`
+  - `/health`
+  - `/api/live-state`
+  - `/api/status`
+  - `/api/runtime-info`
+  - `/api/camera/config`
+  - `/api/camera/probe`
+- Dashboard ID wiring is consistent after the UI control additions.
+
+### Interpretation
+- The project now has a stronger operational backbone:
+  - server-owned live video
+  - richer reference-grade tracking
+  - configurable camera routing
+  - deployable server entry path
+- The main remaining risk is now machine-specific webcam/backend binding, not the absence of runtime architecture.
+
+### Next recommended step
+- Restart the live server and use the new camera control panel to probe/select the valid webcam source/backend on this machine.
+- Once that is confirmed, do one final polish pass on copy/layout only if needed.

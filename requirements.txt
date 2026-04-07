@@ -1,0 +1,8 @@
+flask
+mediapipe
+numpy
+opencv-python
+pandas
+torch
+torchvision
+waitress

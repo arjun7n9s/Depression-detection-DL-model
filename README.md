@@ -150,7 +150,7 @@ The problem is hard for reasons that are **technical**, **statistical**, and **d
 | **NumPy + Pandas** | Stable array processing, benchmark ledgers, calibration outputs, and metric slicing |
 | **OpenCV** | Efficient video decoding and live-compatible frame processing |
 | **Torchvision** | Lightweight pretrained hook support for stronger visual encoders |
-| **Flask** | Simple prototype server for bridge status, model lock, and feature extraction endpoints |
+| **Flask + Waitress** | Lightweight local API with a production-ready serving path for MJPEG video streaming, diagnostics, and live runtime control |
 
 </details>
 
@@ -337,6 +337,16 @@ flowchart LR
 - The bridge trains a projection from **MediaPipe landmarks → OpenFace AU space** using 773 paired videos
 - Only bridged features may be used for live inference — no shortcut mappings allowed
 - The live dashboard now renders mirrored face mesh, pose overlays, and a secondary tracker-projection stage from the same live subject state
+- The live server now owns the webcam loop end to end: threaded capture, backend analyzers, OpenCV overlays, MJPEG video feed, runtime diagnostics, and camera config/probing APIs
+
+#### Live Dashboard Snapshot
+
+<p align="center">
+  <img src="assets/live-dashboard-overlay.jpeg" alt="MindSense live dashboard with face mesh, pose skeleton, and tracker projection" width="100%"/>
+</p>
+<p align="center">
+  <em>Current live prototype: server-owned video feed, mirrored face mesh, pose skeleton overlays, tracker projection, and bridge-backed Vision V3 inference running together.</em>
+</p>
 
 ---
 
@@ -600,12 +610,21 @@ timeline
 
 ### Immediate Target
 
-> Current focus: **live dashboard polish and demo refinement**.
+> Current focus: **production hardening and final demo readiness**.
 >
-> - smoother tracker projection and overlay cadence
-> - cleaner final dashboard copy and visual hierarchy
-> - session reliability checks across lighting and pose changes
-> - final demo-ready repo snapshot with the current inference stack
+> - camera source/backend reliability across machines
+> - production-grade runtime controls and diagnostics
+> - final dashboard UX cleanup on top of the server-owned video pipeline
+> - final demo-ready repo snapshot with the hardened inference stack
+
+#### Engineering Snapshot
+
+<p align="center">
+  <img src="assets/engineering-runtime-snapshot.jpeg" alt="Engineering snapshot showing the MindSense repo, dashboard runtime logs, and active hardening work" width="100%"/>
+</p>
+<p align="center">
+  <em>Current hardening phase: live-state diagnostics, dashboard iteration, runtime tuning, and repo cleanup converging toward the final demo-ready snapshot.</em>
+</p>
 
 ---
 

@@ -214,21 +214,14 @@ html, body {
   border: 1px solid var(--line);
 }
 
-#video, #overlay {
+#video-feed {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-#video {
   object-fit: cover;
   transform: scaleX(-1);
   background: #080c14;
-}
-
-#overlay {
-  pointer-events: none;
 }
 
 #tracker-stage {
@@ -287,6 +280,46 @@ html, body {
   font-size: 0.82rem;
   line-height: 1.45;
   backdrop-filter: blur(8px);
+}
+
+.live-tracking-card {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 132px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(10, 14, 23, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  backdrop-filter: blur(8px);
+  z-index: 2;
+}
+
+.live-tracking-title {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.live-tracking-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+
+.live-tracking-row + .live-tracking-row {
+  margin-top: 6px;
+}
+
+.live-tracking-row strong {
+  color: var(--ink-bright);
+  font-variant-numeric: tabular-nums;
 }
 
 .video-stats {
@@ -661,6 +694,95 @@ html, body {
   font-weight: 700;
 }
 
+.camera-config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(148, 163, 184, 0.05);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
+}
+
+.camera-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.camera-diagnostics {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.probe-results {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.probe-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(148, 163, 184, 0.04);
+}
+
+.probe-item.good {
+  border-color: rgba(45, 212, 191, 0.25);
+  background: rgba(45, 212, 191, 0.06);
+}
+
+.probe-item.bad {
+  border-color: rgba(251, 113, 133, 0.20);
+  background: rgba(251, 113, 133, 0.05);
+}
+
+.probe-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.probe-meta {
+  margin-top: 4px;
+  font-size: 0.74rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 1100px) {
   .primary-grid { grid-template-columns: 1fr; }
@@ -675,4 +797,6 @@ html, body {
   .video-stats { grid-template-columns: repeat(2, 1fr); }
   .modality-grid { grid-template-columns: repeat(3, 1fr); }
   .tracker-footer { grid-template-columns: 1fr; }
+  .camera-config-grid { grid-template-columns: 1fr; }
+  .camera-actions { flex-direction: column; }
 }
