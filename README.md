@@ -30,6 +30,7 @@
 - [The Idea](#-the-idea)
 - [Why This Problem Is Hard](#-why-this-problem-is-hard)
 - [Technology Stack](#-technology-stack)
+- [Dataset Access & Permission Proofs](#-dataset-access--permission-proofs)
 - [System Architecture](#-system-architecture)
   - [End-to-End Pipeline](#end-to-end-pipeline)
   - [Model Strategy & Selection](#model-strategy--selection)
@@ -160,6 +161,59 @@ The problem is hard for reasons that are **technical**, **statistical**, and **d
 |:---|:---|:---:|:---|:---|
 | **E-DAIC** | Clinical interviews | 275 | Controlled benchmark | Harder transfer problem, PHQ-linked labels, strict generalization challenge |
 | **D-Vlog** | YouTube vlogs (in-the-wild) | 961 | Real-world benchmark | Best place to validate a vision-first approach on uncontrolled data |
+| **MODMA EEG** | Resting-state + ERP EEG | 53-55 per public EEG subset | Approved expansion track | Adds neurophysiological signals that can complement behavior-centric depression analysis |
+
+> [!NOTE]
+> MindSense's current locked benchmark story remains centered on **E-DAIC** and **D-Vlog**. **MODMA EEG** is being documented as an approved next-step dataset for future multimodal expansion, not as a completed benchmark track yet.
+
+The official MODMA access page lists three currently available EEG subsets:
+
+- `EEG_128channels_ERP_lanzhou_2015`: `24` Major Depressive Disorder subjects + `29` Healthy Controls
+- `EEG_128channels_resting_lanzhou_2015`: `24` Major Depressive Disorder subjects + `29` Healthy Controls
+- `EEG_3channels_resting_lanzhou_2015`: `26` Major Depressive Disorder subjects + `29` Healthy Controls
+
+---
+
+## 🔐 Dataset Access & Permission Proofs
+
+Some of the datasets used or planned in MindSense are gated behind institutional approval, signed EULAs, or maintainer review. This section makes that access trail visible so the README is explicit about responsible dataset use rather than silently implying everything was openly downloadable.
+
+### E-DAIC / DAIC-WOZ
+
+E-DAIC is a permission-controlled clinical interview dataset. The project has an approved DAIC-WOZ download request and signed end-user license coverage for the research team.
+
+<p align="center">
+  <img src="assets/E-Daic.jpeg" alt="DAIC-WOZ dataset download approval confirmation" width="82%"/>
+</p>
+<p align="center">
+  <em>Permission proof for DAIC-WOZ / E-DAIC access.</em>
+</p>
+
+### D-Vlog
+
+D-Vlog access was granted by the dataset maintainers after the request form was submitted. The approval email also clarifies the dataset structure, extracted feature availability, and the research-use sharing path for the original video keys.
+
+<p align="center">
+  <img src="assets/D-Vlog.jpeg" alt="D-Vlog dataset approval email" width="100%"/>
+</p>
+<p align="center">
+  <em>Maintainer approval and research-use access details for the D-Vlog dataset.</em>
+</p>
+
+### MODMA EEG
+
+[MODMA](https://modma.lzu.edu.cn/data/index/) is the **Multi-modal Open Dataset for Mental-disorder Analysis** maintained by Lanzhou University. According to the [official access page](https://modma.lzu.edu.cn/data/application/), the currently public portions include EEG and speech data from clinically diagnosed depressed participants and matched healthy controls, and access requires registration, signed EULA upload, and administrator approval.
+
+For MindSense, MODMA matters because it can add a **neurophysiological signal path** alongside the current behavioral pipeline. E-DAIC and D-Vlog help us reason about visible and acoustic behavior; MODMA EEG offers a future way to test whether brain-signal features can enrich that picture and support deeper multimodal mental-health analysis without replacing the repo's current benchmarked foundations.
+
+The approved MODMA screenshot below shows access granted for the three EEG subsets currently listed on the portal: `128-channel ERP`, `128-channel resting-state`, and `3-channel resting-state`.
+
+<p align="center">
+  <img src="assets/MODMA.jpeg" alt="MODMA EEG dataset approval status" width="92%"/>
+</p>
+<p align="center">
+  <em>Approval status for the requested MODMA EEG subsets on the official MODMA portal.</em>
+</p>
 
 ---
 
